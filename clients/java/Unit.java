@@ -1,0 +1,103 @@
+import com.sun.jna.Pointer;
+
+///Represents a single unit on the map.
+class Unit extends Mappable
+{
+  public Unit(Pointer p)
+  {
+    super(p);
+  }
+  boolean validify()
+  {
+    if(iteration == BaseAI.iteration) return true;
+    for(int i = 0; i < BaseAI.units.length; i++)
+    {
+      if(BaseAI.units[i].ID == ID)
+      {
+        ptr = BaseAI.units[i].ptr;
+        iteration = BaseAI.iteration;
+        return true;
+      }
+    }
+    throw new ExistentialError();
+  }
+
+    //commands
+
+  ///Make the unit move to the respective x and y location.
+  boolean move(int x, int y)
+  {
+    validify();
+    return (Client.INSTANCE.unitMove(ptr, x, y) == 0) ? false : true;
+  }
+  ///Attack another unit!.
+  boolean attack(int unit)
+  {
+    validify();
+    return (Client.INSTANCE.unitAttack(ptr, unit) == 0) ? false : true;
+  }
+  ///Put dirt in a hole!
+  boolean fill(int tile)
+  {
+    validify();
+    return (Client.INSTANCE.unitFill(ptr, tile) == 0) ? false : true;
+  }
+  ///Build something!
+  boolean build(int tile)
+  {
+    validify();
+    return (Client.INSTANCE.unitBuild(ptr, tile) == 0) ? false : true;
+  }
+
+    //getters
+
+  ///Unique Identifier
+  public int getId()
+  {
+    validify();
+    return Client.INSTANCE.unitGetId(ptr);
+  }
+  ///X position of the object
+  public int getX()
+  {
+    validify();
+    return Client.INSTANCE.unitGetX(ptr);
+  }
+  ///Y position of the object
+  public int getY()
+  {
+    validify();
+    return Client.INSTANCE.unitGetY(ptr);
+  }
+  ///The owner of this unit.
+  public int getOwner()
+  {
+    validify();
+    return Client.INSTANCE.unitGetOwner(ptr);
+  }
+  ///The maximum number of moves this unit can move.
+  public int getType()
+  {
+    validify();
+    return Client.INSTANCE.unitGetType(ptr);
+  }
+  ///The current amount health this unit has remaining.
+  public int getCurHealth()
+  {
+    validify();
+    return Client.INSTANCE.unitGetCurHealth(ptr);
+  }
+  ///The number of moves this unit has remaining.
+  public int getCurMovement()
+  {
+    validify();
+    return Client.INSTANCE.unitGetCurMovement(ptr);
+  }
+  ///The maximum number of moves this unit can move.
+  public int getMaxMovement()
+  {
+    validify();
+    return Client.INSTANCE.unitGetMaxMovement(ptr);
+  }
+
+}

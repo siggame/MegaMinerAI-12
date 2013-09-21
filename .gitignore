@@ -1,0 +1,5 @@
+## PyCharm Stuff
+.idea/
+
+## Python Stuff
+*.pyc
