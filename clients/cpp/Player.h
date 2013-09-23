@@ -21,8 +21,8 @@ class Player {
   float time();
   ///The amount of water a player has.
   int waterStored();
-  ///The speed at which a player can spawn units.
-  int spawnRate();
+  ///Resource used to spawn in units
+  int spawnResources();
 
   // Actions
   ///Allows a player to display messages on the screen

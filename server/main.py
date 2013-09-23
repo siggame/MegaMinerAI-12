@@ -116,6 +116,46 @@ class GameApp(AccountsAppMixin, BaseApp):
   @protocolmethod
   @errorBuffer
   @requireTurn
+  @requireTypes(None, int, int, int)
+  def gameMove(self, unit, x, y):
+    """Make the unit move to the respective x and y location."""
+    if self.game.turn is not self:
+      return "Not your turn."
+    return self.game.move(unit, x, y)
+
+  @protocolmethod
+  @errorBuffer
+  @requireTurn
+  @requireTypes(None, int, int)
+  def gameFill(self, unit, tile):
+    """Put dirt in a hole!"""
+    if self.game.turn is not self:
+      return "Not your turn."
+    return self.game.fill(unit, tile)
+
+  @protocolmethod
+  @errorBuffer
+  @requireTurn
+  @requireTypes(None, int, int)
+  def gameDig(self, unit, tile):
+    """Dig out a tile"""
+    if self.game.turn is not self:
+      return "Not your turn."
+    return self.game.dig(unit, tile)
+
+  @protocolmethod
+  @errorBuffer
+  @requireTurn
+  @requireTypes(None, int, int)
+  def gameAttack(self, unit, target):
+    """Command to attack another Unit."""
+    if self.game.turn is not self:
+      return "Not your turn."
+    return self.game.attack(unit, target)
+
+  @protocolmethod
+  @errorBuffer
+  @requireTurn
   @requireTypes(None, int, str)
   def gameTalk(self, player, message):
     """Allows a player to display messages on the screen"""
@@ -132,46 +172,6 @@ class GameApp(AccountsAppMixin, BaseApp):
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.spawn(tile, type)
-
-  @protocolmethod
-  @errorBuffer
-  @requireTurn
-  @requireTypes(None, int, int, int)
-  def gameMove(self, unit, x, y):
-    """Make the unit move to the respective x and y location."""
-    if self.game.turn is not self:
-      return "Not your turn."
-    return self.game.move(unit, x, y)
-
-  @protocolmethod
-  @errorBuffer
-  @requireTurn
-  @requireTypes(None, int, int)
-  def gameAttack(self, unit, unit):
-    """Attack another unit!."""
-    if self.game.turn is not self:
-      return "Not your turn."
-    return self.game.attack(unit, unit)
-
-  @protocolmethod
-  @errorBuffer
-  @requireTurn
-  @requireTypes(None, int, int)
-  def gameFill(self, unit, tile):
-    """Put dirt in a hole!"""
-    if self.game.turn is not self:
-      return "Not your turn."
-    return self.game.fill(unit, tile)
-
-  @protocolmethod
-  @errorBuffer
-  @requireTurn
-  @requireTypes(None, int, int)
-  def gameBuild(self, unit, tile):
-    """Build something!"""
-    if self.game.turn is not self:
-      return "Not your turn."
-    return self.game.build(unit, tile)
 
 
   @protocolmethod

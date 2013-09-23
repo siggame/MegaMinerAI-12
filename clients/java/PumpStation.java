@@ -1,6 +1,6 @@
 import com.sun.jna.Pointer;
 
-///
+///Represents a base to which you want to lead water, and a spawn location for new units.
 class PumpStation
 {
   Pointer ptr;
@@ -15,11 +15,11 @@ class PumpStation
   boolean validify()
   {
     if(iteration == BaseAI.iteration) return true;
-    for(int i = 0; i < BaseAI.speciesList.length; i++)
+    for(int i = 0; i < BaseAI.pumpStations.length; i++)
     {
-      if(BaseAI.speciesList[i].ID == ID)
+      if(BaseAI.pumpStations[i].ID == ID)
       {
-        ptr = BaseAI.speciesList[i].ptr;
+        ptr = BaseAI.pumpStations[i].ptr;
         iteration = BaseAI.iteration;
         return true;
       }
@@ -51,10 +51,10 @@ class PumpStation
     return Client.INSTANCE.pumpStationGetWaterAmount(ptr);
   }
   ///The length of time it takes to capture the PumpStation.
-  public int getSeigeCount()
+  public int getSiegeCount()
   {
     validify();
-    return Client.INSTANCE.pumpStationGetSeigeCount(ptr);
+    return Client.INSTANCE.pumpStationGetSiegeCount(ptr);
   }
 
 }

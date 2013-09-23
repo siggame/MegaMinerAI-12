@@ -8,11 +8,11 @@
 #include <ctime>
 #include "game.h"
 
-#include "PumpStation.h"
 #include "Mappable.h"
+#include "Unit.h"
 #include "Player.h"
 #include "Tile.h"
-#include "Unit.h"
+#include "PumpStation.h"
 
 namespace client
 {
@@ -26,11 +26,11 @@ class BaseAI
 {
 protected:
   Connection* c;
-  std::vector<PumpStation> speciesList;
   std::vector<Mappable> mappables;
+  std::vector<Unit> units;
   std::vector<Player> players;
   std::vector<Tile> tiles;
-  std::vector<Unit> units;
+  std::vector<PumpStation> pumpStations;
 public:
   ///The maximum amount of health a unit will have.
   int maxHealth();
@@ -42,12 +42,14 @@ public:
   int turnNumber();
   ///The amount of damage a unit will deal.
   int attackDamage();
-  ///The count of offense.
+  ///How quickly a unit will siege a base.
   int offenseCount();
-  ///The count of defense.
+  ///The much a unit will slow a  siege.
   int defenseCount();
   ///The maximum number of units allowed per player.
   int maxUnits();
+  ///THe cost of spawning in a new unit
+  int unitCost();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

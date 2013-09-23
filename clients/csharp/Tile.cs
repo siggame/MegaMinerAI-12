@@ -99,13 +99,13 @@ public class Tile: Mappable
     }
   }
 
-  ///The owner of a reservoir.
-  public int ResId
+  ///Determines if this tile is a part of a Pump Station.
+  public int PumpID
   {
     get
     {
       validify();
-      int value = Client.tileGetResId(ptr);
+      int value = Client.tileGetPumpID(ptr);
       return value;
     }
   }

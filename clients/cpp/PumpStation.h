@@ -7,6 +7,7 @@
 #include "structures.h"
 
 
+///Represents a base to which you want to lead water, and a spawn location for new units.
 class PumpStation {
   public:
   void* ptr;
@@ -20,7 +21,7 @@ class PumpStation {
   ///The amount of water the PumpStation pumps.
   int waterAmount();
   ///The length of time it takes to capture the PumpStation.
-  int seigeCount();
+  int siegeCount();
 
   // Actions
 
