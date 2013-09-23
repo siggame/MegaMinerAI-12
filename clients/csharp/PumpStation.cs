@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 
 
-///
+///Represents a base to which you want to lead water, and a spawn location for new units.
 public class PumpStation
 {
   public IntPtr ptr;
@@ -23,11 +23,11 @@ public class PumpStation
   public bool validify()
   {
     if(iteration == BaseAI.iteration) return true;
-    for(int i = 0; i < BaseAI.speciesList.Length; i++)
+    for(int i = 0; i < BaseAI.pumpStations.Length; i++)
     {
-      if(BaseAI.speciesList[i].ID == ID)
+      if(BaseAI.pumpStations[i].ID == ID)
       {
-        ptr = BaseAI.speciesList[i].ptr;
+        ptr = BaseAI.pumpStations[i].ptr;
         iteration = BaseAI.iteration;
         return true;
       }
@@ -75,12 +75,12 @@ public class PumpStation
   }
 
   ///The length of time it takes to capture the PumpStation.
-  public int SeigeCount
+  public int SiegeCount
   {
     get
     {
       validify();
-      int value = Client.pumpStationGetSeigeCount(ptr);
+      int value = Client.pumpStationGetSiegeCount(ptr);
       return value;
     }
   }

@@ -3,6 +3,8 @@
 #include "Unit.h"
 #include "game.h"
 
+#include "Tile.h"
+#include "Unit.h"
 
 namespace client
 {
@@ -42,6 +44,11 @@ int Unit::curHealth()
   return ((_Unit*)ptr)->curHealth;
 }
 
+int Unit::maxHealth()
+{
+  return ((_Unit*)ptr)->maxHealth;
+}
+
 int Unit::curMovement()
 {
   return ((_Unit*)ptr)->curMovement;
@@ -58,19 +65,19 @@ int Unit::move(int x, int y)
   return unitMove( (_Unit*)ptr, x, y);
 }
 
-int Unit::attack(int unit)
+int Unit::fill(Tile& tile)
 {
-  return unitAttack( (_Unit*)ptr, unit);
+  return unitFill( (_Unit*)ptr, (_Tile*) tile.ptr);
 }
 
-int Unit::fill(int tile)
+int Unit::dig(Tile& tile)
 {
-  return unitFill( (_Unit*)ptr, tile);
+  return unitDig( (_Unit*)ptr, (_Tile*) tile.ptr);
 }
 
-int Unit::build(int tile)
+int Unit::attack(Unit& target)
 {
-  return unitBuild( (_Unit*)ptr, tile);
+  return unitAttack( (_Unit*)ptr, (_Unit*) target.ptr);
 }
 
 
@@ -83,6 +90,7 @@ std::ostream& operator<<(std::ostream& stream,Unit ob)
   stream << "owner: " << ((_Unit*)ob.ptr)->owner  <<'\n';
   stream << "type: " << ((_Unit*)ob.ptr)->type  <<'\n';
   stream << "curHealth: " << ((_Unit*)ob.ptr)->curHealth  <<'\n';
+  stream << "maxHealth: " << ((_Unit*)ob.ptr)->maxHealth  <<'\n';
   stream << "curMovement: " << ((_Unit*)ob.ptr)->curMovement  <<'\n';
   stream << "maxMovement: " << ((_Unit*)ob.ptr)->maxMovement  <<'\n';
   return stream;

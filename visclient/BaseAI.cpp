@@ -40,25 +40,29 @@ int BaseAI::maxUnits()
 {
   return getMaxUnits(c);
 }
+int BaseAI::unitCost()
+{
+  return getUnitCost(c);
+}
 
 bool BaseAI::startTurn()
 {
   static bool initialized = false;
   int count = 0;
-  count = getPumpStationCount(c);
-  speciesList.clear();
-  speciesList.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    speciesList[i] = PumpStation(getPumpStation(c, i));
-  }
-
   count = getMappableCount(c);
   mappables.clear();
   mappables.resize(count);
   for(int i = 0; i < count; i++)
   {
     mappables[i] = Mappable(getMappable(c, i));
+  }
+
+  count = getUnitCount(c);
+  units.clear();
+  units.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    units[i] = Unit(getUnit(c, i));
   }
 
   count = getPlayerCount(c);
@@ -77,12 +81,12 @@ bool BaseAI::startTurn()
     tiles[i] = Tile(getTile(c, i));
   }
 
-  count = getUnitCount(c);
-  units.clear();
-  units.resize(count);
+  count = getPumpStationCount(c);
+  pumpStations.clear();
+  pumpStations.resize(count);
   for(int i = 0; i < count; i++)
   {
-    units[i] = Unit(getUnit(c, i));
+    pumpStations[i] = PumpStation(getPumpStation(c, i));
   }
 
   if(!initialized)

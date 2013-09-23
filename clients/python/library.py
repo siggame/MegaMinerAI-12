@@ -41,23 +41,23 @@ library.networkLoop.restype = c_int
 library.networkLoop.argtypes = [c_void_p]
 
 #Functions
+library.unitMove.restype = c_int
+library.unitMove.argtypes = [c_void_p, c_int, c_int]
+
+library.unitFill.restype = c_int
+library.unitFill.argtypes = [c_void_p, c_void_p]
+
+library.unitDig.restype = c_int
+library.unitDig.argtypes = [c_void_p, c_void_p]
+
+library.unitAttack.restype = c_int
+library.unitAttack.argtypes = [c_void_p, c_void_p]
+
 library.playerTalk.restype = c_int
 library.playerTalk.argtypes = [c_void_p, c_char_p]
 
 library.tileSpawn.restype = c_int
 library.tileSpawn.argtypes = [c_void_p, c_int]
-
-library.unitMove.restype = c_int
-library.unitMove.argtypes = [c_void_p, c_int, c_int]
-
-library.unitAttack.restype = c_int
-library.unitAttack.argtypes = [c_void_p, c_int]
-
-library.unitFill.restype = c_int
-library.unitFill.argtypes = [c_void_p, c_int]
-
-library.unitBuild.restype = c_int
-library.unitBuild.argtypes = [c_void_p, c_int]
 
 # accessors
 
@@ -86,17 +86,20 @@ library.getDefenseCount.argtypes = [c_void_p]
 library.getMaxUnits.restype = c_int
 library.getMaxUnits.argtypes = [c_void_p]
 
-library.getPumpStation.restype = c_void_p
-library.getPumpStation.argtypes = [c_void_p, c_int]
-
-library.getPumpStationCount.restype = c_int
-library.getPumpStationCount.argtypes = [c_void_p]
+library.getUnitCost.restype = c_int
+library.getUnitCost.argtypes = [c_void_p]
 
 library.getMappable.restype = c_void_p
 library.getMappable.argtypes = [c_void_p, c_int]
 
 library.getMappableCount.restype = c_int
 library.getMappableCount.argtypes = [c_void_p]
+
+library.getUnit.restype = c_void_p
+library.getUnit.argtypes = [c_void_p, c_int]
+
+library.getUnitCount.restype = c_int
+library.getUnitCount.argtypes = [c_void_p]
 
 library.getPlayer.restype = c_void_p
 library.getPlayer.argtypes = [c_void_p, c_int]
@@ -110,27 +113,15 @@ library.getTile.argtypes = [c_void_p, c_int]
 library.getTileCount.restype = c_int
 library.getTileCount.argtypes = [c_void_p]
 
-library.getUnit.restype = c_void_p
-library.getUnit.argtypes = [c_void_p, c_int]
+library.getPumpStation.restype = c_void_p
+library.getPumpStation.argtypes = [c_void_p, c_int]
 
-library.getUnitCount.restype = c_int
-library.getUnitCount.argtypes = [c_void_p]
+library.getPumpStationCount.restype = c_int
+library.getPumpStationCount.argtypes = [c_void_p]
 
 # getters
 
 #Data
-library.pumpStationGetId.restype = c_int
-library.pumpStationGetId.argtypes = [c_void_p]
-
-library.pumpStationGetOwner.restype = c_int
-library.pumpStationGetOwner.argtypes = [c_void_p]
-
-library.pumpStationGetWaterAmount.restype = c_int
-library.pumpStationGetWaterAmount.argtypes = [c_void_p]
-
-library.pumpStationGetSeigeCount.restype = c_int
-library.pumpStationGetSeigeCount.argtypes = [c_void_p]
-
 library.mappableGetId.restype = c_int
 library.mappableGetId.argtypes = [c_void_p]
 
@@ -139,45 +130,6 @@ library.mappableGetX.argtypes = [c_void_p]
 
 library.mappableGetY.restype = c_int
 library.mappableGetY.argtypes = [c_void_p]
-
-library.playerGetId.restype = c_int
-library.playerGetId.argtypes = [c_void_p]
-
-library.playerGetPlayerName.restype = c_char_p
-library.playerGetPlayerName.argtypes = [c_void_p]
-
-library.playerGetTime.restype = c_float
-library.playerGetTime.argtypes = [c_void_p]
-
-library.playerGetWaterStored.restype = c_int
-library.playerGetWaterStored.argtypes = [c_void_p]
-
-library.playerGetSpawnRate.restype = c_int
-library.playerGetSpawnRate.argtypes = [c_void_p]
-
-library.tileGetId.restype = c_int
-library.tileGetId.argtypes = [c_void_p]
-
-library.tileGetX.restype = c_int
-library.tileGetX.argtypes = [c_void_p]
-
-library.tileGetY.restype = c_int
-library.tileGetY.argtypes = [c_void_p]
-
-library.tileGetOwner.restype = c_int
-library.tileGetOwner.argtypes = [c_void_p]
-
-library.tileGetType.restype = c_int
-library.tileGetType.argtypes = [c_void_p]
-
-library.tileGetResId.restype = c_int
-library.tileGetResId.argtypes = [c_void_p]
-
-library.tileGetWaterAmount.restype = c_int
-library.tileGetWaterAmount.argtypes = [c_void_p]
-
-library.tileGetIsTrench.restype = c_int
-library.tileGetIsTrench.argtypes = [c_void_p]
 
 library.unitGetId.restype = c_int
 library.unitGetId.argtypes = [c_void_p]
@@ -197,11 +149,65 @@ library.unitGetType.argtypes = [c_void_p]
 library.unitGetCurHealth.restype = c_int
 library.unitGetCurHealth.argtypes = [c_void_p]
 
+library.unitGetMaxHealth.restype = c_int
+library.unitGetMaxHealth.argtypes = [c_void_p]
+
 library.unitGetCurMovement.restype = c_int
 library.unitGetCurMovement.argtypes = [c_void_p]
 
 library.unitGetMaxMovement.restype = c_int
 library.unitGetMaxMovement.argtypes = [c_void_p]
+
+library.playerGetId.restype = c_int
+library.playerGetId.argtypes = [c_void_p]
+
+library.playerGetPlayerName.restype = c_char_p
+library.playerGetPlayerName.argtypes = [c_void_p]
+
+library.playerGetTime.restype = c_float
+library.playerGetTime.argtypes = [c_void_p]
+
+library.playerGetWaterStored.restype = c_int
+library.playerGetWaterStored.argtypes = [c_void_p]
+
+library.playerGetSpawnResources.restype = c_int
+library.playerGetSpawnResources.argtypes = [c_void_p]
+
+library.tileGetId.restype = c_int
+library.tileGetId.argtypes = [c_void_p]
+
+library.tileGetX.restype = c_int
+library.tileGetX.argtypes = [c_void_p]
+
+library.tileGetY.restype = c_int
+library.tileGetY.argtypes = [c_void_p]
+
+library.tileGetOwner.restype = c_int
+library.tileGetOwner.argtypes = [c_void_p]
+
+library.tileGetType.restype = c_int
+library.tileGetType.argtypes = [c_void_p]
+
+library.tileGetPumpID.restype = c_int
+library.tileGetPumpID.argtypes = [c_void_p]
+
+library.tileGetWaterAmount.restype = c_int
+library.tileGetWaterAmount.argtypes = [c_void_p]
+
+library.tileGetIsTrench.restype = c_int
+library.tileGetIsTrench.argtypes = [c_void_p]
+
+library.pumpStationGetId.restype = c_int
+library.pumpStationGetId.argtypes = [c_void_p]
+
+library.pumpStationGetOwner.restype = c_int
+library.pumpStationGetOwner.argtypes = [c_void_p]
+
+library.pumpStationGetWaterAmount.restype = c_int
+library.pumpStationGetWaterAmount.argtypes = [c_void_p]
+
+library.pumpStationGetSiegeCount.restype = c_int
+library.pumpStationGetSiegeCount.argtypes = [c_void_p]
 
 
 #Properties

@@ -8,48 +8,19 @@ namespace client
 {
 
 struct Connection;
-struct _PumpStation;
 struct _Mappable;
+struct _Unit;
 struct _Player;
 struct _Tile;
-struct _Unit;
+struct _PumpStation;
 
 
-struct _PumpStation
-{
-  Connection* _c;
-  int id;
-  int owner;
-  int waterAmount;
-  int seigeCount;
-};
 struct _Mappable
 {
   Connection* _c;
   int id;
   int x;
   int y;
-};
-struct _Player
-{
-  Connection* _c;
-  int id;
-  char* playerName;
-  float time;
-  int waterStored;
-  int spawnRate;
-};
-struct _Tile
-{
-  Connection* _c;
-  int id;
-  int x;
-  int y;
-  int owner;
-  int type;
-  int resId;
-  int waterAmount;
-  int isTrench;
 };
 struct _Unit
 {
@@ -60,8 +31,38 @@ struct _Unit
   int owner;
   int type;
   int curHealth;
+  int maxHealth;
   int curMovement;
   int maxMovement;
+};
+struct _Player
+{
+  Connection* _c;
+  int id;
+  char* playerName;
+  float time;
+  int waterStored;
+  int spawnResources;
+};
+struct _Tile
+{
+  Connection* _c;
+  int id;
+  int x;
+  int y;
+  int owner;
+  int type;
+  int pumpID;
+  int waterAmount;
+  int isTrench;
+};
+struct _PumpStation
+{
+  Connection* _c;
+  int id;
+  int owner;
+  int waterAmount;
+  int siegeCount;
 };
 
 }

@@ -62,11 +62,11 @@ class Player
     validify();
     return Client.INSTANCE.playerGetWaterStored(ptr);
   }
-  ///The speed at which a player can spawn units.
-  public int getSpawnRate()
+  ///Resource used to spawn in units
+  public int getSpawnResources()
   {
     validify();
-    return Client.INSTANCE.playerGetSpawnRate(ptr);
+    return Client.INSTANCE.playerGetSpawnResources(ptr);
   }
 
 }

@@ -91,13 +91,13 @@ public class Player
     }
   }
 
-  ///The speed at which a player can spawn units.
-  public int SpawnRate
+  ///Resource used to spawn in units
+  public int SpawnResources
   {
     get
     {
       validify();
-      int value = Client.playerGetSpawnRate(ptr);
+      int value = Client.playerGetSpawnResources(ptr);
       return value;
     }
   }

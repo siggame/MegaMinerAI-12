@@ -30,23 +30,26 @@ class Unit extends Mappable
     validify();
     return (Client.INSTANCE.unitMove(ptr, x, y) == 0) ? false : true;
   }
-  ///Attack another unit!.
-  boolean attack(int unit)
-  {
-    validify();
-    return (Client.INSTANCE.unitAttack(ptr, unit) == 0) ? false : true;
-  }
   ///Put dirt in a hole!
-  boolean fill(int tile)
+  boolean fill(Tile tile)
   {
     validify();
-    return (Client.INSTANCE.unitFill(ptr, tile) == 0) ? false : true;
+    tile.validify();
+    return (Client.INSTANCE.unitFill(ptr, tile.ptr) == 0) ? false : true;
   }
-  ///Build something!
-  boolean build(int tile)
+  ///Dig out a tile
+  boolean dig(Tile tile)
   {
     validify();
-    return (Client.INSTANCE.unitBuild(ptr, tile) == 0) ? false : true;
+    tile.validify();
+    return (Client.INSTANCE.unitDig(ptr, tile.ptr) == 0) ? false : true;
+  }
+  ///Command to attack another Unit.
+  boolean attack(Unit target)
+  {
+    validify();
+    target.validify();
+    return (Client.INSTANCE.unitAttack(ptr, target.ptr) == 0) ? false : true;
   }
 
     //getters
@@ -75,7 +78,7 @@ class Unit extends Mappable
     validify();
     return Client.INSTANCE.unitGetOwner(ptr);
   }
-  ///The maximum number of moves this unit can move.
+  ///The type of this unit (digger/filler).
   public int getType()
   {
     validify();
@@ -86,6 +89,12 @@ class Unit extends Mappable
   {
     validify();
     return Client.INSTANCE.unitGetCurHealth(ptr);
+  }
+  ///The maximum amount of this health this unit can have
+  public int getMaxHealth()
+  {
+    validify();
+    return Client.INSTANCE.unitGetMaxHealth(ptr);
   }
   ///The number of moves this unit has remaining.
   public int getCurMovement()

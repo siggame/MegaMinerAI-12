@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
-  public static PumpStation[] speciesList;
   public static Mappable[] mappables;
+  public static Unit[] units;
   public static Player[] players;
   public static Tile[] tiles;
-  public static Unit[] units;
+  public static PumpStation[] pumpStations;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -46,17 +46,17 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
-    count = Client.getPumpStationCount(connection);
-    speciesList = new PumpStation[count];
-    for(int i = 0; i < count; i++)
-    {
-      speciesList[i] = new PumpStation(Client.getPumpStation(connection, i));
-    }
     count = Client.getMappableCount(connection);
     mappables = new Mappable[count];
     for(int i = 0; i < count; i++)
     {
       mappables[i] = new Mappable(Client.getMappable(connection, i));
+    }
+    count = Client.getUnitCount(connection);
+    units = new Unit[count];
+    for(int i = 0; i < count; i++)
+    {
+      units[i] = new Unit(Client.getUnit(connection, i));
     }
     count = Client.getPlayerCount(connection);
     players = new Player[count];
@@ -70,11 +70,11 @@ public abstract class BaseAI
     {
       tiles[i] = new Tile(Client.getTile(connection, i));
     }
-    count = Client.getUnitCount(connection);
-    units = new Unit[count];
+    count = Client.getPumpStationCount(connection);
+    pumpStations = new PumpStation[count];
     for(int i = 0; i < count; i++)
     {
-      units[i] = new Unit(Client.getUnit(connection, i));
+      pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
     }
 
     if(!initialized)
@@ -116,13 +116,13 @@ public abstract class BaseAI
     int value = Client.getAttackDamage(connection);
     return value;
   }
-  ///The count of offense.
+  ///How quickly a unit will siege a base.
   public int offenseCount()
   {
     int value = Client.getOffenseCount(connection);
     return value;
   }
-  ///The count of defense.
+  ///The much a unit will slow a  siege.
   public int defenseCount()
   {
     int value = Client.getDefenseCount(connection);
@@ -132,6 +132,12 @@ public abstract class BaseAI
   public int maxUnits()
   {
     int value = Client.getMaxUnits(connection);
+    return value;
+  }
+  ///THe cost of spawning in a new unit
+  public int unitCost()
+  {
+    int value = Client.getUnitCost(connection);
     return value;
   }
 }

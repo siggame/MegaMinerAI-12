@@ -40,23 +40,26 @@ public class Unit: Mappable
     validify();
     return (Client.unitMove(ptr, x, y) == 0) ? false : true;
   }
-  ///Attack another unit!.
-  public bool attack(int unit)
-  {
-    validify();
-    return (Client.unitAttack(ptr, unit) == 0) ? false : true;
-  }
   ///Put dirt in a hole!
-  public bool fill(int tile)
+  public bool fill(Tile tile)
   {
     validify();
-    return (Client.unitFill(ptr, tile) == 0) ? false : true;
+    tile.validify();
+    return (Client.unitFill(ptr, tile.ptr) == 0) ? false : true;
   }
-  ///Build something!
-  public bool build(int tile)
+  ///Dig out a tile
+  public bool dig(Tile tile)
   {
     validify();
-    return (Client.unitBuild(ptr, tile) == 0) ? false : true;
+    tile.validify();
+    return (Client.unitDig(ptr, tile.ptr) == 0) ? false : true;
+  }
+  ///Command to attack another Unit.
+  public bool attack(Unit target)
+  {
+    validify();
+    target.validify();
+    return (Client.unitAttack(ptr, target.ptr) == 0) ? false : true;
   }
 
     //getters
@@ -106,7 +109,7 @@ public class Unit: Mappable
     }
   }
 
-  ///The maximum number of moves this unit can move.
+  ///The type of this unit (digger/filler).
   public int Type
   {
     get
@@ -124,6 +127,17 @@ public class Unit: Mappable
     {
       validify();
       int value = Client.unitGetCurHealth(ptr);
+      return value;
+    }
+  }
+
+  ///The maximum amount of this health this unit can have
+  public int MaxHealth
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetMaxHealth(ptr);
       return value;
     }
   }

@@ -7,6 +7,8 @@
 #include "structures.h"
 
 #include "Mappable.h"
+class Tile;
+class Unit;
 
 ///Represents a single unit on the map.
 class Unit : public Mappable {
@@ -22,10 +24,12 @@ class Unit : public Mappable {
   int y();
   ///The owner of this unit.
   int owner();
-  ///The maximum number of moves this unit can move.
+  ///The type of this unit (digger/filler).
   int type();
   ///The current amount health this unit has remaining.
   int curHealth();
+  ///The maximum amount of this health this unit can have
+  int maxHealth();
   ///The number of moves this unit has remaining.
   int curMovement();
   ///The maximum number of moves this unit can move.
@@ -34,12 +38,12 @@ class Unit : public Mappable {
   // Actions
   ///Make the unit move to the respective x and y location.
   bool move(int x, int y);
-  ///Attack another unit!.
-  bool attack(int unit);
   ///Put dirt in a hole!
-  bool fill(int tile);
-  ///Build something!
-  bool build(int tile);
+  bool fill(Tile& tile);
+  ///Dig out a tile
+  bool dig(Tile& tile);
+  ///Command to attack another Unit.
+  bool attack(Unit& target);
 
   // Properties
 
