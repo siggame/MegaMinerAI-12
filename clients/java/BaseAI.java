@@ -7,11 +7,11 @@ import com.sun.jna.Pointer;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
-  static PumpStation[] speciesList;
   static Mappable[] mappables;
+  static Unit[] units;
   static Player[] players;
   static Tile[] tiles;
-  static Unit[] units;
+  static PumpStation[] pumpStations;
   Pointer connection;
   static int iteration;
   boolean initialized;
@@ -45,17 +45,17 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
-    count = Client.INSTANCE.getPumpStationCount(connection);
-    speciesList = new PumpStation[count];
-    for(int i = 0; i < count; i++)
-    {
-      speciesList[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
-    }
     count = Client.INSTANCE.getMappableCount(connection);
     mappables = new Mappable[count];
     for(int i = 0; i < count; i++)
     {
       mappables[i] = new Mappable(Client.INSTANCE.getMappable(connection, i));
+    }
+    count = Client.INSTANCE.getUnitCount(connection);
+    units = new Unit[count];
+    for(int i = 0; i < count; i++)
+    {
+      units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
     }
     count = Client.INSTANCE.getPlayerCount(connection);
     players = new Player[count];
@@ -69,11 +69,11 @@ public abstract class BaseAI
     {
       tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
     }
-    count = Client.INSTANCE.getUnitCount(connection);
-    units = new Unit[count];
+    count = Client.INSTANCE.getPumpStationCount(connection);
+    pumpStations = new PumpStation[count];
     for(int i = 0; i < count; i++)
     {
-      units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
+      pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
     }
 
     if(!initialized)
@@ -110,12 +110,12 @@ public abstract class BaseAI
   {
     return Client.INSTANCE.getAttackDamage(connection);
   }
-  ///The count of offense.
+  ///How quickly a unit will siege a base.
   int offenseCount()
   {
     return Client.INSTANCE.getOffenseCount(connection);
   }
-  ///The count of defense.
+  ///The much a unit will slow a  siege.
   int defenseCount()
   {
     return Client.INSTANCE.getDefenseCount(connection);
@@ -124,5 +124,10 @@ public abstract class BaseAI
   int maxUnits()
   {
     return Client.INSTANCE.getMaxUnits(connection);
+  }
+  ///THe cost of spawning in a new unit
+  int unitCost()
+  {
+    return Client.INSTANCE.getUnitCost(connection);
   }
 }

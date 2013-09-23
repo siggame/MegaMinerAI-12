@@ -63,11 +63,11 @@ class Tile extends Mappable
     validify();
     return Client.INSTANCE.tileGetType(ptr);
   }
-  ///The owner of a reservoir.
-  public int getResId()
+  ///Determines if this tile is a part of a Pump Station.
+  public int getPumpID()
   {
     validify();
-    return Client.INSTANCE.tileGetResId(ptr);
+    return Client.INSTANCE.tileGetPumpID(ptr);
   }
   ///The amount of water contained on the tile.
   public int getWaterAmount()

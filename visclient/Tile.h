@@ -28,8 +28,8 @@ class Tile : public Mappable {
   int owner();
   ///The type of tile this tile represents.
   int type();
-  ///The owner of a reservoir.
-  int resId();
+  ///Determines if this tile is a part of a Pump Station.
+  int pumpID();
   ///The amount of water contained on the tile.
   int waterAmount();
   ///Whether the tile is a trench or not.

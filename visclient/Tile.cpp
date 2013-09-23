@@ -37,9 +37,9 @@ int Tile::type()
   return ((_Tile*)ptr)->type;
 }
 
-int Tile::resId()
+int Tile::pumpID()
 {
-  return ((_Tile*)ptr)->resId;
+  return ((_Tile*)ptr)->pumpID;
 }
 
 int Tile::waterAmount()
@@ -67,7 +67,7 @@ std::ostream& operator<<(std::ostream& stream,Tile ob)
   stream << "y: " << ((_Tile*)ob.ptr)->y  <<'\n';
   stream << "owner: " << ((_Tile*)ob.ptr)->owner  <<'\n';
   stream << "type: " << ((_Tile*)ob.ptr)->type  <<'\n';
-  stream << "resId: " << ((_Tile*)ob.ptr)->resId  <<'\n';
+  stream << "pumpID: " << ((_Tile*)ob.ptr)->pumpID  <<'\n';
   stream << "waterAmount: " << ((_Tile*)ob.ptr)->waterAmount  <<'\n';
   stream << "isTrench: " << ((_Tile*)ob.ptr)->isTrench  <<'\n';
   return stream;
