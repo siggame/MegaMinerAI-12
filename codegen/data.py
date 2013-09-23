@@ -8,9 +8,21 @@ gameName = "Mars"
 constants = [
   ]
 
+globals = [
+  Variable('maxHealth', int, 'The maximum amount of health a unit will have.'),
+  Variable('trenchDamage', int, 'The amount of damage walking over a trench.'),
+  Variable('waterDamage', int, 'The amount of damage walking over water.'),
+  Variable('turnNumber', int, 'The current turn number.'),
+  Variable('attackDamage', int, 'The amount of damage a unit will deal.'),
+  Variable('offenseCount', int, 'How quickly a unit will siege a base.'),
+  Variable('defenseCount', int, 'The much a unit will slow a  siege.'),
+  Variable('maxUnits', int, 'The maximum number of units allowed per player.'),
+  Variable('unitCost', int, 'THe cost of spawning in a new unit'),
+]
+
 playerData = [
   Variable('waterStored', int, 'The amount of water a player has.'),
-  Variable('spawnRate', int, 'The speed at which a player can spawn units.'),
+  Variable('spawnResources', int, 'Resource used to spawn in units'),
   ]
 
 playerFunctions = [
@@ -25,46 +37,13 @@ Mappable = Model('Mappable',
   doc='A mappable object!',
 )
 
-globals = [
-  Variable('maxHealth', int, 'The maximum amount of health a unit will have.'),
-  Variable('trenchDamage', int, 'The amount of damage walking over a trench.'),
-  Variable('waterDamage', int, 'The amount of damage walking over water.'),
-  Variable('turnNumber', int, 'The current turn number.'),
-  Variable('attackDamage', int, 'The amount of damage a unit will deal.'),
-  Variable('offenseCount', int, 'The count of offense.'),
-  Variable('defenseCount', int, 'The count of defense.'),
-  Variable('maxUnits', int, 'The maximum number of units allowed per player.'),
-]
-#UNIT
-Unit = Model('Unit',
-  parent = Mappable,
-  data = [
-    Variable('owner', int, 'The owner of this unit.'),
-    Variable('type', int, 'The maximum number of moves this unit can move.'),
-    Variable('curHealth', int, 'The current amount health this unit has remaining.'),
-    Variable('curMovement', int, 'The number of moves this unit has remaining.'),
-    Variable('maxMovement', int, 'The maximum number of moves this unit can move.'),
-
-    ],
-  doc='Represents a single unit on the map.',
-    functions=[
-    Function('move',[Variable('x', int), Variable('y', int)],
-    doc='Make the unit move to the respective x and y location.'),
-    Function('attack',[Variable('unit', int)],
-    doc='Attack another unit!.'),
-    Function('fill',[Variable('tile', int)],
-    doc='Put dirt in a hole!'),
-    Function('build',[Variable('tile', int)],
-    doc='Build something!'),
-    ],
-  )
 #TILE
 Tile = Model('Tile',
   parent = Mappable,
   data = [
     Variable('owner', int, 'The owner of the tile.'),
     Variable('type', int, 'The type of tile this tile represents.'),
-    Variable('resId', int, 'The owner of a reservoir.'),
+    Variable('pumpID', int, 'Determines if this tile is a part of a Pump Station.'),
     Variable('waterAmount', int, 'The amount of water contained on the tile.'),
     Variable('isTrench', int, 'Whether the tile is a trench or not.'),
     ],
@@ -76,15 +55,42 @@ Tile = Model('Tile',
   permanent = True,
   )
 
+#UNIT
+Unit = Model('Unit',
+  parent = Mappable,
+  data = [
+    Variable('owner', int, 'The owner of this unit.'),
+    Variable('type', int, 'The type of this unit (digger/filler).'),
+    Variable('curHealth', int, 'The current amount health this unit has remaining.'),
+    Variable('maxHealth', int, 'The maximum amount of this health this unit can have'),
+    Variable('curMovement', int, 'The number of moves this unit has remaining.'),
+    Variable('maxMovement', int, 'The maximum number of moves this unit can move.'),
+
+    ],
+  doc='Represents a single unit on the map.',
+    functions=[
+    Function('move',[Variable('x', int), Variable('y', int)],
+    doc='Make the unit move to the respective x and y location.'),
+    Function('fill',[Variable('tile', Tile)],
+    doc='Put dirt in a hole!'),
+    Function('dig',[Variable('tile', Tile)],
+    doc='Dig out a tile'),
+    ],
+  )
+
+Unit.addFunctions([Function("attack", [ Variable("target", Unit)],
+    doc='Command to attack another Unit.')])
+
+
 PumpStation = Model('PumpStation',
   data = [
     Variable('owner', int, 'The owner of the PumpStation.'),
     Variable('waterAmount', int, 'The amount of water the PumpStation pumps.'),
-    Variable('seigeCount', int, 'The length of time it takes to capture the PumpStation.'),
+    Variable('siegeCount', int, 'The length of time it takes to capture the PumpStation.'),
     ],
-  functions=[],
-  doc='',
-  plural='SpeciesList',
+  functions=[
+  ],
+  doc='Represents a base to which you want to lead water, and a spawn location for new units.',
   permanent = True,
   )
 
@@ -98,4 +104,38 @@ move = Animation('move',
   ],
   )
 
+dig = Animation('dig',
+  data=[
+    Variable('actingID', int),
+    Variable('tileID', int),
+  ],
+  )
 
+fill = Animation('fill',
+  data=[
+    Variable('actingID', int),
+    Variable('tileID', int),
+  ],
+  )
+
+attack = Animation('attack',
+  data=[
+    Variable('actingID', int),
+    Variable('targetID', int)
+  ],
+  )
+
+flow = Animation('flow',
+  data=[
+    Variable('sourceID', int),
+    Variable('destID', int),
+    Variable('waterAmount', int),
+  ],
+  )
+
+spawn = Animation('spawn',
+  data=[
+    Variable('sourceID', int),
+    Variable('unitID', int),
+  ],
+  )
