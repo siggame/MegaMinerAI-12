@@ -35,7 +35,7 @@ class Match(DefaultGameWorld):
     self.waterDamage = self.waterDamage
     self.turnNumber = -1
     self.attackDamage = self.attackDamage
-    self.offenseCount = self.offen
+    self.offenseCount = self.offenseCount
     self.defenseCount = self.defenseCount
     self.maxUnits = self.maxUnits
     self.unitCost = self.unitCost
