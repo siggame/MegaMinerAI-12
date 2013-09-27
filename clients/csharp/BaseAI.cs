@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 public abstract class BaseAI
 {
   public static Mappable[] mappables;
+  public static Tile[] tiles;
   public static Unit[] units;
   public static Player[] players;
-  public static Tile[] tiles;
   public static PumpStation[] pumpStations;
   IntPtr connection;
   public static int iteration;
@@ -52,6 +52,12 @@ public abstract class BaseAI
     {
       mappables[i] = new Mappable(Client.getMappable(connection, i));
     }
+    count = Client.getTileCount(connection);
+    tiles = new Tile[count];
+    for(int i = 0; i < count; i++)
+    {
+      tiles[i] = new Tile(Client.getTile(connection, i));
+    }
     count = Client.getUnitCount(connection);
     units = new Unit[count];
     for(int i = 0; i < count; i++)
@@ -63,12 +69,6 @@ public abstract class BaseAI
     for(int i = 0; i < count; i++)
     {
       players[i] = new Player(Client.getPlayer(connection, i));
-    }
-    count = Client.getTileCount(connection);
-    tiles = new Tile[count];
-    for(int i = 0; i < count; i++)
-    {
-      tiles[i] = new Tile(Client.getTile(connection, i));
     }
     count = Client.getPumpStationCount(connection);
     pumpStations = new PumpStation[count];
@@ -134,10 +134,16 @@ public abstract class BaseAI
     int value = Client.getMaxUnits(connection);
     return value;
   }
-  ///THe cost of spawning in a new unit
+  ///The cost of spawning in a new unit
   public int unitCost()
   {
     int value = Client.getUnitCost(connection);
+    return value;
+  }
+  ///The id of the current player.
+  public int playerID()
+  {
+    int value = Client.getPlayerID(connection);
     return value;
   }
 }
