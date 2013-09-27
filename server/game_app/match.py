@@ -30,15 +30,15 @@ class Match(DefaultGameWorld):
     self.addPlayer(self.scribe, "spectator")
 
     #TODO: INITIALIZE THESE!
-    self.maxHealth = None
-    self.trenchDamage = None
-    self.waterDamage = None
-    self.turnNumber = None
-    self.attackDamage = None
-    self.offenseCount = None
-    self.defenseCount = None
-    self.maxUnits = None
-    self.unitCost = None
+    self.maxHealth = self.maxHealth
+    self.trenchDamage = self.trenchDamage
+    self.waterDamage = self.waterDamage
+    self.turnNumber = -1
+    self.attackDamage = self.attackDamage
+    self.offenseCount = self.offen
+    self.defenseCount = self.defenseCount
+    self.maxUnits = self.maxUnits
+    self.unitCost = self.unitCost
 
   #this is here to be wrapped
   def __del__(self):
