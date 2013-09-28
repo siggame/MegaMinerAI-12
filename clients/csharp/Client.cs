@@ -27,8 +27,6 @@ public class Client {
   [DllImport("client")]
   public static extern int playerTalk(IntPtr self, string message);
   [DllImport("client")]
-  public static extern int tileSpawn(IntPtr self, int type);
-  [DllImport("client")]
   public static extern int unitMove(IntPtr self, int x, int y);
   [DllImport("client")]
   public static extern int unitFill(IntPtr self, IntPtr tile);
@@ -36,6 +34,8 @@ public class Client {
   public static extern int unitDig(IntPtr self, IntPtr tile);
   [DllImport("client")]
   public static extern int unitAttack(IntPtr self, IntPtr target);
+  [DllImport("client")]
+  public static extern int tileSpawn(IntPtr self, int type);
 
     //accessors
   [DllImport("client")]
@@ -58,6 +58,8 @@ public class Client {
   public static extern int getUnitCost(IntPtr connection);
   [DllImport("client")]
   public static extern int getPlayerID(IntPtr connection);
+  [DllImport("client")]
+  public static extern int getGameNumber(IntPtr connection);
 
   [DllImport("client")]
   public static extern IntPtr getPlayer(IntPtr connection, int num);
@@ -68,17 +70,17 @@ public class Client {
   [DllImport("client")]
   public static extern int getMappableCount(IntPtr connection);
   [DllImport("client")]
-  public static extern IntPtr getTile(IntPtr connection, int num);
+  public static extern IntPtr getUnit(IntPtr connection, int num);
   [DllImport("client")]
-  public static extern int getTileCount(IntPtr connection);
+  public static extern int getUnitCount(IntPtr connection);
   [DllImport("client")]
   public static extern IntPtr getPumpStation(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getPumpStationCount(IntPtr connection);
   [DllImport("client")]
-  public static extern IntPtr getUnit(IntPtr connection, int num);
+  public static extern IntPtr getTile(IntPtr connection, int num);
   [DllImport("client")]
-  public static extern int getUnitCount(IntPtr connection);
+  public static extern int getTileCount(IntPtr connection);
 
 
     //getters
@@ -99,32 +101,6 @@ public class Client {
   public static extern int mappableGetX(IntPtr ptr);
   [DllImport("client")]
   public static extern int mappableGetY(IntPtr ptr);
-
-  [DllImport("client")]
-  public static extern int tileGetId(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetX(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetY(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetOwner(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetType(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetPumpID(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetWaterAmount(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetIsTrench(IntPtr ptr);
-
-  [DllImport("client")]
-  public static extern int pumpStationGetId(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetOwner(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetSiegeCount(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int unitGetId(IntPtr ptr);
@@ -150,6 +126,32 @@ public class Client {
   public static extern int unitGetMovementLeft(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetMaxMovement(IntPtr ptr);
+
+  [DllImport("client")]
+  public static extern int pumpStationGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetOwner(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetSiegeCount(IntPtr ptr);
+
+  [DllImport("client")]
+  public static extern int tileGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetX(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetY(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetOwner(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetType(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetPumpID(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetWaterAmount(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetIsTrench(IntPtr ptr);
 
 
     //properties
