@@ -17,7 +17,8 @@ globals = [
   Variable('offenseCount', int, 'How quickly a unit will siege a base.'),
   Variable('defenseCount', int, 'The much a unit will slow a  siege.'),
   Variable('maxUnits', int, 'The maximum number of units allowed per player.'),
-  Variable('unitCost', int, 'THe cost of spawning in a new unit'),
+  Variable('unitCost', int, 'The cost of spawning in a new unit'),
+  Variable('playerID', int, 'The id of the current player.'),
 ]
 
 playerData = [
@@ -61,9 +62,12 @@ Unit = Model('Unit',
   data = [
     Variable('owner', int, 'The owner of this unit.'),
     Variable('type', int, 'The type of this unit (digger/filler).'),
-    Variable('curHealth', int, 'The current amount health this unit has remaining.'),
+    Variable('hasAttacked', int, 'Whether current unit has attacked or not.'),
+    Variable('hasDigged', int, 'Whether the current unit has digged or not.'),
+    Variable('hasBuilt', int, 'Whether the current unit has built or not.'),
+    Variable('healthLeft', int, 'The current amount health this unit has remaining.'),
     Variable('maxHealth', int, 'The maximum amount of this health this unit can have'),
-    Variable('curMovement', int, 'The number of moves this unit has remaining.'),
+    Variable('movementLeft', int, 'The number of moves this unit has remaining.'),
     Variable('maxMovement', int, 'The maximum number of moves this unit can move.'),
 
     ],

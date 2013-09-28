@@ -12,62 +12,6 @@ DLLEXPORT int mappableGetY(_Mappable* ptr)
 {
   return ptr->y;
 }
-DLLEXPORT int unitGetId(_Unit* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT int unitGetX(_Unit* ptr)
-{
-  return ptr->x;
-}
-DLLEXPORT int unitGetY(_Unit* ptr)
-{
-  return ptr->y;
-}
-DLLEXPORT int unitGetOwner(_Unit* ptr)
-{
-  return ptr->owner;
-}
-DLLEXPORT int unitGetType(_Unit* ptr)
-{
-  return ptr->type;
-}
-DLLEXPORT int unitGetCurHealth(_Unit* ptr)
-{
-  return ptr->curHealth;
-}
-DLLEXPORT int unitGetMaxHealth(_Unit* ptr)
-{
-  return ptr->maxHealth;
-}
-DLLEXPORT int unitGetCurMovement(_Unit* ptr)
-{
-  return ptr->curMovement;
-}
-DLLEXPORT int unitGetMaxMovement(_Unit* ptr)
-{
-  return ptr->maxMovement;
-}
-DLLEXPORT int playerGetId(_Player* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT char* playerGetPlayerName(_Player* ptr)
-{
-  return ptr->playerName;
-}
-DLLEXPORT float playerGetTime(_Player* ptr)
-{
-  return ptr->time;
-}
-DLLEXPORT int playerGetWaterStored(_Player* ptr)
-{
-  return ptr->waterStored;
-}
-DLLEXPORT int playerGetSpawnResources(_Player* ptr)
-{
-  return ptr->spawnResources;
-}
 DLLEXPORT int tileGetId(_Tile* ptr)
 {
   return ptr->id;
@@ -99,6 +43,74 @@ DLLEXPORT int tileGetWaterAmount(_Tile* ptr)
 DLLEXPORT int tileGetIsTrench(_Tile* ptr)
 {
   return ptr->isTrench;
+}
+DLLEXPORT int unitGetId(_Unit* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT int unitGetX(_Unit* ptr)
+{
+  return ptr->x;
+}
+DLLEXPORT int unitGetY(_Unit* ptr)
+{
+  return ptr->y;
+}
+DLLEXPORT int unitGetOwner(_Unit* ptr)
+{
+  return ptr->owner;
+}
+DLLEXPORT int unitGetType(_Unit* ptr)
+{
+  return ptr->type;
+}
+DLLEXPORT int unitGetHasAttacked(_Unit* ptr)
+{
+  return ptr->hasAttacked;
+}
+DLLEXPORT int unitGetHasDigged(_Unit* ptr)
+{
+  return ptr->hasDigged;
+}
+DLLEXPORT int unitGetHasBuilt(_Unit* ptr)
+{
+  return ptr->hasBuilt;
+}
+DLLEXPORT int unitGetHealthLeft(_Unit* ptr)
+{
+  return ptr->healthLeft;
+}
+DLLEXPORT int unitGetMaxHealth(_Unit* ptr)
+{
+  return ptr->maxHealth;
+}
+DLLEXPORT int unitGetMovementLeft(_Unit* ptr)
+{
+  return ptr->movementLeft;
+}
+DLLEXPORT int unitGetMaxMovement(_Unit* ptr)
+{
+  return ptr->maxMovement;
+}
+DLLEXPORT int playerGetId(_Player* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT char* playerGetPlayerName(_Player* ptr)
+{
+  return ptr->playerName;
+}
+DLLEXPORT float playerGetTime(_Player* ptr)
+{
+  return ptr->time;
+}
+DLLEXPORT int playerGetWaterStored(_Player* ptr)
+{
+  return ptr->waterStored;
+}
+DLLEXPORT int playerGetSpawnResources(_Player* ptr)
+{
+  return ptr->spawnResources;
 }
 DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
 {

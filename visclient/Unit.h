@@ -30,12 +30,18 @@ class Unit : public Mappable {
   int owner();
   ///The type of this unit (digger/filler).
   int type();
+  ///Whether current unit has attacked or not.
+  int hasAttacked();
+  ///Whether the current unit has digged or not.
+  int hasDigged();
+  ///Whether the current unit has built or not.
+  int hasBuilt();
   ///The current amount health this unit has remaining.
-  int curHealth();
+  int healthLeft();
   ///The maximum amount of this health this unit can have
   int maxHealth();
   ///The number of moves this unit has remaining.
-  int curMovement();
+  int movementLeft();
   ///The maximum number of moves this unit can move.
   int maxMovement();
 

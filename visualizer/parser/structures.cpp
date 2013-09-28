@@ -17,6 +17,20 @@ std::ostream& operator<<(std::ostream& stream, Mappable ob)
 }
 
 
+std::ostream& operator<<(std::ostream& stream, Tile ob)
+{
+  stream << "id: " << ob.id  <<'\n';
+  stream << "x: " << ob.x  <<'\n';
+  stream << "y: " << ob.y  <<'\n';
+  stream << "owner: " << ob.owner  <<'\n';
+  stream << "type: " << ob.type  <<'\n';
+  stream << "pumpID: " << ob.pumpID  <<'\n';
+  stream << "waterAmount: " << ob.waterAmount  <<'\n';
+  stream << "isTrench: " << ob.isTrench  <<'\n';
+  return stream;
+}
+
+
 std::ostream& operator<<(std::ostream& stream, Unit ob)
 {
   stream << "id: " << ob.id  <<'\n';
@@ -24,9 +38,12 @@ std::ostream& operator<<(std::ostream& stream, Unit ob)
   stream << "y: " << ob.y  <<'\n';
   stream << "owner: " << ob.owner  <<'\n';
   stream << "type: " << ob.type  <<'\n';
-  stream << "curHealth: " << ob.curHealth  <<'\n';
+  stream << "hasAttacked: " << ob.hasAttacked  <<'\n';
+  stream << "hasDigged: " << ob.hasDigged  <<'\n';
+  stream << "hasBuilt: " << ob.hasBuilt  <<'\n';
+  stream << "healthLeft: " << ob.healthLeft  <<'\n';
   stream << "maxHealth: " << ob.maxHealth  <<'\n';
-  stream << "curMovement: " << ob.curMovement  <<'\n';
+  stream << "movementLeft: " << ob.movementLeft  <<'\n';
   stream << "maxMovement: " << ob.maxMovement  <<'\n';
   return stream;
 }
@@ -43,20 +60,6 @@ std::ostream& operator<<(std::ostream& stream, Player ob)
 }
 
 
-std::ostream& operator<<(std::ostream& stream, Tile ob)
-{
-  stream << "id: " << ob.id  <<'\n';
-  stream << "x: " << ob.x  <<'\n';
-  stream << "y: " << ob.y  <<'\n';
-  stream << "owner: " << ob.owner  <<'\n';
-  stream << "type: " << ob.type  <<'\n';
-  stream << "pumpID: " << ob.pumpID  <<'\n';
-  stream << "waterAmount: " << ob.waterAmount  <<'\n';
-  stream << "isTrench: " << ob.isTrench  <<'\n';
-  return stream;
-}
-
-
 std::ostream& operator<<(std::ostream& stream, PumpStation ob)
 {
   stream << "id: " << ob.id  <<'\n';
@@ -68,24 +71,6 @@ std::ostream& operator<<(std::ostream& stream, PumpStation ob)
 
 
 
-std::ostream& operator<<(std::ostream& stream, dig ob)
-{
-  stream << "dig" << "\n";
-  stream << "actingID: " << ob.actingID  <<'\n';
-  stream << "tileID: " << ob.tileID  <<'\n';
-  return stream;
-}
-
-
-std::ostream& operator<<(std::ostream& stream, attack ob)
-{
-  stream << "attack" << "\n";
-  stream << "actingID: " << ob.actingID  <<'\n';
-  stream << "targetID: " << ob.targetID  <<'\n';
-  return stream;
-}
-
-
 std::ostream& operator<<(std::ostream& stream, fill ob)
 {
   stream << "fill" << "\n";
@@ -95,11 +80,12 @@ std::ostream& operator<<(std::ostream& stream, fill ob)
 }
 
 
-std::ostream& operator<<(std::ostream& stream, spawn ob)
+std::ostream& operator<<(std::ostream& stream, flow ob)
 {
-  stream << "spawn" << "\n";
+  stream << "flow" << "\n";
   stream << "sourceID: " << ob.sourceID  <<'\n';
-  stream << "unitID: " << ob.unitID  <<'\n';
+  stream << "destID: " << ob.destID  <<'\n';
+  stream << "waterAmount: " << ob.waterAmount  <<'\n';
   return stream;
 }
 
@@ -116,12 +102,29 @@ std::ostream& operator<<(std::ostream& stream, move ob)
 }
 
 
-std::ostream& operator<<(std::ostream& stream, flow ob)
+std::ostream& operator<<(std::ostream& stream, attack ob)
 {
-  stream << "flow" << "\n";
+  stream << "attack" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "targetID: " << ob.targetID  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, spawn ob)
+{
+  stream << "spawn" << "\n";
   stream << "sourceID: " << ob.sourceID  <<'\n';
-  stream << "destID: " << ob.destID  <<'\n';
-  stream << "waterAmount: " << ob.waterAmount  <<'\n';
+  stream << "unitID: " << ob.unitID  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, dig ob)
+{
+  stream << "dig" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "tileID: " << ob.tileID  <<'\n';
   return stream;
 }
 
@@ -137,18 +140,19 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   stream << "defenseCount: " << ob.defenseCount  <<'\n';
   stream << "maxUnits: " << ob.maxUnits  <<'\n';
   stream << "unitCost: " << ob.unitCost  <<'\n';
+  stream << "playerID: " << ob.playerID  <<'\n';
 
   stream << "\n\nMappables:\n";
   for(std::map<int,Mappable>::iterator i = ob.mappables.begin(); i != ob.mappables.end(); i++)
+    stream << i->second << '\n';
+  stream << "\n\nTiles:\n";
+  for(std::map<int,Tile>::iterator i = ob.tiles.begin(); i != ob.tiles.end(); i++)
     stream << i->second << '\n';
   stream << "\n\nUnits:\n";
   for(std::map<int,Unit>::iterator i = ob.units.begin(); i != ob.units.end(); i++)
     stream << i->second << '\n';
   stream << "\n\nPlayers:\n";
   for(std::map<int,Player>::iterator i = ob.players.begin(); i != ob.players.end(); i++)
-    stream << i->second << '\n';
-  stream << "\n\nTiles:\n";
-  for(std::map<int,Tile>::iterator i = ob.tiles.begin(); i != ob.tiles.end(); i++)
     stream << i->second << '\n';
   stream << "\n\nPumpStations:\n";
   for(std::map<int,PumpStation>::iterator i = ob.pumpStations.begin(); i != ob.pumpStations.end(); i++)
@@ -163,18 +167,18 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   {
   for(std::vector< SmartPointer< Animation > >::iterator i = j->second.begin(); i != j->second.end(); i++)
   {
-//    if((*(*i)).type == DIG)
-//      stream << *((dig*)*i) << "\n";
-//    if((*(*i)).type == ATTACK)
-//      stream << *((attack*)*i) << "\n";
 //    if((*(*i)).type == FILL)
 //      stream << *((fill*)*i) << "\n";
-//    if((*(*i)).type == SPAWN)
-//      stream << *((spawn*)*i) << "\n";
-//    if((*(*i)).type == MOVE)
-//      stream << *((move*)*i) << "\n";
 //    if((*(*i)).type == FLOW)
 //      stream << *((flow*)*i) << "\n";
+//    if((*(*i)).type == MOVE)
+//      stream << *((move*)*i) << "\n";
+//    if((*(*i)).type == ATTACK)
+//      stream << *((attack*)*i) << "\n";
+//    if((*(*i)).type == SPAWN)
+//      stream << *((spawn*)*i) << "\n";
+//    if((*(*i)).type == DIG)
+//      stream << *((dig*)*i) << "\n";
   }
   
 

@@ -9,9 +9,9 @@
 #include "game.h"
 
 #include "Mappable.h"
+#include "Tile.h"
 #include "Unit.h"
 #include "Player.h"
-#include "Tile.h"
 #include "PumpStation.h"
 
 namespace client
@@ -27,9 +27,9 @@ class BaseAI
 protected:
   Connection* c;
   std::vector<Mappable> mappables;
+  std::vector<Tile> tiles;
   std::vector<Unit> units;
   std::vector<Player> players;
-  std::vector<Tile> tiles;
   std::vector<PumpStation> pumpStations;
 public:
   ///The maximum amount of health a unit will have.
@@ -48,8 +48,10 @@ public:
   int defenseCount();
   ///The maximum number of units allowed per player.
   int maxUnits();
-  ///THe cost of spawning in a new unit
+  ///The cost of spawning in a new unit
   int unitCost();
+  ///The id of the current player.
+  int playerID();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

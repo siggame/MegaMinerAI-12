@@ -8,9 +8,9 @@ import com.sun.jna.Pointer;
 public abstract class BaseAI
 {
   static Mappable[] mappables;
+  static Tile[] tiles;
   static Unit[] units;
   static Player[] players;
-  static Tile[] tiles;
   static PumpStation[] pumpStations;
   Pointer connection;
   static int iteration;
@@ -51,6 +51,12 @@ public abstract class BaseAI
     {
       mappables[i] = new Mappable(Client.INSTANCE.getMappable(connection, i));
     }
+    count = Client.INSTANCE.getTileCount(connection);
+    tiles = new Tile[count];
+    for(int i = 0; i < count; i++)
+    {
+      tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
+    }
     count = Client.INSTANCE.getUnitCount(connection);
     units = new Unit[count];
     for(int i = 0; i < count; i++)
@@ -62,12 +68,6 @@ public abstract class BaseAI
     for(int i = 0; i < count; i++)
     {
       players[i] = new Player(Client.INSTANCE.getPlayer(connection, i));
-    }
-    count = Client.INSTANCE.getTileCount(connection);
-    tiles = new Tile[count];
-    for(int i = 0; i < count; i++)
-    {
-      tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
     }
     count = Client.INSTANCE.getPumpStationCount(connection);
     pumpStations = new PumpStation[count];
@@ -125,9 +125,14 @@ public abstract class BaseAI
   {
     return Client.INSTANCE.getMaxUnits(connection);
   }
-  ///THe cost of spawning in a new unit
+  ///The cost of spawning in a new unit
   int unitCost()
   {
     return Client.INSTANCE.getUnitCost(connection);
+  }
+  ///The id of the current player.
+  int playerID()
+  {
+    return Client.INSTANCE.getPlayerID(connection);
   }
 }

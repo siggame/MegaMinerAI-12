@@ -6,9 +6,9 @@
 
 struct Connection;
 struct _Mappable;
+struct _Tile;
 struct _Unit;
 struct _Player;
-struct _Tile;
 struct _PumpStation;
 
 
@@ -18,28 +18,6 @@ struct _Mappable
   int id;
   int x;
   int y;
-};
-struct _Unit
-{
-  Connection* _c;
-  int id;
-  int x;
-  int y;
-  int owner;
-  int type;
-  int curHealth;
-  int maxHealth;
-  int curMovement;
-  int maxMovement;
-};
-struct _Player
-{
-  Connection* _c;
-  int id;
-  char* playerName;
-  float time;
-  int waterStored;
-  int spawnResources;
 };
 struct _Tile
 {
@@ -52,6 +30,31 @@ struct _Tile
   int pumpID;
   int waterAmount;
   int isTrench;
+};
+struct _Unit
+{
+  Connection* _c;
+  int id;
+  int x;
+  int y;
+  int owner;
+  int type;
+  int hasAttacked;
+  int hasDigged;
+  int hasBuilt;
+  int healthLeft;
+  int maxHealth;
+  int movementLeft;
+  int maxMovement;
+};
+struct _Player
+{
+  Connection* _c;
+  int id;
+  char* playerName;
+  float time;
+  int waterStored;
+  int spawnResources;
 };
 struct _PumpStation
 {

@@ -39,9 +39,24 @@ int Unit::type()
   return ((_Unit*)ptr)->type;
 }
 
-int Unit::curHealth()
+int Unit::hasAttacked()
 {
-  return ((_Unit*)ptr)->curHealth;
+  return ((_Unit*)ptr)->hasAttacked;
+}
+
+int Unit::hasDigged()
+{
+  return ((_Unit*)ptr)->hasDigged;
+}
+
+int Unit::hasBuilt()
+{
+  return ((_Unit*)ptr)->hasBuilt;
+}
+
+int Unit::healthLeft()
+{
+  return ((_Unit*)ptr)->healthLeft;
 }
 
 int Unit::maxHealth()
@@ -49,9 +64,9 @@ int Unit::maxHealth()
   return ((_Unit*)ptr)->maxHealth;
 }
 
-int Unit::curMovement()
+int Unit::movementLeft()
 {
-  return ((_Unit*)ptr)->curMovement;
+  return ((_Unit*)ptr)->movementLeft;
 }
 
 int Unit::maxMovement()
@@ -89,9 +104,12 @@ std::ostream& operator<<(std::ostream& stream,Unit ob)
   stream << "y: " << ((_Unit*)ob.ptr)->y  <<'\n';
   stream << "owner: " << ((_Unit*)ob.ptr)->owner  <<'\n';
   stream << "type: " << ((_Unit*)ob.ptr)->type  <<'\n';
-  stream << "curHealth: " << ((_Unit*)ob.ptr)->curHealth  <<'\n';
+  stream << "hasAttacked: " << ((_Unit*)ob.ptr)->hasAttacked  <<'\n';
+  stream << "hasDigged: " << ((_Unit*)ob.ptr)->hasDigged  <<'\n';
+  stream << "hasBuilt: " << ((_Unit*)ob.ptr)->hasBuilt  <<'\n';
+  stream << "healthLeft: " << ((_Unit*)ob.ptr)->healthLeft  <<'\n';
   stream << "maxHealth: " << ((_Unit*)ob.ptr)->maxHealth  <<'\n';
-  stream << "curMovement: " << ((_Unit*)ob.ptr)->curMovement  <<'\n';
+  stream << "movementLeft: " << ((_Unit*)ob.ptr)->movementLeft  <<'\n';
   stream << "maxMovement: " << ((_Unit*)ob.ptr)->maxMovement  <<'\n';
   return stream;
 }
