@@ -43,6 +43,7 @@ class Match(DefaultGameWorld):
     self.unitCost = self.unitCost
     self.playerID = -1
     self.gameNumber = id
+    self.turnLimit = self.turnLimit
 
   #this is here to be wrapped
   def __del__(self):
@@ -55,7 +56,7 @@ class Match(DefaultGameWorld):
     if type == "player":
       self.players.append(connection)
       try:
-        self.addObject(Player, [connection.screenName, self.startTime])
+        self.addObject(Player, [connection.screenName, self.startTime, 0, 0])
       except TypeError:
         raise TypeError("Someone forgot to add the extra attributes to the Player object initialization")
     elif type == "spectator":
@@ -85,7 +86,7 @@ class Match(DefaultGameWorld):
     self.turnNumber = -1
     
     self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, 0, 0, 1]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
-    set_tiles(self)
+    #set_tiles(self)
 
     self.nextTurn()
     return True
@@ -159,6 +160,7 @@ class Match(DefaultGameWorld):
         self.declareWinner(self.players[1], "Player 2 wins through more water storage")
       else:
         #TODO: Tie condition, number of bases owned might determine winner
+        self.declareWinner(self.players[0], "Tie for now")
         pass
        
 
