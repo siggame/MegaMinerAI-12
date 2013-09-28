@@ -9,9 +9,9 @@ public abstract class BaseAI
 {
   static Player[] players;
   static Mappable[] mappables;
-  static Tile[] tiles;
-  static PumpStation[] pumpStations;
   static Unit[] units;
+  static PumpStation[] pumpStations;
+  static Tile[] tiles;
   Pointer connection;
   static int iteration;
   boolean initialized;
@@ -57,11 +57,11 @@ public abstract class BaseAI
     {
       mappables[i] = new Mappable(Client.INSTANCE.getMappable(connection, i));
     }
-    count = Client.INSTANCE.getTileCount(connection);
-    tiles = new Tile[count];
+    count = Client.INSTANCE.getUnitCount(connection);
+    units = new Unit[count];
     for(int i = 0; i < count; i++)
     {
-      tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
+      units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
     }
     count = Client.INSTANCE.getPumpStationCount(connection);
     pumpStations = new PumpStation[count];
@@ -69,11 +69,11 @@ public abstract class BaseAI
     {
       pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
     }
-    count = Client.INSTANCE.getUnitCount(connection);
-    units = new Unit[count];
+    count = Client.INSTANCE.getTileCount(connection);
+    tiles = new Tile[count];
     for(int i = 0; i < count; i++)
     {
-      units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
+      tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
     }
 
     if(!initialized)
@@ -134,5 +134,10 @@ public abstract class BaseAI
   int playerID()
   {
     return Client.INSTANCE.getPlayerID(connection);
+  }
+  ///What number game this is for the server
+  int gameNumber()
+  {
+    return Client.INSTANCE.getGameNumber(connection);
   }
 }

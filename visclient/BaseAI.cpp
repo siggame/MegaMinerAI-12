@@ -48,6 +48,10 @@ int BaseAI::playerID()
 {
   return getPlayerID(c);
 }
+int BaseAI::gameNumber()
+{
+  return getGameNumber(c);
+}
 
 bool BaseAI::startTurn()
 {
@@ -69,12 +73,12 @@ bool BaseAI::startTurn()
     mappables[i] = Mappable(getMappable(c, i));
   }
 
-  count = getTileCount(c);
-  tiles.clear();
-  tiles.resize(count);
+  count = getUnitCount(c);
+  units.clear();
+  units.resize(count);
   for(int i = 0; i < count; i++)
   {
-    tiles[i] = Tile(getTile(c, i));
+    units[i] = Unit(getUnit(c, i));
   }
 
   count = getPumpStationCount(c);
@@ -85,12 +89,12 @@ bool BaseAI::startTurn()
     pumpStations[i] = PumpStation(getPumpStation(c, i));
   }
 
-  count = getUnitCount(c);
-  units.clear();
-  units.resize(count);
+  count = getTileCount(c);
+  tiles.clear();
+  tiles.resize(count);
   for(int i = 0; i < count; i++)
   {
-    units[i] = Unit(getUnit(c, i));
+    tiles[i] = Tile(getTile(c, i));
   }
 
   if(!initialized)

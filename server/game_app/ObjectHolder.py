@@ -5,9 +5,9 @@ class ObjectHolder(dict):
     dict.__init__(self, *args, **kwargs)
     self.players = []
     self.mappables = []
-    self.tiles = []
-    self.pumpStations = []
     self.units = []
+    self.pumpStations = []
+    self.tiles = []
 
   def __setitem__(self, key, value):
     if key in self:
@@ -17,12 +17,12 @@ class ObjectHolder(dict):
       self.players.append(value)
     if isinstance(value, objects.Mappable):
       self.mappables.append(value)
-    if isinstance(value, objects.Tile):
-      self.tiles.append(value)
-    if isinstance(value, objects.PumpStation):
-      self.pumpStations.append(value)
     if isinstance(value, objects.Unit):
       self.units.append(value)
+    if isinstance(value, objects.PumpStation):
+      self.pumpStations.append(value)
+    if isinstance(value, objects.Tile):
+      self.tiles.append(value)
 
   def __delitem__(self, key):
     value = self[key]
@@ -31,12 +31,12 @@ class ObjectHolder(dict):
       self.players.remove(value)
     if value in self.mappables:
       self.mappables.remove(value)
-    if value in self.tiles:
-      self.tiles.remove(value)
-    if value in self.pumpStations:
-      self.pumpStations.remove(value)
     if value in self.units:
       self.units.remove(value)
+    if value in self.pumpStations:
+      self.pumpStations.remove(value)
+    if value in self.tiles:
+      self.tiles.remove(value)
 
   def clear(self):
     for i in self.keys():

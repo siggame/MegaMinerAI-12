@@ -126,16 +126,6 @@ class GameApp(AccountsAppMixin, BaseApp):
   @protocolmethod
   @errorBuffer
   @requireTurn
-  @requireTypes(None, int, int)
-  def gameSpawn(self, tile, type):
-    """Attempt to spawn a unit of a type on this tile."""
-    if self.game.turn is not self:
-      return "Not your turn."
-    return self.game.spawn(tile, type)
-
-  @protocolmethod
-  @errorBuffer
-  @requireTurn
   @requireTypes(None, int, int, int)
   def gameMove(self, unit, x, y):
     """Make the unit move to the respective x and y location."""
@@ -172,6 +162,16 @@ class GameApp(AccountsAppMixin, BaseApp):
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.attack(unit, target)
+
+  @protocolmethod
+  @errorBuffer
+  @requireTurn
+  @requireTypes(None, int, int)
+  def gameSpawn(self, tile, type):
+    """Attempt to spawn a unit of a type on this tile."""
+    if self.game.turn is not self:
+      return "Not your turn."
+    return self.game.spawn(tile, type)
 
 
   @protocolmethod

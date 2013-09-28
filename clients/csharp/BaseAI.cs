@@ -10,9 +10,9 @@ public abstract class BaseAI
 {
   public static Player[] players;
   public static Mappable[] mappables;
-  public static Tile[] tiles;
-  public static PumpStation[] pumpStations;
   public static Unit[] units;
+  public static PumpStation[] pumpStations;
+  public static Tile[] tiles;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -58,11 +58,11 @@ public abstract class BaseAI
     {
       mappables[i] = new Mappable(Client.getMappable(connection, i));
     }
-    count = Client.getTileCount(connection);
-    tiles = new Tile[count];
+    count = Client.getUnitCount(connection);
+    units = new Unit[count];
     for(int i = 0; i < count; i++)
     {
-      tiles[i] = new Tile(Client.getTile(connection, i));
+      units[i] = new Unit(Client.getUnit(connection, i));
     }
     count = Client.getPumpStationCount(connection);
     pumpStations = new PumpStation[count];
@@ -70,11 +70,11 @@ public abstract class BaseAI
     {
       pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
     }
-    count = Client.getUnitCount(connection);
-    units = new Unit[count];
+    count = Client.getTileCount(connection);
+    tiles = new Tile[count];
     for(int i = 0; i < count; i++)
     {
-      units[i] = new Unit(Client.getUnit(connection, i));
+      tiles[i] = new Tile(Client.getTile(connection, i));
     }
 
     if(!initialized)
@@ -144,6 +144,12 @@ public abstract class BaseAI
   public int playerID()
   {
     int value = Client.getPlayerID(connection);
+    return value;
+  }
+  ///What number game this is for the server
+  public int gameNumber()
+  {
+    int value = Client.getGameNumber(connection);
     return value;
   }
 }
