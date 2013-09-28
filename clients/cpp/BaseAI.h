@@ -10,9 +10,9 @@
 
 #include "Player.h"
 #include "Mappable.h"
-#include "Tile.h"
-#include "PumpStation.h"
 #include "Unit.h"
+#include "PumpStation.h"
+#include "Tile.h"
 
 /// \brief A basic AI interface.
 
@@ -25,9 +25,9 @@ protected:
   Connection* c;
   std::vector<Player> players;
   std::vector<Mappable> mappables;
-  std::vector<Tile> tiles;
-  std::vector<PumpStation> pumpStations;
   std::vector<Unit> units;
+  std::vector<PumpStation> pumpStations;
+  std::vector<Tile> tiles;
 public:
   ///The maximum amount of health a unit will have.
   int maxHealth();
@@ -49,6 +49,8 @@ public:
   int unitCost();
   ///The id of the current player.
   int playerID();
+  ///What number game this is for the server
+  int gameNumber();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

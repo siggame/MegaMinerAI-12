@@ -24,22 +24,6 @@ DLLEXPORT int mappableGetX(_Mappable* ptr);
 DLLEXPORT int mappableGetY(_Mappable* ptr);
 
 
-DLLEXPORT int tileGetId(_Tile* ptr);
-DLLEXPORT int tileGetX(_Tile* ptr);
-DLLEXPORT int tileGetY(_Tile* ptr);
-DLLEXPORT int tileGetOwner(_Tile* ptr);
-DLLEXPORT int tileGetType(_Tile* ptr);
-DLLEXPORT int tileGetPumpID(_Tile* ptr);
-DLLEXPORT int tileGetWaterAmount(_Tile* ptr);
-DLLEXPORT int tileGetIsTrench(_Tile* ptr);
-
-
-DLLEXPORT int pumpStationGetId(_PumpStation* ptr);
-DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr);
-DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr);
-DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr);
-
-
 DLLEXPORT int unitGetId(_Unit* ptr);
 DLLEXPORT int unitGetX(_Unit* ptr);
 DLLEXPORT int unitGetY(_Unit* ptr);
@@ -52,6 +36,22 @@ DLLEXPORT int unitGetHealthLeft(_Unit* ptr);
 DLLEXPORT int unitGetMaxHealth(_Unit* ptr);
 DLLEXPORT int unitGetMovementLeft(_Unit* ptr);
 DLLEXPORT int unitGetMaxMovement(_Unit* ptr);
+
+
+DLLEXPORT int pumpStationGetId(_PumpStation* ptr);
+DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr);
+DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr);
+DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr);
+
+
+DLLEXPORT int tileGetId(_Tile* ptr);
+DLLEXPORT int tileGetX(_Tile* ptr);
+DLLEXPORT int tileGetY(_Tile* ptr);
+DLLEXPORT int tileGetOwner(_Tile* ptr);
+DLLEXPORT int tileGetType(_Tile* ptr);
+DLLEXPORT int tileGetPumpID(_Tile* ptr);
+DLLEXPORT int tileGetWaterAmount(_Tile* ptr);
+DLLEXPORT int tileGetIsTrench(_Tile* ptr);
 
 
 
