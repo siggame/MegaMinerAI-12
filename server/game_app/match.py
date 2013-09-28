@@ -8,6 +8,8 @@ import os
 import itertools
 import scribe
 import jsonLogger
+import mapGenerator import set_tiles
+
 
 Scribe = scribe.Scribe
 
@@ -29,16 +31,15 @@ class Match(DefaultGameWorld):
       self.dictLog = dict(gameName = "Mars", turns = [])
     self.addPlayer(self.scribe, "spectator")
 
-    #TODO: INITIALIZE THESE!
-    self.maxHealth = None
-    self.trenchDamage = None
-    self.waterDamage = None
-    self.turnNumber = None
-    self.attackDamage = None
-    self.offenseCount = None
-    self.defenseCount = None
-    self.maxUnits = None
-    self.unitCost = None
+    self.maxHealth = self.maxHealth
+    self.trenchDamage = self.trenchDamage
+    self.waterDamage = self.waterDamage
+    self.turnNumber = -1
+    self.attackDamage = self.attackDamage
+    self.offenseCount = self.offenseCount
+    self.defenseCount = self.defenseCount
+    self.maxUnits = self.maxUnits
+    self.unitCost = self.unitCost
 
   #this is here to be wrapped
   def __del__(self):
@@ -79,10 +80,16 @@ class Match(DefaultGameWorld):
     #TODO: START STUFF
     self.turn = self.players[-1]
     self.turnNumber = -1
+    
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, 0, 0, 1]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+    set_tiles(self)
 
     self.nextTurn()
     return True
 
+  def waterFlow(self):
+      #TODO: Create water flow conditions to move water from icecaps to pump stations
+      pass
 
   def nextTurn(self):
     self.turnNumber += 1
@@ -132,8 +139,23 @@ class Match(DefaultGameWorld):
 
   def checkWinner(self):
     #TODO: Make this check if a player won, and call declareWinner with a player if they did
+    # Get the players
+        player1 = self.objects.players[0]
+        player2 = self.objects.players[1]
+        
+    # Get the current water stored
+        p1h = player1.waterStored
+        p2h = player2.waterStored
+    
     if self.turnNumber >= self.turnLimit:
-       self.declareWinner(self.players[0], "Because I said so, this shold be removed")
+       if p1h>p2h:
+           self.declareWinner(self.players[0], "Player 1 wins through more water stored")
+       elif p2h>p1h:
+           self.declareWinner(self.players[1], "Player 2 wins through more water storage")
+       else:
+           #TODO: Tie condition, number of bases owned might determine winner
+           pass
+       
 
 
   def declareWinner(self, winner, reason=''):
@@ -238,6 +260,7 @@ class Match(DefaultGameWorld):
     # generate the json
     if( self.logJson ):
       self.jsonAnimations.append(anim.toJson())
+      
   
 
 
