@@ -19,6 +19,7 @@ globals = [
   Variable('maxUnits', int, 'The maximum number of units allowed per player.'),
   Variable('unitCost', int, 'The cost of spawning in a new unit'),
   Variable('playerID', int, 'The id of the current player.'),
+  Variable('gameNumber', int, 'What number game this is for the server'),
 ]
 
 playerData = [
