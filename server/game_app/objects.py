@@ -80,7 +80,29 @@ class Unit(Mappable):
     pass
 
   def move(self, x, y):
-    pass
+    if self.owner != self.game.playerID:
+      return 'Turn {}: You cannot use the other player\'s unit {}. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif self.movementLeft <= 0:
+      return 'Turn {}: Your unit {} does not have any movements left. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif not (0 <= x < self.game.mapWidth) or not (0 <= y < self.game.mapHeight):
+      return 'Turn {}: Your unit {} cannot move off the map. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif abs(self.x-x) + abs(self.y-y) != 1:
+      return 'Turn {}: Your unit {} can only move one unit away. ({}.{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+
+    #Check for units running into each other
+    for unit in self.game.units:
+      if unit.x == x and unit.y == y:
+        return 'Turn[]: Your unit {} is trying to run into unit {}. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, unit.id, self.x, self.y, x, y)
+
+    self.game.grid[self.x][self.y].remove(self)
+    self.game.grid[x][x].append(self)
+
+    self.game.addAnimation(MoveAnimation(self.id,self.x,self.y,x,y))
+    self.movementLeft -= 1
+    self.x = x
+    self.y = y
+
+    return True
 
   def fill(self, tile):
     pass
