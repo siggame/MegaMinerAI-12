@@ -5,33 +5,13 @@
 #define STRUCTURES_H
 
 struct Connection;
-struct _Mappable;
-struct _Unit;
 struct _Player;
+struct _Mappable;
 struct _Tile;
 struct _PumpStation;
+struct _Unit;
 
 
-struct _Mappable
-{
-  Connection* _c;
-  int id;
-  int x;
-  int y;
-};
-struct _Unit
-{
-  Connection* _c;
-  int id;
-  int x;
-  int y;
-  int owner;
-  int type;
-  int curHealth;
-  int maxHealth;
-  int curMovement;
-  int maxMovement;
-};
 struct _Player
 {
   Connection* _c;
@@ -40,6 +20,13 @@ struct _Player
   float time;
   int waterStored;
   int spawnResources;
+};
+struct _Mappable
+{
+  Connection* _c;
+  int id;
+  int x;
+  int y;
 };
 struct _Tile
 {
@@ -60,6 +47,22 @@ struct _PumpStation
   int owner;
   int waterAmount;
   int siegeCount;
+};
+struct _Unit
+{
+  Connection* _c;
+  int id;
+  int x;
+  int y;
+  int owner;
+  int type;
+  int hasAttacked;
+  int hasDigged;
+  int hasBuilt;
+  int healthLeft;
+  int maxHealth;
+  int movementLeft;
+  int maxMovement;
 };
 
 #endif

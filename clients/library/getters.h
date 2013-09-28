@@ -12,27 +12,16 @@
 extern "C" {
 #endif
 
-DLLEXPORT int mappableGetId(_Mappable* ptr);
-DLLEXPORT int mappableGetX(_Mappable* ptr);
-DLLEXPORT int mappableGetY(_Mappable* ptr);
-
-
-DLLEXPORT int unitGetId(_Unit* ptr);
-DLLEXPORT int unitGetX(_Unit* ptr);
-DLLEXPORT int unitGetY(_Unit* ptr);
-DLLEXPORT int unitGetOwner(_Unit* ptr);
-DLLEXPORT int unitGetType(_Unit* ptr);
-DLLEXPORT int unitGetCurHealth(_Unit* ptr);
-DLLEXPORT int unitGetMaxHealth(_Unit* ptr);
-DLLEXPORT int unitGetCurMovement(_Unit* ptr);
-DLLEXPORT int unitGetMaxMovement(_Unit* ptr);
-
-
 DLLEXPORT int playerGetId(_Player* ptr);
 DLLEXPORT char* playerGetPlayerName(_Player* ptr);
 DLLEXPORT float playerGetTime(_Player* ptr);
 DLLEXPORT int playerGetWaterStored(_Player* ptr);
 DLLEXPORT int playerGetSpawnResources(_Player* ptr);
+
+
+DLLEXPORT int mappableGetId(_Mappable* ptr);
+DLLEXPORT int mappableGetX(_Mappable* ptr);
+DLLEXPORT int mappableGetY(_Mappable* ptr);
 
 
 DLLEXPORT int tileGetId(_Tile* ptr);
@@ -49,6 +38,20 @@ DLLEXPORT int pumpStationGetId(_PumpStation* ptr);
 DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr);
 DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr);
 DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr);
+
+
+DLLEXPORT int unitGetId(_Unit* ptr);
+DLLEXPORT int unitGetX(_Unit* ptr);
+DLLEXPORT int unitGetY(_Unit* ptr);
+DLLEXPORT int unitGetOwner(_Unit* ptr);
+DLLEXPORT int unitGetType(_Unit* ptr);
+DLLEXPORT int unitGetHasAttacked(_Unit* ptr);
+DLLEXPORT int unitGetHasDigged(_Unit* ptr);
+DLLEXPORT int unitGetHasBuilt(_Unit* ptr);
+DLLEXPORT int unitGetHealthLeft(_Unit* ptr);
+DLLEXPORT int unitGetMaxHealth(_Unit* ptr);
+DLLEXPORT int unitGetMovementLeft(_Unit* ptr);
+DLLEXPORT int unitGetMaxMovement(_Unit* ptr);
 
 
 

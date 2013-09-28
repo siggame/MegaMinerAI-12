@@ -15,24 +15,24 @@ class BaseAI:
   runGenerator = None
   connection = None
   #\endcond
-  mappables = []
-  units = []
   players = []
+  mappables = []
   tiles = []
   pumpStations = []
+  units = []
   #\cond
   def startTurn(self):
-    from GameObject import Mappable
-    from GameObject import Unit
     from GameObject import Player
+    from GameObject import Mappable
     from GameObject import Tile
     from GameObject import PumpStation
+    from GameObject import Unit
 
-    BaseAI.mappables = [Mappable(library.getMappable(self.connection, i)) for i in xrange(library.getMappableCount(self.connection))]
-    BaseAI.units = [Unit(library.getUnit(self.connection, i)) for i in xrange(library.getUnitCount(self.connection))]
     BaseAI.players = [Player(library.getPlayer(self.connection, i)) for i in xrange(library.getPlayerCount(self.connection))]
+    BaseAI.mappables = [Mappable(library.getMappable(self.connection, i)) for i in xrange(library.getMappableCount(self.connection))]
     BaseAI.tiles = [Tile(library.getTile(self.connection, i)) for i in xrange(library.getTileCount(self.connection))]
     BaseAI.pumpStations = [PumpStation(library.getPumpStation(self.connection, i)) for i in xrange(library.getPumpStationCount(self.connection))]
+    BaseAI.units = [Unit(library.getUnit(self.connection, i)) for i in xrange(library.getUnitCount(self.connection))]
 
     if not self.initialized:
       self.initialized = True
@@ -94,5 +94,10 @@ class BaseAI:
     return library.getUnitCost(self.connection)
   #\endcond
   unitCost = property(getUnitCost)
+  #\cond
+  def getPlayerID(self):
+    return library.getPlayerID(self.connection)
+  #\endcond
+  playerID = property(getPlayerID)
   def __init__(self, connection):
     self.connection = connection

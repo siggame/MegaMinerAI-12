@@ -41,33 +41,29 @@ int BaseAI::unitCost()
 {
   return getUnitCost(c);
 }
+int BaseAI::playerID()
+{
+  return getPlayerID(c);
+}
 
 bool BaseAI::startTurn()
 {
   static bool initialized = false;
   int count = 0;
-  count = getMappableCount(c);
-  mappables.clear();
-  mappables.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    mappables[i] = Mappable(getMappable(c, i));
-  }
-
-  count = getUnitCount(c);
-  units.clear();
-  units.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    units[i] = Unit(getUnit(c, i));
-  }
-
   count = getPlayerCount(c);
   players.clear();
   players.resize(count);
   for(int i = 0; i < count; i++)
   {
     players[i] = Player(getPlayer(c, i));
+  }
+
+  count = getMappableCount(c);
+  mappables.clear();
+  mappables.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    mappables[i] = Mappable(getMappable(c, i));
   }
 
   count = getTileCount(c);
@@ -84,6 +80,14 @@ bool BaseAI::startTurn()
   for(int i = 0; i < count; i++)
   {
     pumpStations[i] = PumpStation(getPumpStation(c, i));
+  }
+
+  count = getUnitCount(c);
+  units.clear();
+  units.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    units[i] = Unit(getUnit(c, i));
   }
 
   if(!initialized)

@@ -1,69 +1,3 @@
-class Mappable(object):
-  game_state_attributes = ['id', 'x', 'y']
-  def __init__(self, game, id, x, y):
-    self.game = game
-    self.id = id
-    self.x = x
-    self.y = y
-    self.updatedAt = game.turnNumber
-
-  def toList(self):
-    return [self.id, self.x, self.y, ]
-  
-  # This will not work if the object has variables other than primitives
-  def toJson(self):
-    return dict(id = self.id, x = self.x, y = self.y, )
-  
-  def nextTurn(self):
-    pass
-
-  def __setattr__(self, name, value):
-      if name in self.game_state_attributes:
-        object.__setattr__(self, 'updatedAt', self.game.turnNumber)
-      object.__setattr__(self, name, value)
-
-class Unit(Mappable):
-  game_state_attributes = ['id', 'x', 'y', 'owner', 'type', 'curHealth', 'maxHealth', 'curMovement', 'maxMovement']
-  def __init__(self, game, id, x, y, owner, type, curHealth, maxHealth, curMovement, maxMovement):
-    self.game = game
-    self.id = id
-    self.x = x
-    self.y = y
-    self.owner = owner
-    self.type = type
-    self.curHealth = curHealth
-    self.maxHealth = maxHealth
-    self.curMovement = curMovement
-    self.maxMovement = maxMovement
-    self.updatedAt = game.turnNumber
-
-  def toList(self):
-    return [self.id, self.x, self.y, self.owner, self.type, self.curHealth, self.maxHealth, self.curMovement, self.maxMovement, ]
-  
-  # This will not work if the object has variables other than primitives
-  def toJson(self):
-    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, curHealth = self.curHealth, maxHealth = self.maxHealth, curMovement = self.curMovement, maxMovement = self.maxMovement, )
-  
-  def nextTurn(self):
-    pass
-
-  def move(self, x, y):
-    pass
-
-  def fill(self, tile):
-    pass
-
-  def dig(self, tile):
-    pass
-
-  def attack(self, target):
-    pass
-
-  def __setattr__(self, name, value):
-      if name in self.game_state_attributes:
-        object.__setattr__(self, 'updatedAt', self.game.turnNumber)
-      object.__setattr__(self, name, value)
-
 class Player(object):
   game_state_attributes = ['id', 'playerName', 'time', 'waterStored', 'spawnResources']
   def __init__(self, game, id, playerName, time, waterStored, spawnResources):
@@ -86,6 +20,30 @@ class Player(object):
     pass
 
   def talk(self, message):
+    pass
+
+  def __setattr__(self, name, value):
+      if name in self.game_state_attributes:
+        object.__setattr__(self, 'updatedAt', self.game.turnNumber)
+      object.__setattr__(self, name, value)
+
+class Mappable(object):
+  game_state_attributes = ['id', 'x', 'y']
+  def __init__(self, game, id, x, y):
+    self.game = game
+    self.id = id
+    self.x = x
+    self.y = y
+    self.updatedAt = game.turnNumber
+
+  def toList(self):
+    return [self.id, self.x, self.y, ]
+  
+  # This will not work if the object has variables other than primitives
+  def toJson(self):
+    return dict(id = self.id, x = self.x, y = self.y, )
+  
+  def nextTurn(self):
     pass
 
   def __setattr__(self, name, value):
@@ -150,30 +108,53 @@ class PumpStation(object):
         object.__setattr__(self, 'updatedAt', self.game.turnNumber)
       object.__setattr__(self, name, value)
 
+class Unit(Mappable):
+  game_state_attributes = ['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDigged', 'hasBuilt', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
+  def __init__(self, game, id, x, y, owner, type, hasAttacked, hasDigged, hasBuilt, healthLeft, maxHealth, movementLeft, maxMovement):
+    self.game = game
+    self.id = id
+    self.x = x
+    self.y = y
+    self.owner = owner
+    self.type = type
+    self.hasAttacked = hasAttacked
+    self.hasDigged = hasDigged
+    self.hasBuilt = hasBuilt
+    self.healthLeft = healthLeft
+    self.maxHealth = maxHealth
+    self.movementLeft = movementLeft
+    self.maxMovement = maxMovement
+    self.updatedAt = game.turnNumber
+
+  def toList(self):
+    return [self.id, self.x, self.y, self.owner, self.type, self.hasAttacked, self.hasDigged, self.hasBuilt, self.healthLeft, self.maxHealth, self.movementLeft, self.maxMovement, ]
+  
+  # This will not work if the object has variables other than primitives
+  def toJson(self):
+    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDigged = self.hasDigged, hasBuilt = self.hasBuilt, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, )
+  
+  def nextTurn(self):
+    pass
+
+  def move(self, x, y):
+    pass
+
+  def fill(self, tile):
+    pass
+
+  def dig(self, tile):
+    pass
+
+  def attack(self, target):
+    pass
+
+  def __setattr__(self, name, value):
+      if name in self.game_state_attributes:
+        object.__setattr__(self, 'updatedAt', self.game.turnNumber)
+      object.__setattr__(self, name, value)
+
 
 # The following are animations and do not need to have any logic added
-class DigAnimation:
-  def __init__(self, actingID, tileID):
-    self.actingID = actingID
-    self.tileID = tileID
-
-  def toList(self):
-    return ["dig", self.actingID, self.tileID, ]
-
-  def toJson(self):
-    return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
-
-class AttackAnimation:
-  def __init__(self, actingID, targetID):
-    self.actingID = actingID
-    self.targetID = targetID
-
-  def toList(self):
-    return ["attack", self.actingID, self.targetID, ]
-
-  def toJson(self):
-    return dict(type = "attack", actingID = self.actingID, targetID = self.targetID)
-
 class FillAnimation:
   def __init__(self, actingID, tileID):
     self.actingID = actingID
@@ -184,6 +165,17 @@ class FillAnimation:
 
   def toJson(self):
     return dict(type = "fill", actingID = self.actingID, tileID = self.tileID)
+
+class DigAnimation:
+  def __init__(self, actingID, tileID):
+    self.actingID = actingID
+    self.tileID = tileID
+
+  def toList(self):
+    return ["dig", self.actingID, self.tileID, ]
+
+  def toJson(self):
+    return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
 
 class SpawnAnimation:
   def __init__(self, sourceID, unitID):
@@ -221,4 +213,15 @@ class FlowAnimation:
 
   def toJson(self):
     return dict(type = "flow", sourceID = self.sourceID, destID = self.destID, waterAmount = self.waterAmount)
+
+class AttackAnimation:
+  def __init__(self, actingID, targetID):
+    self.actingID = actingID
+    self.targetID = targetID
+
+  def toList(self):
+    return ["attack", self.actingID, self.targetID, ]
+
+  def toJson(self):
+    return dict(type = "attack", actingID = self.actingID, targetID = self.targetID)
 
