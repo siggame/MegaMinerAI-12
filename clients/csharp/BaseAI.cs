@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
+  public static Player[] players;
   public static Mappable[] mappables;
   public static Tile[] tiles;
-  public static Unit[] units;
-  public static Player[] players;
   public static PumpStation[] pumpStations;
+  public static Unit[] units;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -46,6 +46,12 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.getPlayerCount(connection);
+    players = new Player[count];
+    for(int i = 0; i < count; i++)
+    {
+      players[i] = new Player(Client.getPlayer(connection, i));
+    }
     count = Client.getMappableCount(connection);
     mappables = new Mappable[count];
     for(int i = 0; i < count; i++)
@@ -58,23 +64,17 @@ public abstract class BaseAI
     {
       tiles[i] = new Tile(Client.getTile(connection, i));
     }
-    count = Client.getUnitCount(connection);
-    units = new Unit[count];
-    for(int i = 0; i < count; i++)
-    {
-      units[i] = new Unit(Client.getUnit(connection, i));
-    }
-    count = Client.getPlayerCount(connection);
-    players = new Player[count];
-    for(int i = 0; i < count; i++)
-    {
-      players[i] = new Player(Client.getPlayer(connection, i));
-    }
     count = Client.getPumpStationCount(connection);
     pumpStations = new PumpStation[count];
     for(int i = 0; i < count; i++)
     {
       pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
+    }
+    count = Client.getUnitCount(connection);
+    units = new Unit[count];
+    for(int i = 0; i < count; i++)
+    {
+      units[i] = new Unit(Client.getUnit(connection, i));
     }
 
     if(!initialized)

@@ -18,12 +18,12 @@ public interface Client extends Library {
 
 
     //commands
+  int playerTalk(Pointer object, String message);
   int tileSpawn(Pointer object, int type);
   int unitMove(Pointer object, int x, int y);
   int unitFill(Pointer object, Pointer tile);
   int unitDig(Pointer object, Pointer tile);
   int unitAttack(Pointer object, Pointer target);
-  int playerTalk(Pointer object, String message);
 
     //accessors
   int getMaxHealth(Pointer connection);
@@ -37,19 +37,25 @@ public interface Client extends Library {
   int getUnitCost(Pointer connection);
   int getPlayerID(Pointer connection);
 
+  Pointer getPlayer(Pointer connection, int num);
+  int getPlayerCount(Pointer connection);
   Pointer getMappable(Pointer connection, int num);
   int getMappableCount(Pointer connection);
   Pointer getTile(Pointer connection, int num);
   int getTileCount(Pointer connection);
-  Pointer getUnit(Pointer connection, int num);
-  int getUnitCount(Pointer connection);
-  Pointer getPlayer(Pointer connection, int num);
-  int getPlayerCount(Pointer connection);
   Pointer getPumpStation(Pointer connection, int num);
   int getPumpStationCount(Pointer connection);
+  Pointer getUnit(Pointer connection, int num);
+  int getUnitCount(Pointer connection);
 
 
     //getters
+  int playerGetId(Pointer ptr);
+  String playerGetPlayerName(Pointer ptr);
+  float playerGetTime(Pointer ptr);
+  int playerGetWaterStored(Pointer ptr);
+  int playerGetSpawnResources(Pointer ptr);
+
   int mappableGetId(Pointer ptr);
   int mappableGetX(Pointer ptr);
   int mappableGetY(Pointer ptr);
@@ -63,6 +69,11 @@ public interface Client extends Library {
   int tileGetWaterAmount(Pointer ptr);
   int tileGetIsTrench(Pointer ptr);
 
+  int pumpStationGetId(Pointer ptr);
+  int pumpStationGetOwner(Pointer ptr);
+  int pumpStationGetWaterAmount(Pointer ptr);
+  int pumpStationGetSiegeCount(Pointer ptr);
+
   int unitGetId(Pointer ptr);
   int unitGetX(Pointer ptr);
   int unitGetY(Pointer ptr);
@@ -75,17 +86,6 @@ public interface Client extends Library {
   int unitGetMaxHealth(Pointer ptr);
   int unitGetMovementLeft(Pointer ptr);
   int unitGetMaxMovement(Pointer ptr);
-
-  int playerGetId(Pointer ptr);
-  String playerGetPlayerName(Pointer ptr);
-  float playerGetTime(Pointer ptr);
-  int playerGetWaterStored(Pointer ptr);
-  int playerGetSpawnResources(Pointer ptr);
-
-  int pumpStationGetId(Pointer ptr);
-  int pumpStationGetOwner(Pointer ptr);
-  int pumpStationGetWaterAmount(Pointer ptr);
-  int pumpStationGetSiegeCount(Pointer ptr);
 
 
     //properties

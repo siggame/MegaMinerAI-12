@@ -41,6 +41,9 @@ library.networkLoop.restype = c_int
 library.networkLoop.argtypes = [c_void_p]
 
 #Functions
+library.playerTalk.restype = c_int
+library.playerTalk.argtypes = [c_void_p, c_char_p]
+
 library.tileSpawn.restype = c_int
 library.tileSpawn.argtypes = [c_void_p, c_int]
 
@@ -55,9 +58,6 @@ library.unitDig.argtypes = [c_void_p, c_void_p]
 
 library.unitAttack.restype = c_int
 library.unitAttack.argtypes = [c_void_p, c_void_p]
-
-library.playerTalk.restype = c_int
-library.playerTalk.argtypes = [c_void_p, c_char_p]
 
 # accessors
 
@@ -92,6 +92,12 @@ library.getUnitCost.argtypes = [c_void_p]
 library.getPlayerID.restype = c_int
 library.getPlayerID.argtypes = [c_void_p]
 
+library.getPlayer.restype = c_void_p
+library.getPlayer.argtypes = [c_void_p, c_int]
+
+library.getPlayerCount.restype = c_int
+library.getPlayerCount.argtypes = [c_void_p]
+
 library.getMappable.restype = c_void_p
 library.getMappable.argtypes = [c_void_p, c_int]
 
@@ -104,27 +110,36 @@ library.getTile.argtypes = [c_void_p, c_int]
 library.getTileCount.restype = c_int
 library.getTileCount.argtypes = [c_void_p]
 
-library.getUnit.restype = c_void_p
-library.getUnit.argtypes = [c_void_p, c_int]
-
-library.getUnitCount.restype = c_int
-library.getUnitCount.argtypes = [c_void_p]
-
-library.getPlayer.restype = c_void_p
-library.getPlayer.argtypes = [c_void_p, c_int]
-
-library.getPlayerCount.restype = c_int
-library.getPlayerCount.argtypes = [c_void_p]
-
 library.getPumpStation.restype = c_void_p
 library.getPumpStation.argtypes = [c_void_p, c_int]
 
 library.getPumpStationCount.restype = c_int
 library.getPumpStationCount.argtypes = [c_void_p]
 
+library.getUnit.restype = c_void_p
+library.getUnit.argtypes = [c_void_p, c_int]
+
+library.getUnitCount.restype = c_int
+library.getUnitCount.argtypes = [c_void_p]
+
 # getters
 
 #Data
+library.playerGetId.restype = c_int
+library.playerGetId.argtypes = [c_void_p]
+
+library.playerGetPlayerName.restype = c_char_p
+library.playerGetPlayerName.argtypes = [c_void_p]
+
+library.playerGetTime.restype = c_float
+library.playerGetTime.argtypes = [c_void_p]
+
+library.playerGetWaterStored.restype = c_int
+library.playerGetWaterStored.argtypes = [c_void_p]
+
+library.playerGetSpawnResources.restype = c_int
+library.playerGetSpawnResources.argtypes = [c_void_p]
+
 library.mappableGetId.restype = c_int
 library.mappableGetId.argtypes = [c_void_p]
 
@@ -157,6 +172,18 @@ library.tileGetWaterAmount.argtypes = [c_void_p]
 
 library.tileGetIsTrench.restype = c_int
 library.tileGetIsTrench.argtypes = [c_void_p]
+
+library.pumpStationGetId.restype = c_int
+library.pumpStationGetId.argtypes = [c_void_p]
+
+library.pumpStationGetOwner.restype = c_int
+library.pumpStationGetOwner.argtypes = [c_void_p]
+
+library.pumpStationGetWaterAmount.restype = c_int
+library.pumpStationGetWaterAmount.argtypes = [c_void_p]
+
+library.pumpStationGetSiegeCount.restype = c_int
+library.pumpStationGetSiegeCount.argtypes = [c_void_p]
 
 library.unitGetId.restype = c_int
 library.unitGetId.argtypes = [c_void_p]
@@ -193,33 +220,6 @@ library.unitGetMovementLeft.argtypes = [c_void_p]
 
 library.unitGetMaxMovement.restype = c_int
 library.unitGetMaxMovement.argtypes = [c_void_p]
-
-library.playerGetId.restype = c_int
-library.playerGetId.argtypes = [c_void_p]
-
-library.playerGetPlayerName.restype = c_char_p
-library.playerGetPlayerName.argtypes = [c_void_p]
-
-library.playerGetTime.restype = c_float
-library.playerGetTime.argtypes = [c_void_p]
-
-library.playerGetWaterStored.restype = c_int
-library.playerGetWaterStored.argtypes = [c_void_p]
-
-library.playerGetSpawnResources.restype = c_int
-library.playerGetSpawnResources.argtypes = [c_void_p]
-
-library.pumpStationGetId.restype = c_int
-library.pumpStationGetId.argtypes = [c_void_p]
-
-library.pumpStationGetOwner.restype = c_int
-library.pumpStationGetOwner.argtypes = [c_void_p]
-
-library.pumpStationGetWaterAmount.restype = c_int
-library.pumpStationGetWaterAmount.argtypes = [c_void_p]
-
-library.pumpStationGetSiegeCount.restype = c_int
-library.pumpStationGetSiegeCount.argtypes = [c_void_p]
 
 
 #Properties

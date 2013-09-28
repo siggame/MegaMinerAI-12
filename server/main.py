@@ -116,6 +116,16 @@ class GameApp(AccountsAppMixin, BaseApp):
   @protocolmethod
   @errorBuffer
   @requireTurn
+  @requireTypes(None, int, str)
+  def gameTalk(self, player, message):
+    """Allows a player to display messages on the screen"""
+    if self.game.turn is not self:
+      return "Not your turn."
+    return self.game.talk(player, message)
+
+  @protocolmethod
+  @errorBuffer
+  @requireTurn
   @requireTypes(None, int, int)
   def gameSpawn(self, tile, type):
     """Attempt to spawn a unit of a type on this tile."""
@@ -162,16 +172,6 @@ class GameApp(AccountsAppMixin, BaseApp):
     if self.game.turn is not self:
       return "Not your turn."
     return self.game.attack(unit, target)
-
-  @protocolmethod
-  @errorBuffer
-  @requireTurn
-  @requireTypes(None, int, str)
-  def gameTalk(self, player, message):
-    """Allows a player to display messages on the screen"""
-    if self.game.turn is not self:
-      return "Not your turn."
-    return self.game.talk(player, message)
 
 
   @protocolmethod

@@ -1,5 +1,25 @@
 #include "getters.h"
 
+DLLEXPORT int playerGetId(_Player* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT char* playerGetPlayerName(_Player* ptr)
+{
+  return ptr->playerName;
+}
+DLLEXPORT float playerGetTime(_Player* ptr)
+{
+  return ptr->time;
+}
+DLLEXPORT int playerGetWaterStored(_Player* ptr)
+{
+  return ptr->waterStored;
+}
+DLLEXPORT int playerGetSpawnResources(_Player* ptr)
+{
+  return ptr->spawnResources;
+}
 DLLEXPORT int mappableGetId(_Mappable* ptr)
 {
   return ptr->id;
@@ -43,6 +63,22 @@ DLLEXPORT int tileGetWaterAmount(_Tile* ptr)
 DLLEXPORT int tileGetIsTrench(_Tile* ptr)
 {
   return ptr->isTrench;
+}
+DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
+{
+  return ptr->owner;
+}
+DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
+{
+  return ptr->waterAmount;
+}
+DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr)
+{
+  return ptr->siegeCount;
 }
 DLLEXPORT int unitGetId(_Unit* ptr)
 {
@@ -91,41 +127,5 @@ DLLEXPORT int unitGetMovementLeft(_Unit* ptr)
 DLLEXPORT int unitGetMaxMovement(_Unit* ptr)
 {
   return ptr->maxMovement;
-}
-DLLEXPORT int playerGetId(_Player* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT char* playerGetPlayerName(_Player* ptr)
-{
-  return ptr->playerName;
-}
-DLLEXPORT float playerGetTime(_Player* ptr)
-{
-  return ptr->time;
-}
-DLLEXPORT int playerGetWaterStored(_Player* ptr)
-{
-  return ptr->waterStored;
-}
-DLLEXPORT int playerGetSpawnResources(_Player* ptr)
-{
-  return ptr->spawnResources;
-}
-DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
-{
-  return ptr->owner;
-}
-DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
-{
-  return ptr->waterAmount;
-}
-DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr)
-{
-  return ptr->siegeCount;
 }
 

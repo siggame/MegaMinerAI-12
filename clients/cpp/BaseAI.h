@@ -8,11 +8,11 @@
 #include <ctime>
 #include "game.h"
 
+#include "Player.h"
 #include "Mappable.h"
 #include "Tile.h"
-#include "Unit.h"
-#include "Player.h"
 #include "PumpStation.h"
+#include "Unit.h"
 
 /// \brief A basic AI interface.
 
@@ -23,11 +23,11 @@ class BaseAI
 {
 protected:
   Connection* c;
+  std::vector<Player> players;
   std::vector<Mappable> mappables;
   std::vector<Tile> tiles;
-  std::vector<Unit> units;
-  std::vector<Player> players;
   std::vector<PumpStation> pumpStations;
+  std::vector<Unit> units;
 public:
   ///The maximum amount of health a unit will have.
   int maxHealth();

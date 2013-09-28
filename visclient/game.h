@@ -45,16 +45,16 @@ struct Connection
   int unitCost;
   int playerID;
 
+  _Player* Players;
+  int PlayerCount;
   _Mappable* Mappables;
   int MappableCount;
   _Tile* Tiles;
   int TileCount;
-  _Unit* Units;
-  int UnitCount;
-  _Player* Players;
-  int PlayerCount;
   _PumpStation* PumpStations;
   int PumpStationCount;
+  _Unit* Units;
+  int UnitCount;
 };
 
 #ifdef __cplusplus
@@ -75,6 +75,8 @@ extern "C"
 
 //commands
 
+  ///Allows a player to display messages on the screen
+  DLLEXPORT int playerTalk(_Player* object, char* message);
   ///Attempt to spawn a unit of a type on this tile.
   DLLEXPORT int tileSpawn(_Tile* object, int type);
   ///Make the unit move to the respective x and y location.
@@ -85,8 +87,6 @@ extern "C"
   DLLEXPORT int unitDig(_Unit* object, _Tile* tile);
   ///Command to attack another Unit.
   DLLEXPORT int unitAttack(_Unit* object, _Unit* target);
-  ///Allows a player to display messages on the screen
-  DLLEXPORT int playerTalk(_Player* object, char* message);
 
 //derived properties
 
@@ -105,20 +105,20 @@ DLLEXPORT int getMaxUnits(Connection* c);
 DLLEXPORT int getUnitCost(Connection* c);
 DLLEXPORT int getPlayerID(Connection* c);
 
+DLLEXPORT _Player* getPlayer(Connection* c, int num);
+DLLEXPORT int getPlayerCount(Connection* c);
+
 DLLEXPORT _Mappable* getMappable(Connection* c, int num);
 DLLEXPORT int getMappableCount(Connection* c);
 
 DLLEXPORT _Tile* getTile(Connection* c, int num);
 DLLEXPORT int getTileCount(Connection* c);
 
-DLLEXPORT _Unit* getUnit(Connection* c, int num);
-DLLEXPORT int getUnitCount(Connection* c);
-
-DLLEXPORT _Player* getPlayer(Connection* c, int num);
-DLLEXPORT int getPlayerCount(Connection* c);
-
 DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num);
 DLLEXPORT int getPumpStationCount(Connection* c);
+
+DLLEXPORT _Unit* getUnit(Connection* c, int num);
+DLLEXPORT int getUnitCount(Connection* c);
 
 
 

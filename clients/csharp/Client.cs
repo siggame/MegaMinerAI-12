@@ -25,6 +25,8 @@ public class Client {
 
     //commands
   [DllImport("client")]
+  public static extern int playerTalk(IntPtr self, string message);
+  [DllImport("client")]
   public static extern int tileSpawn(IntPtr self, int type);
   [DllImport("client")]
   public static extern int unitMove(IntPtr self, int x, int y);
@@ -34,8 +36,6 @@ public class Client {
   public static extern int unitDig(IntPtr self, IntPtr tile);
   [DllImport("client")]
   public static extern int unitAttack(IntPtr self, IntPtr target);
-  [DllImport("client")]
-  public static extern int playerTalk(IntPtr self, string message);
 
     //accessors
   [DllImport("client")]
@@ -60,6 +60,10 @@ public class Client {
   public static extern int getPlayerID(IntPtr connection);
 
   [DllImport("client")]
+  public static extern IntPtr getPlayer(IntPtr connection, int num);
+  [DllImport("client")]
+  public static extern int getPlayerCount(IntPtr connection);
+  [DllImport("client")]
   public static extern IntPtr getMappable(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getMappableCount(IntPtr connection);
@@ -68,20 +72,27 @@ public class Client {
   [DllImport("client")]
   public static extern int getTileCount(IntPtr connection);
   [DllImport("client")]
-  public static extern IntPtr getUnit(IntPtr connection, int num);
-  [DllImport("client")]
-  public static extern int getUnitCount(IntPtr connection);
-  [DllImport("client")]
-  public static extern IntPtr getPlayer(IntPtr connection, int num);
-  [DllImport("client")]
-  public static extern int getPlayerCount(IntPtr connection);
-  [DllImport("client")]
   public static extern IntPtr getPumpStation(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getPumpStationCount(IntPtr connection);
+  [DllImport("client")]
+  public static extern IntPtr getUnit(IntPtr connection, int num);
+  [DllImport("client")]
+  public static extern int getUnitCount(IntPtr connection);
 
 
     //getters
+  [DllImport("client")]
+  public static extern int playerGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern IntPtr playerGetPlayerName(IntPtr ptr);
+  [DllImport("client")]
+  public static extern float playerGetTime(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int playerGetWaterStored(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int playerGetSpawnResources(IntPtr ptr);
+
   [DllImport("client")]
   public static extern int mappableGetId(IntPtr ptr);
   [DllImport("client")]
@@ -107,6 +118,15 @@ public class Client {
   public static extern int tileGetIsTrench(IntPtr ptr);
 
   [DllImport("client")]
+  public static extern int pumpStationGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetOwner(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetSiegeCount(IntPtr ptr);
+
+  [DllImport("client")]
   public static extern int unitGetId(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetX(IntPtr ptr);
@@ -130,26 +150,6 @@ public class Client {
   public static extern int unitGetMovementLeft(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetMaxMovement(IntPtr ptr);
-
-  [DllImport("client")]
-  public static extern int playerGetId(IntPtr ptr);
-  [DllImport("client")]
-  public static extern IntPtr playerGetPlayerName(IntPtr ptr);
-  [DllImport("client")]
-  public static extern float playerGetTime(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int playerGetWaterStored(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int playerGetSpawnResources(IntPtr ptr);
-
-  [DllImport("client")]
-  public static extern int pumpStationGetId(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetOwner(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetSiegeCount(IntPtr ptr);
 
 
     //properties
