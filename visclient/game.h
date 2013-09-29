@@ -34,6 +34,8 @@ struct Connection
   pthread_mutex_t mutex;
   #endif
   
+  int mapWidth;
+  int mapHeight;
   int maxHealth;
   int trenchDamage;
   int waterDamage;
@@ -50,10 +52,10 @@ struct Connection
   int PlayerCount;
   _Mappable* Mappables;
   int MappableCount;
-  _Unit* Units;
-  int UnitCount;
   _PumpStation* PumpStations;
   int PumpStationCount;
+  _Unit* Units;
+  int UnitCount;
   _Tile* Tiles;
   int TileCount;
 };
@@ -95,6 +97,8 @@ extern "C"
 
 //accessors
 
+DLLEXPORT int getMapWidth(Connection* c);
+DLLEXPORT int getMapHeight(Connection* c);
 DLLEXPORT int getMaxHealth(Connection* c);
 DLLEXPORT int getTrenchDamage(Connection* c);
 DLLEXPORT int getWaterDamage(Connection* c);
@@ -113,11 +117,11 @@ DLLEXPORT int getPlayerCount(Connection* c);
 DLLEXPORT _Mappable* getMappable(Connection* c, int num);
 DLLEXPORT int getMappableCount(Connection* c);
 
-DLLEXPORT _Unit* getUnit(Connection* c, int num);
-DLLEXPORT int getUnitCount(Connection* c);
-
 DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num);
 DLLEXPORT int getPumpStationCount(Connection* c);
+
+DLLEXPORT _Unit* getUnit(Connection* c, int num);
+DLLEXPORT int getUnitCount(Connection* c);
 
 DLLEXPORT _Tile* getTile(Connection* c, int num);
 DLLEXPORT int getTileCount(Connection* c);

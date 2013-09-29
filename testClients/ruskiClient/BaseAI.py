@@ -17,21 +17,21 @@ class BaseAI:
   #\endcond
   players = []
   mappables = []
-  units = []
   pumpStations = []
+  units = []
   tiles = []
   #\cond
   def startTurn(self):
     from GameObject import Player
     from GameObject import Mappable
-    from GameObject import Unit
     from GameObject import PumpStation
+    from GameObject import Unit
     from GameObject import Tile
 
     BaseAI.players = [Player(library.getPlayer(self.connection, i)) for i in xrange(library.getPlayerCount(self.connection))]
     BaseAI.mappables = [Mappable(library.getMappable(self.connection, i)) for i in xrange(library.getMappableCount(self.connection))]
-    BaseAI.units = [Unit(library.getUnit(self.connection, i)) for i in xrange(library.getUnitCount(self.connection))]
     BaseAI.pumpStations = [PumpStation(library.getPumpStation(self.connection, i)) for i in xrange(library.getPumpStationCount(self.connection))]
+    BaseAI.units = [Unit(library.getUnit(self.connection, i)) for i in xrange(library.getUnitCount(self.connection))]
     BaseAI.tiles = [Tile(library.getTile(self.connection, i)) for i in xrange(library.getTileCount(self.connection))]
 
     if not self.initialized:
@@ -49,6 +49,16 @@ class BaseAI:
       return r.next()
     return r
   #\endcond
+  #\cond
+  def getMapWidth(self):
+    return library.getMapWidth(self.connection)
+  #\endcond
+  mapWidth = property(getMapWidth)
+  #\cond
+  def getMapHeight(self):
+    return library.getMapHeight(self.connection)
+  #\endcond
+  mapHeight = property(getMapHeight)
   #\cond
   def getMaxHealth(self):
     return library.getMaxHealth(self.connection)

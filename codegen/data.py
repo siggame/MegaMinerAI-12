@@ -9,6 +9,8 @@ constants = [
   ]
 
 globals = [
+  Variable('mapWidth', int, 'The width of the total map.'),
+  Variable('mapHeight', int, 'The height of the total map.'),
   Variable('maxHealth', int, 'The maximum amount of health a unit will have.'),
   Variable('trenchDamage', int, 'The amount of damage walking over a trench.'),
   Variable('waterDamage', int, 'The amount of damage walking over water.'),

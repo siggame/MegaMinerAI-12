@@ -39,6 +39,10 @@ public class Client {
 
     //accessors
   [DllImport("client")]
+  public static extern int getMapWidth(IntPtr connection);
+  [DllImport("client")]
+  public static extern int getMapHeight(IntPtr connection);
+  [DllImport("client")]
   public static extern int getMaxHealth(IntPtr connection);
   [DllImport("client")]
   public static extern int getTrenchDamage(IntPtr connection);
@@ -70,13 +74,13 @@ public class Client {
   [DllImport("client")]
   public static extern int getMappableCount(IntPtr connection);
   [DllImport("client")]
-  public static extern IntPtr getUnit(IntPtr connection, int num);
-  [DllImport("client")]
-  public static extern int getUnitCount(IntPtr connection);
-  [DllImport("client")]
   public static extern IntPtr getPumpStation(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getPumpStationCount(IntPtr connection);
+  [DllImport("client")]
+  public static extern IntPtr getUnit(IntPtr connection, int num);
+  [DllImport("client")]
+  public static extern int getUnitCount(IntPtr connection);
   [DllImport("client")]
   public static extern IntPtr getTile(IntPtr connection, int num);
   [DllImport("client")]
@@ -103,6 +107,15 @@ public class Client {
   public static extern int mappableGetY(IntPtr ptr);
 
   [DllImport("client")]
+  public static extern int pumpStationGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetOwner(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetSiegeCount(IntPtr ptr);
+
+  [DllImport("client")]
   public static extern int unitGetId(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetX(IntPtr ptr);
@@ -126,15 +139,6 @@ public class Client {
   public static extern int unitGetMovementLeft(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetMaxMovement(IntPtr ptr);
-
-  [DllImport("client")]
-  public static extern int pumpStationGetId(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetOwner(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetSiegeCount(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int tileGetId(IntPtr ptr);

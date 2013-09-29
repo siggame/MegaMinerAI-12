@@ -5,6 +5,14 @@
 #include "BaseAI.h"
 #include "game.h"
 
+int BaseAI::mapWidth()
+{
+  return getMapWidth(c);
+}
+int BaseAI::mapHeight()
+{
+  return getMapHeight(c);
+}
 int BaseAI::maxHealth()
 {
   return getMaxHealth(c);
@@ -70,20 +78,20 @@ bool BaseAI::startTurn()
     mappables[i] = Mappable(getMappable(c, i));
   }
 
-  count = getUnitCount(c);
-  units.clear();
-  units.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    units[i] = Unit(getUnit(c, i));
-  }
-
   count = getPumpStationCount(c);
   pumpStations.clear();
   pumpStations.resize(count);
   for(int i = 0; i < count; i++)
   {
     pumpStations[i] = PumpStation(getPumpStation(c, i));
+  }
+
+  count = getUnitCount(c);
+  units.clear();
+  units.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    units[i] = Unit(getUnit(c, i));
   }
 
   count = getTileCount(c);

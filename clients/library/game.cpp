@@ -54,6 +54,8 @@ DLLEXPORT Connection* createConnection()
   pthread_mutex_init(&c->mutex, NULL);
   #endif
 
+  c->mapWidth = 0;
+  c->mapHeight = 0;
   c->maxHealth = 0;
   c->trenchDamage = 0;
   c->waterDamage = 0;
@@ -69,10 +71,10 @@ DLLEXPORT Connection* createConnection()
   c->PlayerCount = 0;
   c->Mappables = NULL;
   c->MappableCount = 0;
-  c->Units = NULL;
-  c->UnitCount = 0;
   c->PumpStations = NULL;
   c->PumpStationCount = 0;
+  c->Units = NULL;
+  c->UnitCount = 0;
   c->Tiles = NULL;
   c->TileCount = 0;
   return c;
@@ -98,19 +100,19 @@ DLLEXPORT void destroyConnection(Connection* c)
     }
     delete[] c->Mappables;
   }
-  if(c->Units)
-  {
-    for(int i = 0; i < c->UnitCount; i++)
-    {
-    }
-    delete[] c->Units;
-  }
   if(c->PumpStations)
   {
     for(int i = 0; i < c->PumpStationCount; i++)
     {
     }
     delete[] c->PumpStations;
+  }
+  if(c->Units)
+  {
+    for(int i = 0; i < c->UnitCount; i++)
+    {
+    }
+    delete[] c->Units;
   }
   if(c->Tiles)
   {
@@ -241,6 +243,7 @@ DLLEXPORT int playerTalk(_Player* object, char* message)
 
 
 
+
 DLLEXPORT int unitMove(_Unit* object, int x, int y)
 {
   stringstream expr;
@@ -289,7 +292,6 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   UNLOCK( &object->_c->mutex);
   return 1;
 }
-
 
 
 DLLEXPORT int tileSpawn(_Tile* object, int type)
@@ -342,6 +344,23 @@ void parseMappable(Connection* c, _Mappable* object, sexp_t* expression)
   sub = sub->next;
 
 }
+void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
+{
+  sexp_t* sub;
+  sub = expression->list;
+
+  object->_c = c;
+
+  object->id = atoi(sub->val);
+  sub = sub->next;
+  object->owner = atoi(sub->val);
+  sub = sub->next;
+  object->waterAmount = atoi(sub->val);
+  sub = sub->next;
+  object->siegeCount = atoi(sub->val);
+  sub = sub->next;
+
+}
 void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -372,23 +391,6 @@ void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
   object->movementLeft = atoi(sub->val);
   sub = sub->next;
   object->maxMovement = atoi(sub->val);
-  sub = sub->next;
-
-}
-void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
-{
-  sexp_t* sub;
-  sub = expression->list;
-
-  object->_c = c;
-
-  object->id = atoi(sub->val);
-  sub = sub->next;
-  object->owner = atoi(sub->val);
-  sub = sub->next;
-  object->waterAmount = atoi(sub->val);
-  sub = sub->next;
-  object->siegeCount = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -486,6 +488,12 @@ DLLEXPORT int networkLoop(Connection* c)
         if(string(sub->val) == "game")
         {
           sub = sub->next;
+          c->mapWidth = atoi(sub->val);
+          sub = sub->next;
+
+          c->mapHeight = atoi(sub->val);
+          sub = sub->next;
+
           c->maxHealth = atoi(sub->val);
           sub = sub->next;
 
@@ -555,23 +563,6 @@ DLLEXPORT int networkLoop(Connection* c)
             parseMappable(c, c->Mappables+i, sub);
           }
         }
-        else if(string(sub->val) == "Unit")
-        {
-          if(c->Units)
-          {
-            for(int i = 0; i < c->UnitCount; i++)
-            {
-            }
-            delete[] c->Units;
-          }
-          c->UnitCount =  sexp_list_length(expression)-1; //-1 for the header
-          c->Units = new _Unit[c->UnitCount];
-          for(int i = 0; i < c->UnitCount; i++)
-          {
-            sub = sub->next;
-            parseUnit(c, c->Units+i, sub);
-          }
-        }
         else if(string(sub->val) == "PumpStation")
         {
           if(c->PumpStations)
@@ -600,6 +591,23 @@ DLLEXPORT int networkLoop(Connection* c)
               sub = sub->next;
               parsePumpStation(c, c->PumpStations+i, sub);
             }
+          }
+        }
+        else if(string(sub->val) == "Unit")
+        {
+          if(c->Units)
+          {
+            for(int i = 0; i < c->UnitCount; i++)
+            {
+            }
+            delete[] c->Units;
+          }
+          c->UnitCount =  sexp_list_length(expression)-1; //-1 for the header
+          c->Units = new _Unit[c->UnitCount];
+          for(int i = 0; i < c->UnitCount; i++)
+          {
+            sub = sub->next;
+            parseUnit(c, c->Units+i, sub);
           }
         }
         else if(string(sub->val) == "Tile")
@@ -664,15 +672,6 @@ DLLEXPORT int getMappableCount(Connection* c)
   return c->MappableCount;
 }
 
-DLLEXPORT _Unit* getUnit(Connection* c, int num)
-{
-  return c->Units + num;
-}
-DLLEXPORT int getUnitCount(Connection* c)
-{
-  return c->UnitCount;
-}
-
 DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num)
 {
   return c->PumpStations + num;
@@ -680,6 +679,15 @@ DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num)
 DLLEXPORT int getPumpStationCount(Connection* c)
 {
   return c->PumpStationCount;
+}
+
+DLLEXPORT _Unit* getUnit(Connection* c, int num)
+{
+  return c->Units + num;
+}
+DLLEXPORT int getUnitCount(Connection* c)
+{
+  return c->UnitCount;
 }
 
 DLLEXPORT _Tile* getTile(Connection* c, int num)
@@ -692,6 +700,14 @@ DLLEXPORT int getTileCount(Connection* c)
 }
 
 
+DLLEXPORT int getMapWidth(Connection* c)
+{
+  return c->mapWidth;
+}
+DLLEXPORT int getMapHeight(Connection* c)
+{
+  return c->mapHeight;
+}
 DLLEXPORT int getMaxHealth(Connection* c)
 {
   return c->maxHealth;

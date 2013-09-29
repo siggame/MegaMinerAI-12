@@ -32,6 +32,22 @@ DLLEXPORT int mappableGetY(_Mappable* ptr)
 {
   return ptr->y;
 }
+DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
+{
+  return ptr->owner;
+}
+DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
+{
+  return ptr->waterAmount;
+}
+DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr)
+{
+  return ptr->siegeCount;
+}
 DLLEXPORT int unitGetId(_Unit* ptr)
 {
   return ptr->id;
@@ -79,22 +95,6 @@ DLLEXPORT int unitGetMovementLeft(_Unit* ptr)
 DLLEXPORT int unitGetMaxMovement(_Unit* ptr)
 {
   return ptr->maxMovement;
-}
-DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
-{
-  return ptr->owner;
-}
-DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
-{
-  return ptr->waterAmount;
-}
-DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr)
-{
-  return ptr->siegeCount;
 }
 DLLEXPORT int tileGetId(_Tile* ptr)
 {

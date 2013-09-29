@@ -10,8 +10,8 @@
 
 #include "Player.h"
 #include "Mappable.h"
-#include "Unit.h"
 #include "PumpStation.h"
+#include "Unit.h"
 #include "Tile.h"
 
 /// \brief A basic AI interface.
@@ -25,10 +25,14 @@ protected:
   Connection* c;
   std::vector<Player> players;
   std::vector<Mappable> mappables;
-  std::vector<Unit> units;
   std::vector<PumpStation> pumpStations;
+  std::vector<Unit> units;
   std::vector<Tile> tiles;
 public:
+  ///The width of the total map.
+  int mapWidth();
+  ///The height of the total map.
+  int mapHeight();
   ///The maximum amount of health a unit will have.
   int maxHealth();
   ///The amount of damage walking over a trench.
