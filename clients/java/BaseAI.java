@@ -9,8 +9,8 @@ public abstract class BaseAI
 {
   static Player[] players;
   static Mappable[] mappables;
-  static Unit[] units;
   static PumpStation[] pumpStations;
+  static Unit[] units;
   static Tile[] tiles;
   Pointer connection;
   static int iteration;
@@ -57,17 +57,17 @@ public abstract class BaseAI
     {
       mappables[i] = new Mappable(Client.INSTANCE.getMappable(connection, i));
     }
-    count = Client.INSTANCE.getUnitCount(connection);
-    units = new Unit[count];
-    for(int i = 0; i < count; i++)
-    {
-      units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
-    }
     count = Client.INSTANCE.getPumpStationCount(connection);
     pumpStations = new PumpStation[count];
     for(int i = 0; i < count; i++)
     {
       pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
+    }
+    count = Client.INSTANCE.getUnitCount(connection);
+    units = new Unit[count];
+    for(int i = 0; i < count; i++)
+    {
+      units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
     }
     count = Client.INSTANCE.getTileCount(connection);
     tiles = new Tile[count];
@@ -85,6 +85,16 @@ public abstract class BaseAI
   }
 
 
+  ///The width of the total map.
+  int mapWidth()
+  {
+    return Client.INSTANCE.getMapWidth(connection);
+  }
+  ///The height of the total map.
+  int mapHeight()
+  {
+    return Client.INSTANCE.getMapHeight(connection);
+  }
   ///The maximum amount of health a unit will have.
   int maxHealth()
   {
