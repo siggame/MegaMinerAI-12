@@ -9,6 +9,7 @@ import itertools
 import scribe
 import jsonLogger
 import mapGenerator
+import random
 #import set_tiles
 
 
@@ -58,9 +59,9 @@ class Match(DefaultGameWorld):
     if type == "player":
       self.players.append(connection)
       try:
-        #game_state_attributes = ['id', 'playerName', 'time', 'waterStored', 'spawnResources']
-        playerStats = [connection.screenName, self.startTime, 0, 0]
-        self.addObject(Player, playerStats)
+        #['id', 'playerName', 'time', 'waterStored', 'spawnResources']
+        startingResources = 1000
+        self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources])
       except TypeError:
         raise TypeError("Someone forgot to add the extra attributes to the Player object initialization")
     elif type == "spectator":
@@ -88,12 +89,27 @@ class Match(DefaultGameWorld):
     #TODO: START STUFF
     self.turn = self.players[-1]
     self.turnNumber = -1
-    
-    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, 0, 0, 1]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+
+    # ['id', 'x', 'y', 'owner', 'type', 'pumpID', 'waterAmount', 'isTrench']
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, 0, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+    self.setTiles()
     #set_tiles(self)
 
     self.nextTurn()
     return True
+
+  def setTiles(self):
+    #TODO: Better spawner spawning
+    #Set Tiles on far sides as spawns
+    for y in range(self.mapHeight):
+      for x in range(self.mapWidth/2):
+        rand = random.random()
+        if rand > .95:
+            self.grid[x][y][0].owner = 0
+            self.grid[self.mapWidth-x-1][y][0].owner = 1
+
+
+    pass
 
   def waterFlow(self):
       #TODO: Create water flow conditions to move water from icecaps to pump stations

@@ -22,6 +22,7 @@ class Player(object):
       for newUnitStats in self.spawnQueue:
         newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
+      self.spawnQueue = []
     return True
 
   def talk(self, message):
@@ -107,7 +108,11 @@ class Unit(Mappable):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDigged = self.hasDigged, hasBuilt = self.hasBuilt, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, )
   
   def nextTurn(self):
-    pass
+    self.movementLeft = self.maxMovement
+    self.hasAttacked = 0
+    self.hasBuilt = 0
+    self.hasDigged = 0
+    return True
 
   def move(self, x, y):
     if self.owner != self.game.playerID:
@@ -120,27 +125,31 @@ class Unit(Mappable):
       return 'Turn {}: Your unit {} can only move one unit away. ({}.{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
 
     #Check for units running into each other
-    for unit in self.game.units:
-      if unit.x == x and unit.y == y:
-        return 'Turn[]: Your unit {} is trying to run into unit {}. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, unit.id, self.x, self.y, x, y)
+    if len(self.game.grid[x][y]) > 1:
+        return 'Turn {}: Your unit {} is trying to run into something. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+
 
     self.game.grid[self.x][self.y].remove(self)
-    self.game.grid[x][x].append(self)
 
     self.game.addAnimation(MoveAnimation(self.id,self.x,self.y,x,y))
-    self.movementLeft -= 1
     self.x = x
     self.y = y
+    self.movementLeft -= 1
+    self.game.grid[self.x][self.y].append(self)
+
 
     return True
 
   def fill(self, tile):
+    #TODO: Unit Fill Function
     pass
 
   def dig(self, tile):
+    #TODO: Unit Dig Function
     pass
 
   def attack(self, target):
+    #TODO: Unit Attack Function
     pass
 
   def __setattr__(self, name, value):
@@ -170,10 +179,11 @@ class Tile(Mappable):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, pumpID = self.pumpID, waterAmount = self.waterAmount, isTrench = self.isTrench, )
   
   def nextTurn(self):
+    #TODO: Tile Next Turn (Possible Flow Logic?)
     pass
 
   def spawn(self, type):
-    player = self.game.players[self.game.playerID]
+    player = self.game.objects.players[self.game.playerID]
 
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
@@ -182,12 +192,14 @@ class Tile(Mappable):
     if type not in [1,2]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
 
+    if len(self.game.grid[self.x][self.y]) > 1:
+      return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
+
     player.spawnResources -= self.game.unitCost
 
-    maxMovements = 1
     #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDigged', 'hasBuilt', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
-    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, maxMovements, maxMovements ]
-    player.spawning.append(newUnitStats)
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, 1, 1 ]
+    player.spawnQueue.append(newUnitStats)
 
     #TODO: Add spawning animation
 
