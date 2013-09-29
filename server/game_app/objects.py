@@ -8,6 +8,7 @@ class Player(object):
     self.waterStored = waterStored
     self.spawnResources = spawnResources
     self.updatedAt = game.turnNumber
+    self.spawnQueue = []
 
   def toList(self):
     return [self.id, self.playerName, self.time, self.waterStored, self.spawnResources, ]
@@ -17,7 +18,11 @@ class Player(object):
     return dict(id = self.id, playerName = self.playerName, time = self.time, waterStored = self.waterStored, spawnResources = self.spawnResources, )
   
   def nextTurn(self):
-    pass
+    if self.id == self.game.playerID:
+      for newUnitStats in self.spawnQueue:
+        newUnit = self.game.addObject(Unit, newUnitStats)
+        self.game.grid[newUnit.x][newUnit.y].append(newUnit)
+    return True
 
   def talk(self, message):
     pass
@@ -168,6 +173,24 @@ class Tile(Mappable):
     pass
 
   def spawn(self, type):
+    player = self.game.players[self.game.playerID]
+
+    if self.owner != self.game.playerID:
+      return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
+    if player.spawnResources < self.game.unitCost:
+      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.spawnResources, self.game.unitCost, tile.x, tile.y)
+    if type not in [1,2]:
+      return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
+
+    player.spawnResources -= self.game.unitCost
+
+    maxMovements = 1
+    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDigged', 'hasBuilt', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, maxMovements, maxMovements ]
+    player.spawning.append(newUnitStats)
+
+    #TODO: Add spawning animation
+
     pass
 
   def __setattr__(self, name, value):

@@ -20,12 +20,14 @@ class AI(BaseAI):
     return "password"
 
   def save_snapshot(self):
-    tempGrid = [[' ' for _ in range(self.mapWidth) ] for _ in range(self.mapHeight) ]
+    tempGrid = [[' ' for _ in range( self.mapWidth ) ] for _ in range( self.mapHeight ) ]
     for tile in self.tiles:
       if tile.waterAmount > 0:
         tempGrid[tile.x][tile.y] = 'W'
       elif tile.isTrench == 1:
         tempGrid[tile.x][tile.y] = 'T'
+      elif tile.owner in [0, 1]:
+        tempGrid[tile.x][tile.y] = tile.owner
 
       for pump in self.pumpstations:
         tempGrid[pump.x][pump.y] = 'P'
@@ -35,6 +37,7 @@ class AI(BaseAI):
           tempGrid[pump.x][pump.y] = 'U'
         elif unit.owner == 1:
           tempGrid[pump.x][pump.y] = 'u'
+
 
     self.history.append(tempGrid)
     return
@@ -63,8 +66,13 @@ class AI(BaseAI):
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
-    #self.save_snapshot()
     print(self.turnNumber)
+    #SNAPSHOT AT BEGINNING
+    self.save_snapshot()
+
+
+    #SNAPSHOT AT END
+    self.save_snapshot()
     return 1
 
   def __init__(self, conn):

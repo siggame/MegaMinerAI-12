@@ -32,6 +32,9 @@ class Match(DefaultGameWorld):
       self.dictLog = dict(gameName = "Mars", turns = [])
     self.addPlayer(self.scribe, "spectator")
 
+    self.mapWidth = self.mapWidth
+    self.mapHeight = self.mapHeight
+
     self.maxHealth = self.maxHealth
     self.trenchDamage = self.trenchDamage
     self.waterDamage = self.waterDamage
