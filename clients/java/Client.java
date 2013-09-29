@@ -26,6 +26,8 @@ public interface Client extends Library {
   int tileSpawn(Pointer object, int type);
 
     //accessors
+  int getMapWidth(Pointer connection);
+  int getMapHeight(Pointer connection);
   int getMaxHealth(Pointer connection);
   int getTrenchDamage(Pointer connection);
   int getWaterDamage(Pointer connection);
@@ -42,10 +44,10 @@ public interface Client extends Library {
   int getPlayerCount(Pointer connection);
   Pointer getMappable(Pointer connection, int num);
   int getMappableCount(Pointer connection);
-  Pointer getUnit(Pointer connection, int num);
-  int getUnitCount(Pointer connection);
   Pointer getPumpStation(Pointer connection, int num);
   int getPumpStationCount(Pointer connection);
+  Pointer getUnit(Pointer connection, int num);
+  int getUnitCount(Pointer connection);
   Pointer getTile(Pointer connection, int num);
   int getTileCount(Pointer connection);
 
@@ -61,6 +63,11 @@ public interface Client extends Library {
   int mappableGetX(Pointer ptr);
   int mappableGetY(Pointer ptr);
 
+  int pumpStationGetId(Pointer ptr);
+  int pumpStationGetOwner(Pointer ptr);
+  int pumpStationGetWaterAmount(Pointer ptr);
+  int pumpStationGetSiegeCount(Pointer ptr);
+
   int unitGetId(Pointer ptr);
   int unitGetX(Pointer ptr);
   int unitGetY(Pointer ptr);
@@ -73,11 +80,6 @@ public interface Client extends Library {
   int unitGetMaxHealth(Pointer ptr);
   int unitGetMovementLeft(Pointer ptr);
   int unitGetMaxMovement(Pointer ptr);
-
-  int pumpStationGetId(Pointer ptr);
-  int pumpStationGetOwner(Pointer ptr);
-  int pumpStationGetWaterAmount(Pointer ptr);
-  int pumpStationGetSiegeCount(Pointer ptr);
 
   int tileGetId(Pointer ptr);
   int tileGetX(Pointer ptr);
