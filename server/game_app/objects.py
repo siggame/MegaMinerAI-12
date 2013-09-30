@@ -150,7 +150,7 @@ class Unit(Mappable):
       return 'Turn {}: Your digger {} cannot fill.'.format(self.game.turnNumber, self.id)
     elif self.hasBuilt:
       return 'Turn {}: Your {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
-    elif taxiDist(self, x, y) != 1:
+    elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only fill adjacent Tiles.'.format(self.game.turnNumber, self.id)
     elif not Tile.isTrench:
       return 'Turn {}: Your {} can only fill trench Tiles.'.format(self.game.turnNumber, self.id)
@@ -180,7 +180,7 @@ class Unit(Mappable):
       return 'Turn {}: Your filler {} cannot dig.'.format(self.game.turnNumber, self.id)
     elif self.hasDigged:
       return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
-    elif taxiDist(self, x, y) != 1:
+    elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only dig adjacent Tiles.'.format(self.game.turnNumber, self.id)
     elif Tile.isTrench:
       return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
@@ -206,7 +206,7 @@ class Unit(Mappable):
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
-    elif (taxiDist(self, x, y) != 1)
+    elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only attack adjacent Units. ({}, {})->({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.hasAttacked:
       return 'Turn {}: Your {} has already attacked this turn.'.format(self.game.turnNumber, self.id)
