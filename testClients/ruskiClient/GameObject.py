@@ -144,6 +144,70 @@ class Mappable(GameObject):
     ret += "y: %s\n" % self.getY()
     return ret
 
+##Represents a base to which you want to lead water, and a spawn location for new units.
+class PumpStation(GameObject):
+  def __init__(self, ptr):
+    from BaseAI import BaseAI
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.pumpStationGetId(ptr)
+
+  #\cond
+  def validify(self):
+    from BaseAI import BaseAI
+    #if this class is pointing to an object from before the current turn it's probably
+    #somewhere else in memory now
+    if self._iteration == BaseAI.iteration:
+      return True
+    for i in BaseAI.pumpStations:
+      if i._id == self._id:
+        self._ptr = i._ptr
+        self._iteration = BaseAI.iteration
+        return True
+    raise ExistentialError()
+  #\endcond
+  #\cond
+  def getId(self):
+    self.validify()
+    return library.pumpStationGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
+
+  #\cond
+  def getOwner(self):
+    self.validify()
+    return library.pumpStationGetOwner(self._ptr)
+  #\endcond
+  ##The owner of the PumpStation.
+  owner = property(getOwner)
+
+  #\cond
+  def getWaterAmount(self):
+    self.validify()
+    return library.pumpStationGetWaterAmount(self._ptr)
+  #\endcond
+  ##The amount of water the PumpStation pumps.
+  waterAmount = property(getWaterAmount)
+
+  #\cond
+  def getSiegeCount(self):
+    self.validify()
+    return library.pumpStationGetSiegeCount(self._ptr)
+  #\endcond
+  ##The length of time it takes to capture the PumpStation.
+  siegeCount = property(getSiegeCount)
+
+
+  def __str__(self):
+    self.validify()
+    ret = ""
+    ret += "id: %s\n" % self.getId()
+    ret += "owner: %s\n" % self.getOwner()
+    ret += "waterAmount: %s\n" % self.getWaterAmount()
+    ret += "siegeCount: %s\n" % self.getSiegeCount()
+    return ret
+
 ##Represents a single unit on the map.
 class Unit(Mappable):
   def __init__(self, ptr):
@@ -307,70 +371,6 @@ class Unit(Mappable):
     ret += "maxHealth: %s\n" % self.getMaxHealth()
     ret += "movementLeft: %s\n" % self.getMovementLeft()
     ret += "maxMovement: %s\n" % self.getMaxMovement()
-    return ret
-
-##Represents a base to which you want to lead water, and a spawn location for new units.
-class PumpStation(GameObject):
-  def __init__(self, ptr):
-    from BaseAI import BaseAI
-    self._ptr = ptr
-    self._iteration = BaseAI.iteration
-    self._id = library.pumpStationGetId(ptr)
-
-  #\cond
-  def validify(self):
-    from BaseAI import BaseAI
-    #if this class is pointing to an object from before the current turn it's probably
-    #somewhere else in memory now
-    if self._iteration == BaseAI.iteration:
-      return True
-    for i in BaseAI.pumpStations:
-      if i._id == self._id:
-        self._ptr = i._ptr
-        self._iteration = BaseAI.iteration
-        return True
-    raise ExistentialError()
-  #\endcond
-  #\cond
-  def getId(self):
-    self.validify()
-    return library.pumpStationGetId(self._ptr)
-  #\endcond
-  ##Unique Identifier
-  id = property(getId)
-
-  #\cond
-  def getOwner(self):
-    self.validify()
-    return library.pumpStationGetOwner(self._ptr)
-  #\endcond
-  ##The owner of the PumpStation.
-  owner = property(getOwner)
-
-  #\cond
-  def getWaterAmount(self):
-    self.validify()
-    return library.pumpStationGetWaterAmount(self._ptr)
-  #\endcond
-  ##The amount of water the PumpStation pumps.
-  waterAmount = property(getWaterAmount)
-
-  #\cond
-  def getSiegeCount(self):
-    self.validify()
-    return library.pumpStationGetSiegeCount(self._ptr)
-  #\endcond
-  ##The length of time it takes to capture the PumpStation.
-  siegeCount = property(getSiegeCount)
-
-
-  def __str__(self):
-    self.validify()
-    ret = ""
-    ret += "id: %s\n" % self.getId()
-    ret += "owner: %s\n" % self.getOwner()
-    ret += "waterAmount: %s\n" % self.getWaterAmount()
-    ret += "siegeCount: %s\n" % self.getSiegeCount()
     return ret
 
 ##Represents a single tile on the map, can contain some amount of water.
