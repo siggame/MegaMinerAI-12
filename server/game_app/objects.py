@@ -141,16 +141,96 @@ class Unit(Mappable):
     return True
 
   def fill(self, tile):
-    #TODO: Unit Fill Function
-    pass
+    x = tile.x
+    y = tile.y
+    
+    if self.owner != self.game.playerID:
+      return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
+    elif self.type != 1:
+      return 'Turn {}: Your digger {} cannot fill.'.format(self.game.turnNumber, self.id)
+    elif self.hasBuilt:
+      return 'Turn {}: Your {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
+    elif taxiDist(self, x, y) != 1:
+      return 'Turn {}: Your {} can only fill adjacent Tiles.'.format(self.game.turnNumber, self.id)
+    elif not Tile.isTrench:
+      return 'Turn {}: Your {} can only fill trench Tiles.'.format(self.game.turnNumber, self.id)
+    elif Tile.waterAmount > 0:
+      return 'Turn {}: Your {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
+    elif len(self.game.getUnit(x, y)) != 0:
+      return 'Turn {}: Your {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
+    
+    # Set the Tile to not be a trench
+    tile.isTrench = 0
+    # Unit can no longer move
+    self.movementLeft = 0
+    
+    self.hasBuilt = 1
+    
+    self.game.addAnimation(FillAnimation(self.id, tile.id))
+    
+    return True
 
   def dig(self, tile):
-    #TODO: Unit Dig Function
-    pass
+    x = tile.x
+    y = tile.y
+    
+    if self.owner != self.game.playerID:
+      return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
+    elif self.type != 0:
+      return 'Turn {}: Your filler {} cannot dig.'.format(self.game.turnNumber, self.id)
+    elif self.hasDigged:
+      return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
+    elif taxiDist(self, x, y) != 1:
+      return 'Turn {}: Your {} can only dig adjacent Tiles.'.format(self.game.turnNumber, self.id)
+    elif Tile.isTrench:
+      return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
+    elif Tile.type == 0:
+      return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
+    elif len(self.game.getUnit(x, y)) != 0:
+      return 'Turn {}: Your {} cannot dig under other Units.'.format(self.game.turnNumber, self.id)
+    
+    # Set the Tile to be a trench
+    tile.isTrench = 1
+    # Unit can no longer move
+    self.movementLeft = 0
+    
+    self.hasDigged = 1
+    
+    self.game.addAnimation(DigAnimation(self.id, tile.id))
+    
+    return True
 
   def attack(self, target):
-    #TODO: Unit Attack Function
-    pass
+    x = target.x
+    y = target.y
+    
+    if self.owner != self.game.playerID:
+      return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
+    elif (taxiDist(self, x, y) != 1)
+      return 'Turn {}: Your {} can only attack adjacent Units. ({}, {})->({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif self.hasAttacked:
+      return 'Turn {}: Your {} has already attacked this turn.'.format(self.game.turnNumber, self.id)
+    elif not isinstance(target, Unit):
+      return 'Turn {}: Your {} can only attack other Units.'.format(self.game.turnNumber, self.id)
+    elif target.owner == self.owner:
+      return 'Turn {}: Your {} cannot attack a friendly {}.'.format(self.game.turnNumber, self.id, target.id)
+      
+    self.hasAttacked  = 1
+    
+    # Unit can no longer move
+    self.movementLeft = 0
+    
+    self.game.addAnimation(AttackAnimation(self.id, target.id))
+    
+    # Deal damage
+    target.healthLeft -= attackDamage
+    
+    # Check if target is dead
+    if target.healthLeft <= 0:
+      self.game.grid[x][y].remove(target)
+      self.game.removeObject(target)
+    
+    return True
 
   def __setattr__(self, name, value):
       if name in self.game_state_attributes:
@@ -281,4 +361,3 @@ class DigAnimation:
 
   def toJson(self):
     return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
-
