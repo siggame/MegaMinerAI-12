@@ -42,7 +42,7 @@ void Mars::preDraw()
 	const Input& input = gui->getInput();
 
 	renderer->setColor(Color());
-	renderer->drawTexturedQuad(0.0f,0.0f,2.0f*m_game->states[0].mapWidth,2.0f*m_game->states[0].mapHeight,"mars");
+	renderer->drawTexturedQuad(0.0f,0.0f,m_game->states[0].mapWidth,m_game->states[0].mapHeight,"mars");
 
 // Handle player input here
 }
@@ -106,8 +106,8 @@ void Mars::loadGamelog( std::string gamelog )
 
 	// Setup the renderer as a 4 x 4 map by default
 	// TODO: Change board size to something useful
-	renderer->setCamera( 0, 0, m_game->states[0].mapWidth, m_game->states[0].mapHeight );
-	renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight );
+	renderer->setCamera( 0, 0, m_game->states[0].mapWidth, m_game->states[0].mapHeight);
+	renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight);
 
 	start();
 } // Mars::loadGamelog()
@@ -115,7 +115,6 @@ void Mars::loadGamelog( std::string gamelog )
 // The "main" function
 void Mars::run()
 {
-
 	// Build the Debug Table's Headers
 	QStringList header;
 	header << "one" << "two" << "three";
@@ -131,14 +130,11 @@ void Mars::run()
 
 		for(auto& unitIter : m_game->states[state].units)
 		{
-			cout << "Creature at: " << unitIter.second << endl;
-			SmartPointer<BaseSprite> pUnit = new BaseSprite(glm::vec2(unitIter.second.x,unitIter.second.y), glm::vec2(1.0f,1.0f), "digger");
+			SmartPointer<BaseSprite> pUnit = new BaseSprite(glm::vec2(unitIter.second.x,unitIter.second.y), glm::vec2(1.0f), "digger");
 			pUnit->addKeyFrame(new DrawSprite(pUnit));
 			turn.addAnimatable(pUnit);
 		}
-		//SmartPointer<Something> something = new Something();
-		//something->addKeyFrame( new DrawSomething( something ) );
-		// turn.addAnimatable( something );
+
 		animationEngine->buildAnimations(turn);
 		addFrame(turn);
 
@@ -153,6 +149,14 @@ void Mars::run()
 				timeManager->setTurn(0);
 				timeManager->play();
 			}
+		}
+		else
+		{
+			timeManager->setNumTurns(state);
+			animationEngine->registerGame( this, this );
+			animationEngine->registerGame(this, this);
+			timeManager->setTurn(0);
+			timeManager->play();
 		}
 	}
 
