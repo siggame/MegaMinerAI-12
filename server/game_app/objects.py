@@ -140,23 +140,22 @@ class Unit(Mappable):
 
     return True
 
-  def fill(self, tile):
-    x = tile.x
-    y = tile.y
+  def fill(self, x, y):
+    tile = self.game.grid[x][y][0];
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.type != 1:
       return 'Turn {}: Your digger {} cannot fill.'.format(self.game.turnNumber, self.id)
-    elif self.hasBuilt:
+    elif self.hasBuilt == 1:
       return 'Turn {}: Your {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only fill adjacent Tiles.'.format(self.game.turnNumber, self.id)
-    elif not Tile.isTrench:
+    elif tile.isTrench == 0:
       return 'Turn {}: Your {} can only fill trench Tiles.'.format(self.game.turnNumber, self.id)
-    elif Tile.waterAmount > 0:
+    elif tile.waterAmount > 0:
       return 'Turn {}: Your {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
-    elif len(self.game.getUnit(x, y)) != 0:
+    elif len(self.game.grid[x][y]) > 1:
       return 'Turn {}: Your {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
     
     # Set the Tile to not be a trench
@@ -170,25 +169,24 @@ class Unit(Mappable):
     
     return True
 
-  def dig(self, tile):
-    x = tile.x
-    y = tile.y
+  def dig(self, x, y):
+    tile = self.game.grid[x][y][0];
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.type != 0:
       return 'Turn {}: Your filler {} cannot dig.'.format(self.game.turnNumber, self.id)
-    elif self.hasDigged:
+    elif self.hasDigged == 1:
       return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only dig adjacent Tiles.'.format(self.game.turnNumber, self.id)
-    elif Tile.isTrench:
+    elif tile.isTrench == 1:
       return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
-    elif Tile.type == 0:
+    elif tile.type == 0:
       return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
-    elif Tile.owner == 0 or Tile.owner == 1:
+    elif tile.owner == 0 or tile.owner == 1:
       return 'Turn {}: Your {} can not dig trenches on spawn tiles.'.format(self.game.turn, self.id)
-    elif len(self.game.getUnit(x, y)) != 0:
+    elif len(self.game.grid[x][y]) > 1:
       return 'Turn {}: Your {} cannot dig under other Units.'.format(self.game.turnNumber, self.id)
     
     # Set the Tile to be a trench
@@ -210,7 +208,7 @@ class Unit(Mappable):
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only attack adjacent Units. ({}, {})->({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif self.hasAttacked:
+    elif self.hasAttacked == 1:
       return 'Turn {}: Your {} has already attacked this turn.'.format(self.game.turnNumber, self.id)
     elif not isinstance(target, Unit):
       return 'Turn {}: Your {} can only attack other Units.'.format(self.game.turnNumber, self.id)
