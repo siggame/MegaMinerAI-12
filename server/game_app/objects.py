@@ -90,7 +90,7 @@ class Unit(Mappable):
     self.x = x
     self.y = y
     self.owner = owner
-    self.type = type
+    self.type = type # 0 - Digger , 1 - Filler
     self.hasAttacked = hasAttacked
     self.hasDigged = hasDigged
     self.hasBuilt = hasBuilt
@@ -186,6 +186,8 @@ class Unit(Mappable):
       return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
     elif Tile.type == 0:
       return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
+    elif Tile.owner == 0 or Tile.owner == 1:
+      return 'Turn {}: Your {} can not dig trenches on spawn tiles.'.format(self.game.turn, self.id)
     elif len(self.game.getUnit(x, y)) != 0:
       return 'Turn {}: Your {} cannot dig under other Units.'.format(self.game.turnNumber, self.id)
     
