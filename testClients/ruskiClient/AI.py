@@ -16,11 +16,15 @@ class AI(BaseAI):
   """The class implementing gameplay logic."""
   @staticmethod
   def username():
-    return "Shell AI"
+    return "Ruski Malooski"
 
   @staticmethod
   def password():
     return "password"
+
+  #USEFUL FOR GETTING TILES
+  def getTile(self, x, y):
+    return self.tiles[x * self.mapHeight + y]
 
   def getSpawnTiles(self):
     for tile in self.tiles:
@@ -29,34 +33,46 @@ class AI(BaseAI):
 
   def spawnUnits(self):
     for tile in self.spawnTiles:
-      tile.spawn(random.choice([1,2]))
+      tile.spawn(random.choice([0,1]))
 
   def moveUnits(self):
     for unit in self.units:
       if unit.owner == self.playerID:
-        unit.move(unit.x+1, unit.y)
+        offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
+        if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
+            unit.move(unit.x+offset[0], unit.y+offset[1])
+
+        offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
+        if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
+          tile = self.getTile(unit.x+offset[0], unit.y+offset[1])
+          if tile:
+            if unit.dig(tile):
+              print('TILE WAS DIGGED ({},{})'.format(tile.x, tile.y))
+            #if unit.fill(tile):
+            #  print('TILE WAS FILLED ({},{})'.format(tile.x, tile.y))
+
 
   def save_snapshot(self):
-    tempGrid = [[' ' for _ in range( self.mapHeight ) ] for _ in range( self.mapWidth ) ]
+    tempGrid = [[[] for _ in range( self.mapHeight ) ] for _ in range( self.mapWidth ) ]
 
     for tile in self.tiles:
       if tile.waterAmount > 0:
-        tempGrid[tile.x][tile.y] = 'W'
-      elif tile.isTrench == 1:
-        tempGrid[tile.x][tile.y] = 'T'
-      elif tile.owner == 0:
-        tempGrid[tile.x][tile.y] = 'S'
-      elif tile.owner == 1:
-        tempGrid[tile.x][tile.y] = 's'
+        tempGrid[tile.x][tile.y].append('W')
+      if tile.isTrench == 1:
+        tempGrid[tile.x][tile.y].append('T')
+      if tile.owner == 0:
+        tempGrid[tile.x][tile.y].append('S')
+      if tile.owner == 1:
+        tempGrid[tile.x][tile.y].append('s')
 
     for pump in self.pumpStations:
-      tempGrid[pump.x][pump.y] = 'P'
+      tempGrid[pump.x][pump.y].append('P')
 
     for unit in self.units:
       if unit.owner == self.playerID:
-        tempGrid[unit.x][unit.y] = 'U'
+        tempGrid[unit.x][unit.y].append('U')
       else:
-        tempGrid[unit.x][unit.y] = 'u'
+        tempGrid[unit.x][unit.y].append('u')
 
     self.print_snapshot(tempGrid)
     self.history.append(tempGrid)
@@ -64,10 +80,16 @@ class AI(BaseAI):
 
 
   def print_snapshot(self, snapshot):
-    print "--" * self.mapWidth
+    print('--' * self.mapWidth)
     for y in range(self.mapHeight):
       for x in range(self.mapWidth):
-        print(snapshot[x][y]),
+        if len(snapshot[x][y]) >= 1:
+          if 'T' in snapshot[x][y]:
+            print('T'),
+          else:
+            print(snapshot[x][y][0]),
+        else:
+          print(' '),
       print
 
   ##This function is called once, before your first turn

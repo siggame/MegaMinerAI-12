@@ -147,17 +147,17 @@ class Unit(Mappable):
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.type != 1:
-      return 'Turn {}: Your digger {} cannot fill.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your digger unit {} cannot fill.'.format(self.game.turnNumber, self.id)
     elif self.hasBuilt == 1:
-      return 'Turn {}: Your {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
-      return 'Turn {}: Your {} can only fill adjacent Tiles.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} can only fill adjacent Tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.isTrench == 0:
-      return 'Turn {}: Your {} can only fill trench Tiles.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} cannot fill something that is not a trench. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.waterAmount > 0:
-      return 'Turn {}: Your {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
     elif len(self.game.grid[x][y]) > 1:
-      return 'Turn {}: Your {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
     
     # Set the Tile to not be a trench
     tile.isTrench = 0
@@ -181,15 +181,15 @@ class Unit(Mappable):
     elif self.hasDigged == 1:
       return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
-      return 'Turn {}: Your {} can only dig adjacent Tiles.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.isTrench == 1:
-      return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.type == 0:
       return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
     elif tile.owner == 0 or tile.owner == 1:
-      return 'Turn {}: Your {} can not dig trenches on spawn tiles.'.format(self.game.turn, self.id)
+      return 'Turn {}: Your {} can not dig trenches on spawn tiles. ({},{}) digs ({},{})'.format(self.game.turn, self.id, self.x, self.y, x, y)
     elif len(self.game.grid[x][y]) > 1:
-      return 'Turn {}: Your {} cannot dig under other Units.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     
     # Set the Tile to be a trench
     tile.isTrench = 1
@@ -209,13 +209,13 @@ class Unit(Mappable):
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
-      return 'Turn {}: Your {} can only attack adjacent Units. ({}, {})->({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+      return 'Turn {}: Your {} can only attack adjacent Units. ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.hasAttacked == 1:
       return 'Turn {}: Your {} has already attacked this turn.'.format(self.game.turnNumber, self.id)
     elif not isinstance(target, Unit):
-      return 'Turn {}: Your {} can only attack other Units.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your {} can only attack other units.'.format(self.game.turnNumber, self.id)
     elif target.owner == self.owner:
-      return 'Turn {}: Your {} cannot attack a friendly {}.'.format(self.game.turnNumber, self.id, target.id)
+      return 'Turn {}: Your {} cannot attack a friendly unit {}.'.format(self.game.turnNumber, self.id, target.id)
       
     self.hasAttacked  = 1
     
