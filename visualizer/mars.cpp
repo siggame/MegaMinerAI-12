@@ -9,158 +9,160 @@
 
 namespace visualizer
 {
-  Mars::Mars()
-  {
-    m_game = 0;
-    m_suicide=false;
-  } // Mars::Mars()
 
-  Mars::~Mars()
-  {
-    destroy();
-  }
+Mars::Mars()
+{
+	m_game = 0;
+	m_suicide=false;
+} // Mars::Mars()
 
-  void Mars::destroy()
-  {
-    m_suicide=true;
-    wait();
-    animationEngine->registerGame(0, 0);
+Mars::~Mars()
+{
+	destroy();
+}
 
-    clear();
-    delete m_game;
-    m_game = 0;
-    
-    // Clear your memory here
-    
-    programs.clear();
+void Mars::destroy()
+{
+	m_suicide=true;
+	wait();
+	animationEngine->registerGame(0, 0);
 
-  } // Mars::~Mars()
+	clear();
+	delete m_game;
+	m_game = 0;
 
-  void Mars::preDraw()
-  {
-    const Input& input = gui->getInput();
-    
-    // Handle player input here
-  }
+	// Clear your memory here
 
-  void Mars::postDraw()
-  {
-    if( renderer->fboSupport() )
-    {
-#if 0
-      renderer->useShader( programs["post"] ); 
-      renderer->swapFBO();
-      renderer->useShader( 0 );
-#endif
+	programs.clear();
 
-    }
-  }
+} // Mars::~Mars()
+
+void Mars::preDraw()
+{
+	const Input& input = gui->getInput();
+
+	renderer->setColor(Color());
+	renderer->drawTexturedQuad(0.0f,0.0f,2.0f*m_game->states[0].mapWidth,2.0f*m_game->states[0].mapHeight,"mars");
+
+// Handle player input here
+}
+
+void Mars::postDraw()
+{
+
+}
 
 
-  PluginInfo Mars::getPluginInfo()
-  {
-    PluginInfo i;
-    i.searchLength = 1000;
-    i.gamelogRegexPattern = "Mars";
-    i.returnFilename = false;
-    i.spectateMode = false;
-    i.pluginName = "MegaMinerAI: Mars Plugin";
+PluginInfo Mars::getPluginInfo()
+{
+	PluginInfo i;
+	i.searchLength = 1000;
+	i.gamelogRegexPattern = "Mars";
+	i.returnFilename = false;
+	i.spectateMode = false;
+	i.pluginName = "MegaMinerAI: Mars Plugin";
 
 
-    return i;
-  } // PluginInfo Mars::getPluginInfo()
+	return i;
+} // PluginInfo Mars::getPluginInfo()
 
-  void Mars::setup()
-  {
-    gui->checkForUpdate( "Mars", "./plugins/mars/checkList.md5", VERSION_FILE );
-    options->loadOptionFile( "./plugins/mars/mars.xml", "mars" );
-    resourceManager->loadResourceFile( "./plugins/mars/resources.r" );
-  }
-  
-  // Give the Debug Info widget the selected object IDs in the Gamelog
-  list<int> Mars::getSelectedUnits()
-  {
-    // TODO Selection logic
-    return list<int>();  // return the empty list
-  }
+void Mars::setup()
+{
+	gui->checkForUpdate( "Mars", "./plugins/mars/checkList.md5", VERSION_FILE );
+	options->loadOptionFile( "./plugins/mars/mars.xml", "mars" );
+	resourceManager->loadResourceFile( "./plugins/mars/resources.r" );
+}
 
-  void Mars::loadGamelog( std::string gamelog )
-  {
-    if(isRunning())
-    {
-      m_suicide = true;
-      wait();
-    }
-    m_suicide = false;
+// Give the Debug Info widget the selected object IDs in the Gamelog
+list<int> Mars::getSelectedUnits()
+{
+	// TODO Selection logic
+	return list<int>();  // return the empty list
+}
 
-    // BEGIN: Initial Setup
-    setup();
+void Mars::loadGamelog( std::string gamelog )
+{
+	if(isRunning())
+	{
+		m_suicide = true;
+		wait();
+	}
+	m_suicide = false;
 
-    delete m_game;
-    m_game = new parser::Game;
+	// BEGIN: Initial Setup
+	setup();
 
-    if( !parser::parseGameFromString( *m_game, gamelog.c_str() ) )
-    {
-      delete m_game;
-      m_game = 0;
-      WARNING(
-          "Cannot load gamelog, %s", 
-          gamelog.c_str()
-          );
-    }
-    // END: Initial Setup
+	delete m_game;
+	m_game = new parser::Game;
 
-    // Setup the renderer as a 4 x 4 map by default
-    // TODO: Change board size to something useful
-    renderer->setCamera( 0, 0, 4, 4 );
-    renderer->setGridDimensions( 4, 4 );
- 
-    start();
-  } // Mars::loadGamelog()
-  
-  // The "main" function
-  void Mars::run()
-  {
-    
-    // Build the Debug Table's Headers
-    QStringList header;
-    header << "one" << "two" << "three";
-    gui->setDebugHeader( header );
-    timeManager->setNumTurns( 0 );
+	if( !parser::parseGameFromString( *m_game, gamelog.c_str() ) )
+	{
+		delete m_game;
+		m_game = 0;
+		WARNING("Cannot load gamelog, %s",gamelog.c_str());
+	}
 
-    animationEngine->registerGame(0, 0);
+	// END: Initial Setup
 
-    // Look through each turn in the gamelog
-    for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
-    {
-      Frame turn;  // The frame that will be drawn
-      SmartPointer<Something> something = new Something();
-      something->addKeyFrame( new DrawSomething( something ) );
-      turn.addAnimatable( something );
-      animationEngine->buildAnimations(turn);
-      addFrame(turn);
-      
-      // Register the game and begin playing delayed due to multithreading
-      if(state > 5)
-      {
-        timeManager->setNumTurns(state - 5);
-        animationEngine->registerGame( this, this );
-        if(state == 6)
-        {
-          animationEngine->registerGame(this, this);
-          timeManager->setTurn(0);
-          timeManager->play();
-        }
-      }
-    }
-    
-    if(!m_suicide)
-    {
-      timeManager->setNumTurns( m_game->states.size() );
-      timeManager->play();
-    }
+	// Setup the renderer as a 4 x 4 map by default
+	// TODO: Change board size to something useful
+	renderer->setCamera( 0, 0, m_game->states[0].mapWidth, m_game->states[0].mapHeight );
+	renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight );
 
-  } // Mars::run()
+	start();
+} // Mars::loadGamelog()
+
+// The "main" function
+void Mars::run()
+{
+
+	// Build the Debug Table's Headers
+	QStringList header;
+	header << "one" << "two" << "three";
+	gui->setDebugHeader( header );
+	timeManager->setNumTurns( 0 );
+
+	animationEngine->registerGame(0, 0);
+
+	// Look through each turn in the gamelog
+	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
+	{
+		Frame turn;  // The frame that will be drawn
+
+		for(auto& unitIter : m_game->states[state].units)
+		{
+			cout << "Creature at: " << unitIter.second << endl;
+			SmartPointer<BaseSprite> pUnit = new BaseSprite(glm::vec2(unitIter.second.x,unitIter.second.y), glm::vec2(1.0f,1.0f), "digger");
+			pUnit->addKeyFrame(new DrawSprite(pUnit));
+			turn.addAnimatable(pUnit);
+		}
+		//SmartPointer<Something> something = new Something();
+		//something->addKeyFrame( new DrawSomething( something ) );
+		// turn.addAnimatable( something );
+		animationEngine->buildAnimations(turn);
+		addFrame(turn);
+
+		// Register the game and begin playing delayed due to multithreading
+		if(state > 5)
+		{
+			timeManager->setNumTurns(state - 5);
+			animationEngine->registerGame( this, this );
+			if(state == 6)
+			{
+				animationEngine->registerGame(this, this);
+				timeManager->setTurn(0);
+				timeManager->play();
+			}
+		}
+	}
+
+	if(!m_suicide)
+	{
+		timeManager->setNumTurns( m_game->states.size() );
+		timeManager->play();
+	}
+
+} // Mars::run()
 
 } // visualizer
 
