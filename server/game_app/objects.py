@@ -140,8 +140,9 @@ class Unit(Mappable):
 
     return True
 
-  def fill(self, x, y):
-    tile = self.game.grid[x][y][0];
+  def fill(self, tile):
+    x = tile.x
+    y = tile.y
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
@@ -169,8 +170,9 @@ class Unit(Mappable):
     
     return True
 
-  def dig(self, x, y):
-    tile = self.game.grid[x][y][0];
+  def dig(self, tile):
+    x = tile.x
+    y = tile.y
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
