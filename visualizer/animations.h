@@ -6,29 +6,16 @@
 namespace visualizer
 {
 
-    struct StartAnim: public Anim
-    {
-      public:
-        void animate( const float& t, AnimData *d, IGame* game );
+	class DrawSprite : public Anim
+	{
+	public:
+		DrawSprite( BaseSprite* sprite ) : m_sprite(sprite) {}
+		void animate( const float& t, AnimData* d, IGame* game );
 
-    };
-  
-    class DrawSomething: public Anim
-    {
-        public:
-            DrawSomething( Something* something ) { m_Something = something; }
-            void animate( const float& t, AnimData* d, IGame* game );
+	private:
+		BaseSprite* m_sprite;
+	};
 
-            float controlDuration() const
-            { return 0; }
-
-            float totalDuration() const
-            { return 0; }
-        
-        private:
-            Something *m_Something;
-
-    }; // DrawBackground
 }
 
 #endif // ANIMATION_H
