@@ -22,6 +22,9 @@ class AI(BaseAI):
   def password():
     return "password"
 
+  DIGGER = 0
+  FILLER = 1
+
   #USEFUL FOR GETTING TILES
   def getTile(self, x, y):
     return self.tiles[x * self.mapHeight + y]
@@ -33,7 +36,7 @@ class AI(BaseAI):
 
   def spawnUnits(self):
     for tile in self.spawnTiles:
-      tile.spawn(random.choice([0,1]))
+      tile.spawn(self.DIGGER)
 
   def moveUnits(self):
     for unit in self.units:
@@ -46,10 +49,10 @@ class AI(BaseAI):
         if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
           tile = self.getTile(unit.x+offset[0], unit.y+offset[1])
           if tile:
-            if unit.dig(tile):
+            if unit.dig(tile) == 1:
               print('TILE WAS DIGGED ({},{})'.format(tile.x, tile.y))
-            #if unit.fill(tile):
-            #  print('TILE WAS FILLED ({},{})'.format(tile.x, tile.y))
+            if unit.fill(tile):
+              print('TILE WAS FILLED ({},{})'.format(tile.x, tile.y))
 
 
   def save_snapshot(self):
@@ -70,9 +73,15 @@ class AI(BaseAI):
 
     for unit in self.units:
       if unit.owner == self.playerID:
-        tempGrid[unit.x][unit.y].append('U')
+        if unit.type == self.FILLER:
+          tempGrid[unit.x][unit.y].append('F')
+        elif unit.type == self.DIGGER:
+          tempGrid[unit.x][unit.y].append('D')
       else:
-        tempGrid[unit.x][unit.y].append('u')
+        if unit.type == self.FILLER:
+          tempGrid[unit.x][unit.y].append('f')
+        elif unit.type == self.DIGGER:
+          tempGrid[unit.x][unit.y].append('d')
 
     self.print_snapshot(tempGrid)
     self.history.append(tempGrid)
@@ -102,7 +111,10 @@ class AI(BaseAI):
 
   ##This function is called once, after your last turn
   def end(self):
+    turnNumber = 0
     for snapshot in self.history:
+      print(turnNumber/2)
+      turnNumber += 1
       self.print_snapshot(snapshot)
       sleep(.1)
     return

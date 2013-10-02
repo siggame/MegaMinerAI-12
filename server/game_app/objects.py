@@ -143,6 +143,8 @@ class Unit(Mappable):
   def fill(self, tile):
     x = tile.x
     y = tile.y
+
+    #FILLERS ARE OF TYPE 1
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
@@ -173,6 +175,8 @@ class Unit(Mappable):
   def dig(self, tile):
     x = tile.x
     y = tile.y
+
+    # DIGGERS ARE TYPE 0
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
@@ -184,7 +188,7 @@ class Unit(Mappable):
       return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.isTrench == 1:
       return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.type == 0:
+    elif tile.type != 0:
       return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
     elif tile.owner == 0 or tile.owner == 1:
       return 'Turn {}: Your {} can not dig trenches on spawn tiles. ({},{}) digs ({},{})'.format(self.game.turn, self.id, self.x, self.y, x, y)
@@ -217,7 +221,7 @@ class Unit(Mappable):
     elif target.owner == self.owner:
       return 'Turn {}: Your {} cannot attack a friendly unit {}.'.format(self.game.turnNumber, self.id, target.id)
       
-    self.hasAttacked  = 1
+    self.hasAttacked = 1
     
     # Unit can no longer move
     self.movementLeft = 0
@@ -225,7 +229,7 @@ class Unit(Mappable):
     self.game.addAnimation(AttackAnimation(self.id, target.id))
     
     # Deal damage
-    target.healthLeft -= attackDamage
+    target.healthLeft -= self.game.attackDamage
     
     # Check if target is dead
     if target.healthLeft <= 0:
@@ -271,7 +275,7 @@ class Tile(Mappable):
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.spawnResources < self.game.unitCost:
       return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.spawnResources, self.game.unitCost, tile.x, tile.y)
-    if type not in [1,2]:
+    if type not in [0,1]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
 
     if len(self.game.grid[self.x][self.y]) > 1:
