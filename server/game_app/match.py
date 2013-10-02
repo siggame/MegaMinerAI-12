@@ -214,7 +214,7 @@ class Match(DefaultGameWorld):
                             for trench in self.mappable.tile:
                                 if unit.isTrench and unit.owner == 0:
                                     p1t += 1
-                                else:
+                                elif unit.isTrench and unit.owner == 1:
                                     p2t += 1
                             # Player 1 wins if they have dug more trenches
                             if p1t > p2t:
