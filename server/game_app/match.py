@@ -245,7 +245,6 @@ class Match(DefaultGameWorld):
 
 
 
-=======
     p1h = player1.waterStored
     p2h = player2.waterStored
 
@@ -258,7 +257,6 @@ class Match(DefaultGameWorld):
         #TODO: Tie condition, number of bases owned might determine winner
         self.declareWinner(self.players[0], "Tie for now")
         pass
->>>>>>> 5cd2bcd46fb891333c593b6b6274e0600b66ced7
        
 
 
