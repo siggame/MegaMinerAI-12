@@ -12,7 +12,8 @@ class MakoWriter(object):
     for dir, subdirs, files in os.walk(source):
       #duplicate the source directory structure in the dest
       outdir = dir.replace(source, dest, 1)
-      os.makedirs(outdir, exist_ok=True)
+      if not os.path.exists(outdir):
+        os.makedirs(outdir)
       for i in files:
         infile = os.path.join(dir, i)
         template = Template(i)
@@ -35,7 +36,8 @@ class StaticWriter(object):
     for dir, subdirs, files in os.walk(source):
       #duplicate the source directory structure in the dest
       outdir = dir.replace(source, dest, 1)
-      os.makedirs(outdir, exist_ok=True)
+      if not os.path.exists(outdir):
+        os.makedirs(outdir)
       for i in files:
         infile = os.path.join(dir, i)
         outfile = os.path.join(outdir, i)

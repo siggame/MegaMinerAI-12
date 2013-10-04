@@ -3,6 +3,26 @@
 namespace client
 {
 
+DLLEXPORT int playerGetId(_Player* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT char* playerGetPlayerName(_Player* ptr)
+{
+  return ptr->playerName;
+}
+DLLEXPORT float playerGetTime(_Player* ptr)
+{
+  return ptr->time;
+}
+DLLEXPORT int playerGetWaterStored(_Player* ptr)
+{
+  return ptr->waterStored;
+}
+DLLEXPORT int playerGetSpawnResources(_Player* ptr)
+{
+  return ptr->spawnResources;
+}
 DLLEXPORT int mappableGetId(_Mappable* ptr)
 {
   return ptr->id;
@@ -14,6 +34,22 @@ DLLEXPORT int mappableGetX(_Mappable* ptr)
 DLLEXPORT int mappableGetY(_Mappable* ptr)
 {
   return ptr->y;
+}
+DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
+{
+  return ptr->owner;
+}
+DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
+{
+  return ptr->waterAmount;
+}
+DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr)
+{
+  return ptr->siegeCount;
 }
 DLLEXPORT int unitGetId(_Unit* ptr)
 {
@@ -35,41 +71,33 @@ DLLEXPORT int unitGetType(_Unit* ptr)
 {
   return ptr->type;
 }
-DLLEXPORT int unitGetCurHealth(_Unit* ptr)
+DLLEXPORT int unitGetHasAttacked(_Unit* ptr)
 {
-  return ptr->curHealth;
+  return ptr->hasAttacked;
+}
+DLLEXPORT int unitGetHasDigged(_Unit* ptr)
+{
+  return ptr->hasDigged;
+}
+DLLEXPORT int unitGetHasBuilt(_Unit* ptr)
+{
+  return ptr->hasBuilt;
+}
+DLLEXPORT int unitGetHealthLeft(_Unit* ptr)
+{
+  return ptr->healthLeft;
 }
 DLLEXPORT int unitGetMaxHealth(_Unit* ptr)
 {
   return ptr->maxHealth;
 }
-DLLEXPORT int unitGetCurMovement(_Unit* ptr)
+DLLEXPORT int unitGetMovementLeft(_Unit* ptr)
 {
-  return ptr->curMovement;
+  return ptr->movementLeft;
 }
 DLLEXPORT int unitGetMaxMovement(_Unit* ptr)
 {
   return ptr->maxMovement;
-}
-DLLEXPORT int playerGetId(_Player* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT char* playerGetPlayerName(_Player* ptr)
-{
-  return ptr->playerName;
-}
-DLLEXPORT float playerGetTime(_Player* ptr)
-{
-  return ptr->time;
-}
-DLLEXPORT int playerGetWaterStored(_Player* ptr)
-{
-  return ptr->waterStored;
-}
-DLLEXPORT int playerGetSpawnResources(_Player* ptr)
-{
-  return ptr->spawnResources;
 }
 DLLEXPORT int tileGetId(_Tile* ptr)
 {
@@ -102,22 +130,6 @@ DLLEXPORT int tileGetWaterAmount(_Tile* ptr)
 DLLEXPORT int tileGetIsTrench(_Tile* ptr)
 {
   return ptr->isTrench;
-}
-DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
-{
-  return ptr->owner;
-}
-DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
-{
-  return ptr->waterAmount;
-}
-DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr)
-{
-  return ptr->siegeCount;
 }
 
 }

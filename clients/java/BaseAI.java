@@ -7,11 +7,11 @@ import com.sun.jna.Pointer;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
-  static Mappable[] mappables;
-  static Unit[] units;
   static Player[] players;
-  static Tile[] tiles;
+  static Mappable[] mappables;
   static PumpStation[] pumpStations;
+  static Unit[] units;
+  static Tile[] tiles;
   Pointer connection;
   static int iteration;
   boolean initialized;
@@ -45,11 +45,23 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.INSTANCE.getPlayerCount(connection);
+    players = new Player[count];
+    for(int i = 0; i < count; i++)
+    {
+      players[i] = new Player(Client.INSTANCE.getPlayer(connection, i));
+    }
     count = Client.INSTANCE.getMappableCount(connection);
     mappables = new Mappable[count];
     for(int i = 0; i < count; i++)
     {
       mappables[i] = new Mappable(Client.INSTANCE.getMappable(connection, i));
+    }
+    count = Client.INSTANCE.getPumpStationCount(connection);
+    pumpStations = new PumpStation[count];
+    for(int i = 0; i < count; i++)
+    {
+      pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
     }
     count = Client.INSTANCE.getUnitCount(connection);
     units = new Unit[count];
@@ -57,23 +69,11 @@ public abstract class BaseAI
     {
       units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
     }
-    count = Client.INSTANCE.getPlayerCount(connection);
-    players = new Player[count];
-    for(int i = 0; i < count; i++)
-    {
-      players[i] = new Player(Client.INSTANCE.getPlayer(connection, i));
-    }
     count = Client.INSTANCE.getTileCount(connection);
     tiles = new Tile[count];
     for(int i = 0; i < count; i++)
     {
       tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
-    }
-    count = Client.INSTANCE.getPumpStationCount(connection);
-    pumpStations = new PumpStation[count];
-    for(int i = 0; i < count; i++)
-    {
-      pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
     }
 
     if(!initialized)
@@ -85,6 +85,16 @@ public abstract class BaseAI
   }
 
 
+  ///The width of the total map.
+  int mapWidth()
+  {
+    return Client.INSTANCE.getMapWidth(connection);
+  }
+  ///The height of the total map.
+  int mapHeight()
+  {
+    return Client.INSTANCE.getMapHeight(connection);
+  }
   ///The maximum amount of health a unit will have.
   int maxHealth()
   {
@@ -125,9 +135,19 @@ public abstract class BaseAI
   {
     return Client.INSTANCE.getMaxUnits(connection);
   }
-  ///THe cost of spawning in a new unit
+  ///The cost of spawning in a new unit
   int unitCost()
   {
     return Client.INSTANCE.getUnitCost(connection);
+  }
+  ///The id of the current player.
+  int playerID()
+  {
+    return Client.INSTANCE.getPlayerID(connection);
+  }
+  ///What number game this is for the server
+  int gameNumber()
+  {
+    return Client.INSTANCE.getGameNumber(connection);
   }
 }

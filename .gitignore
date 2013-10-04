@@ -22,5 +22,5 @@
 *.pro.user.*
 moc_*.cpp
 qrc_*.cpp
-Makefile
+#Makefile
 *-build-*

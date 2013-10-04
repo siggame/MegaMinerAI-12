@@ -8,6 +8,14 @@
 namespace client
 {
 
+int BaseAI::mapWidth()
+{
+  return getMapWidth(c);
+}
+int BaseAI::mapHeight()
+{
+  return getMapHeight(c);
+}
 int BaseAI::maxHealth()
 {
   return getMaxHealth(c);
@@ -44,17 +52,41 @@ int BaseAI::unitCost()
 {
   return getUnitCost(c);
 }
+int BaseAI::playerID()
+{
+  return getPlayerID(c);
+}
+int BaseAI::gameNumber()
+{
+  return getGameNumber(c);
+}
 
 bool BaseAI::startTurn()
 {
   static bool initialized = false;
   int count = 0;
+  count = getPlayerCount(c);
+  players.clear();
+  players.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    players[i] = Player(getPlayer(c, i));
+  }
+
   count = getMappableCount(c);
   mappables.clear();
   mappables.resize(count);
   for(int i = 0; i < count; i++)
   {
     mappables[i] = Mappable(getMappable(c, i));
+  }
+
+  count = getPumpStationCount(c);
+  pumpStations.clear();
+  pumpStations.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    pumpStations[i] = PumpStation(getPumpStation(c, i));
   }
 
   count = getUnitCount(c);
@@ -65,28 +97,12 @@ bool BaseAI::startTurn()
     units[i] = Unit(getUnit(c, i));
   }
 
-  count = getPlayerCount(c);
-  players.clear();
-  players.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    players[i] = Player(getPlayer(c, i));
-  }
-
   count = getTileCount(c);
   tiles.clear();
   tiles.resize(count);
   for(int i = 0; i < count; i++)
   {
     tiles[i] = Tile(getTile(c, i));
-  }
-
-  count = getPumpStationCount(c);
-  pumpStations.clear();
-  pumpStations.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    pumpStations[i] = PumpStation(getPumpStation(c, i));
   }
 
   if(!initialized)

@@ -8,8 +8,9 @@ import os
 import itertools
 import scribe
 import jsonLogger
-from mapGenerator import set_tiles
-from random import randint
+import mapGenerator
+import random
+#import set_tiles
 
 
 Scribe = scribe.Scribe
@@ -32,6 +33,8 @@ class Match(DefaultGameWorld):
       self.dictLog = dict(gameName = "Mars", turns = [])
     self.addPlayer(self.scribe, "spectator")
 
+    self.mapWidth = self.mapWidth
+    self.mapHeight = self.mapHeight
     self.maxHealth = self.maxHealth
     self.trenchDamage = self.trenchDamage
     self.waterDamage = self.waterDamage
@@ -41,6 +44,9 @@ class Match(DefaultGameWorld):
     self.defenseCount = self.defenseCount
     self.maxUnits = self.maxUnits
     self.unitCost = self.unitCost
+    self.playerID = -1
+    self.gameNumber = id
+    self.turnLimit = self.turnLimit
 
   #this is here to be wrapped
   def __del__(self):
@@ -53,7 +59,9 @@ class Match(DefaultGameWorld):
     if type == "player":
       self.players.append(connection)
       try:
-        self.addObject(Player, [connection.screenName, self.startTime])
+        #['id', 'playerName', 'time', 'waterStored', 'spawnResources']
+        startingResources = 1000
+        self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources])
       except TypeError:
         raise TypeError("Someone forgot to add the extra attributes to the Player object initialization")
     elif type == "spectator":
@@ -80,12 +88,27 @@ class Match(DefaultGameWorld):
 
     self.turn = self.players[-1]
     self.turnNumber = -1
-    
-    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, 0, 0, 1]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
-    set_tiles(self)
+
+    # ['id', 'x', 'y', 'owner', 'type', 'pumpID', 'waterAmount', 'isTrench']
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, 0, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+    self.setTiles()
+    #set_tiles(self)
 
     self.nextTurn()
     return True
+
+  def setTiles(self):
+    #TODO: Better spawner spawning
+    #Set Tiles on far sides as spawns
+    for y in range(self.mapHeight):
+      for x in range(self.mapWidth/2):
+        rand = random.random()
+        if rand > .95:
+            self.grid[x][y][0].owner = 0
+            self.grid[self.mapWidth-x-1][y][0].owner = 1
+
+
+    pass
 
   def waterFlow(self):
       #TODO: Create water flow conditions to move water from icecaps to pump stations
@@ -115,6 +138,8 @@ class Match(DefaultGameWorld):
     if( self.logJson ):
       self.dictLog['turns'].append(
         dict(
+          mapWidth = self.mapWidth,
+          mapHeight = self.mapHeight,
           maxHealth = self.maxHealth,
           trenchDamage = self.trenchDamage,
           waterDamage = self.waterDamage,
@@ -124,11 +149,13 @@ class Match(DefaultGameWorld):
           defenseCount = self.defenseCount,
           maxUnits = self.maxUnits,
           unitCost = self.unitCost,
-          Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
-          Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
+          playerID = self.playerID,
+          gameNumber = self.gameNumber,
           Players = [i.toJson() for i in self.objects.values() if i.__class__ is Player],
-          Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
+          Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
+          Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
+          Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
           animations = self.jsonAnimations
         )
       )
@@ -140,9 +167,9 @@ class Match(DefaultGameWorld):
   def checkWinner(self):
     #TODO: Make this check if a player won, and call declareWinner with a player if they did
     # Get the players
-        player1 = self.objects.players[0]
-        player2 = self.objects.players[1]
-        
+    player1 = self.objects.players[0]
+    player2 = self.objects.players[1]
+
     # Get the current water stored
         p1w = player1.waterStored
         p2w = player2.waterStored
@@ -218,6 +245,20 @@ class Match(DefaultGameWorld):
 
 
 
+=======
+    p1h = player1.waterStored
+    p2h = player2.waterStored
+
+    if self.turnNumber >= self.turnLimit:
+      if p1h>p2h:
+        self.declareWinner(self.players[0], "Player 1 wins through more water stored")
+      elif p2h>p1h:
+        self.declareWinner(self.players[1], "Player 2 wins through more water storage")
+      else:
+        #TODO: Tie condition, number of bases owned might determine winner
+        self.declareWinner(self.players[0], "Tie for now")
+        pass
+>>>>>>> 5cd2bcd46fb891333c593b6b6274e0600b66ced7
        
 
 
@@ -249,6 +290,10 @@ class Match(DefaultGameWorld):
   def logPath(self):
     return "logs/" + str(self.id)
 
+  @derefArgs(Player, None)
+  def talk(self, object, message):
+    return object.talk(message, )
+
   @derefArgs(Unit, None, None)
   def move(self, object, x, y):
     return object.move(x, y, )
@@ -264,10 +309,6 @@ class Match(DefaultGameWorld):
   @derefArgs(Unit, Unit)
   def attack(self, object, target):
     return object.attack(target, )
-
-  @derefArgs(Player, None)
-  def talk(self, object, message):
-    return object.talk(message, )
 
   @derefArgs(Tile, None)
   def spawn(self, object, type):
@@ -300,18 +341,18 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offenseCount, self.defenseCount, self.maxUnits, self.unitCost])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offenseCount, self.defenseCount, self.maxUnits, self.unitCost, self.playerID, self.gameNumber])
 
     typeLists = []
-    typeLists.append(["Mappable"] + [i.toList() for i in self.objects.values() if i.__class__ is Mappable])
-    typeLists.append(["Unit"] + [i.toList() for i in self.objects.values() if i.__class__ is Unit])
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
-    updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
-    if updated:
-      typeLists.append(["Tile"] + [i.toList() for i in updated])
+    typeLists.append(["Mappable"] + [i.toList() for i in self.objects.values() if i.__class__ is Mappable])
     updated = [i for i in self.objects.values() if i.__class__ is PumpStation and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["PumpStation"] + [i.toList() for i in updated])
+    typeLists.append(["Unit"] + [i.toList() for i in self.objects.values() if i.__class__ is Unit])
+    updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
+    if updated:
+      typeLists.append(["Tile"] + [i.toList() for i in updated])
 
     msg.extend(typeLists)
 

@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
-  public static Mappable[] mappables;
-  public static Unit[] units;
   public static Player[] players;
-  public static Tile[] tiles;
+  public static Mappable[] mappables;
   public static PumpStation[] pumpStations;
+  public static Unit[] units;
+  public static Tile[] tiles;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -46,11 +46,23 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.getPlayerCount(connection);
+    players = new Player[count];
+    for(int i = 0; i < count; i++)
+    {
+      players[i] = new Player(Client.getPlayer(connection, i));
+    }
     count = Client.getMappableCount(connection);
     mappables = new Mappable[count];
     for(int i = 0; i < count; i++)
     {
       mappables[i] = new Mappable(Client.getMappable(connection, i));
+    }
+    count = Client.getPumpStationCount(connection);
+    pumpStations = new PumpStation[count];
+    for(int i = 0; i < count; i++)
+    {
+      pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
     }
     count = Client.getUnitCount(connection);
     units = new Unit[count];
@@ -58,23 +70,11 @@ public abstract class BaseAI
     {
       units[i] = new Unit(Client.getUnit(connection, i));
     }
-    count = Client.getPlayerCount(connection);
-    players = new Player[count];
-    for(int i = 0; i < count; i++)
-    {
-      players[i] = new Player(Client.getPlayer(connection, i));
-    }
     count = Client.getTileCount(connection);
     tiles = new Tile[count];
     for(int i = 0; i < count; i++)
     {
       tiles[i] = new Tile(Client.getTile(connection, i));
-    }
-    count = Client.getPumpStationCount(connection);
-    pumpStations = new PumpStation[count];
-    for(int i = 0; i < count; i++)
-    {
-      pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
     }
 
     if(!initialized)
@@ -86,6 +86,18 @@ public abstract class BaseAI
   }
 
 
+  ///The width of the total map.
+  public int mapWidth()
+  {
+    int value = Client.getMapWidth(connection);
+    return value;
+  }
+  ///The height of the total map.
+  public int mapHeight()
+  {
+    int value = Client.getMapHeight(connection);
+    return value;
+  }
   ///The maximum amount of health a unit will have.
   public int maxHealth()
   {
@@ -134,10 +146,22 @@ public abstract class BaseAI
     int value = Client.getMaxUnits(connection);
     return value;
   }
-  ///THe cost of spawning in a new unit
+  ///The cost of spawning in a new unit
   public int unitCost()
   {
     int value = Client.getUnitCost(connection);
+    return value;
+  }
+  ///The id of the current player.
+  public int playerID()
+  {
+    int value = Client.getPlayerID(connection);
+    return value;
+  }
+  ///What number game this is for the server
+  public int gameNumber()
+  {
+    int value = Client.getGameNumber(connection);
     return value;
   }
 }
