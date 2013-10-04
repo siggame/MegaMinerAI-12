@@ -205,26 +205,26 @@ class Match(DefaultGameWorld):
                 self.declareWinner(self.players[0], "Player 1 wins through more pump stations")
             # Player 2 wins if they own more pump stations
             elif p1p < p2p:
-                self.declareWinner(self.players[1], "Player 1 wins through more pump stations")
+                self.declareWinner(self.players[1], "Player 2 wins through more pump stations")
             else:
                 # Get the total number of units
                 p1u = 0
                 p2u = 0
-                for unit in self.mappable.unit:
+                for unit in self.objects.units:
                     if unit.owner == 0:
                         p1 += 1
                     else:
                         p2 += 1
                 # Player 1 wins if they have more units
                 if p1u > p2u:
-                    self.declareWinner(self.players[0], "Player 2 wins through more units")
+                    self.declareWinner(self.players[0], "Player 1 wins through more units")
                 elif p2u > p1u:
                     self.declareWinner(self.players[1], "Player 2 wins through more units")
                 else:
                     # Get the total current health
                     p1h = 0
                     p2h = 0
-                    for unit in self.mappable.unit:
+                    for unit in self.objects.units:
                         if unit.owner == 0:
                             p1h += unit.curHealth
                         else:
