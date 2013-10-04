@@ -8,7 +8,8 @@ import os
 import itertools
 import scribe
 import jsonLogger
-#from mapGenerator import set_tiles
+from mapGenerator import set_tiles
+from random import randint
 
 
 Scribe = scribe.Scribe
@@ -160,7 +161,7 @@ class Match(DefaultGameWorld):
                 self.declareWinner(self.players[0], "Player 1 wins through more water stored")
             # Player 2 wins if they have more water stored
             elif p2w > p1w:
-                self.declareWinner(self.players[0], "Player 2 wins through more water stored")
+                self.declareWinner(self.players[1], "Player 2 wins through more water stored")
             #TIE CONDITIONS:
             else:
                 #TODO: Tie condition, number of bases owned might determine winner
@@ -177,7 +178,7 @@ class Match(DefaultGameWorld):
                     self.declareWinner(self.players[0], "Player 1 wins through more pump stations")
                 # Player 2 wins if they own more pump stations
                 elif p1p < p2p:
-                    self.declareWinner(self.players[0], "Player 1 wins through more pump stations")
+                    self.declareWinner(self.players[1], "Player 1 wins through more pump stations")
                 else:
                     # Get the total number of units
                     p1u = 0
@@ -191,7 +192,7 @@ class Match(DefaultGameWorld):
                     if p1u > p2u:
                         self.declareWinner(self.players[0], "Player 2 wins through more units")
                     elif p2u > p1u:
-                        self.declareWinner(self.players[0], "Player 2 wins through more units")
+                        self.declareWinner(self.players[1], "Player 2 wins through more units")
                     else:
                         # Get the total current health
                         p1h = 0
@@ -206,24 +207,16 @@ class Match(DefaultGameWorld):
                             self.declareWinner(self.players[0], "Player 1 wins through more total health")
                         # Player 2 wins if they have more health
                         elif p2h > p1h:
-                            self.declareWinner(self.players[0], "Player 2 wins through more total health")
+                            self.declareWinner(self.players[1], "Player 2 wins through more total health")
                         else:
-                            # Get the number of trenches owned
-                            p1t = 0
-                            p2t = 0
-                            for trench in self.mappable.tile:
-                                if unit.isTrench and unit.owner == 0:
-                                    p1t += 1
-                                elif unit.isTrench and unit.owner == 1:
-                                    p2t += 1
-                            # Player 1 wins if they have dug more trenches
-                            if p1t > p2t:
-                                self.declareWinner(self.players[0], "Player 2 wins through more trenches")
-                            # Player 2 wins if they have dug more trenches
-                            elif p2t > p1t:
-                                self.declareWinner(self.players[0], "Player 2 wins through more trenches")
+                            #Toss a coin to choose winner
+                            win=randint(0,1)
+                            if(win==0):
+                                self.declareWinner(self.players[0], "Player 1 wins through a coin toss")
                             else:
-                                pass
+                                self.declareWinner(self.players[1], "Player 2 wins through a coin toss")
+
+
 
        
 
