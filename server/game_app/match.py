@@ -86,7 +86,6 @@ class Match(DefaultGameWorld):
     if self.winner is not None or self.turn is not None:
       return "Game has already begun"
 
-    #TODO: START STUFF
     self.turn = self.players[-1]
     self.turnNumber = -1
 
@@ -172,6 +171,80 @@ class Match(DefaultGameWorld):
     player2 = self.objects.players[1]
 
     # Get the current water stored
+        p1w = player1.waterStored
+        p2w = player2.waterStored
+        
+    # Get the total water left in ice caps
+        totalWater = 0
+        for tile in self.object.tile:
+            totalWater += tile.waterAmount
+
+        earlyWin = abs(p1w-p2w) > totalWater
+
+    #TODO:Condition for early win if difference in water levels is less than water remaining in icecap
+        if self.turnNumber >= self.turnLimit or earlyWin:
+            # Player 1 wins if they have more water stored
+            if p1w > p2w:
+                self.declareWinner(self.players[0], "Player 1 wins through more water stored")
+            # Player 2 wins if they have more water stored
+            elif p2w > p1w:
+                self.declareWinner(self.players[1], "Player 2 wins through more water stored")
+            #TIE CONDITIONS:
+            else:
+                #TODO: Tie condition, number of bases owned might determine winner
+                # Get the total number of pump stations
+                p1p = 0
+                p2p = 0
+                for pump in self.object.pumpstation:
+                    if pump.owner == 0:
+                        p1p += 1
+                    else:
+                        p2p += 1
+                # Player 1 wins if they own more pump stations
+                if p1p > p2p:
+                    self.declareWinner(self.players[0], "Player 1 wins through more pump stations")
+                # Player 2 wins if they own more pump stations
+                elif p1p < p2p:
+                    self.declareWinner(self.players[1], "Player 1 wins through more pump stations")
+                else:
+                    # Get the total number of units
+                    p1u = 0
+                    p2u = 0
+                    for unit in self.mappable.unit:
+                        if unit.owner == 0:
+                            p1 += 1
+                        else:
+                            p2 += 1
+                    # Player 1 wins if they have more units
+                    if p1u > p2u:
+                        self.declareWinner(self.players[0], "Player 2 wins through more units")
+                    elif p2u > p1u:
+                        self.declareWinner(self.players[1], "Player 2 wins through more units")
+                    else:
+                        # Get the total current health
+                        p1h = 0
+                        p2h = 0
+                        for unit in self.mappable.unit:
+                            if unit.owner == 0:
+                                p1h += unit.curHealth
+                            else:
+                                p2h += unit.curHealth
+                        # Player 1 wins if they have more health
+                        if p1h > p2h:
+                            self.declareWinner(self.players[0], "Player 1 wins through more total health")
+                        # Player 2 wins if they have more health
+                        elif p2h > p1h:
+                            self.declareWinner(self.players[1], "Player 2 wins through more total health")
+                        else:
+                            #Toss a coin to choose winner
+                            win=randint(0,1)
+                            if(win==0):
+                                self.declareWinner(self.players[0], "Player 1 wins through a coin toss")
+                            else:
+                                self.declareWinner(self.players[1], "Player 2 wins through a coin toss")
+
+
+
     p1h = player1.waterStored
     p2h = player2.waterStored
 
