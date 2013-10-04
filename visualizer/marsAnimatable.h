@@ -19,6 +19,27 @@ namespace visualizer
 		glm::vec2 scale;
 		string m_sprite;
 	};
+	
+	struct MoveableSprite :
+		public Animatable
+	{
+	public:
+		MoveableSprite() {}
+	
+		struct Move
+		{
+			Move() {}
+			Move(const glm::vec2& t, const glm::vec2&f) :
+				to(t),
+				from(f)
+				{}
+				
+			glm::vec2 to;
+			glm::vec2 from;
+		};
+		
+		std::vector<Move> m_Moves;
+	};
 
 } // visualizer
 

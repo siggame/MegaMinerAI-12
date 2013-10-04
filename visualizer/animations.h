@@ -15,6 +15,21 @@ namespace visualizer
 	private:
 		BaseSprite* m_sprite;
 	};
+	
+	class DrawSmoothMoveSprite : 
+		public Anim
+	{
+	public:
+		DrawSmoothMoveSprite(MoveableSprite * sprite) :
+			m_Sprite(sprite)
+			{}
+		
+		void animate( const float& t, AnimData* d, IGame* game);
+		
+	private:
+		MoveableSprite * m_Sprite;
+		string m_SpriteName;
+	};
 
 }
 
