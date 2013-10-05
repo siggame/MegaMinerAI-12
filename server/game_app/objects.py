@@ -90,7 +90,7 @@ class Unit(Mappable):
     self.x = x
     self.y = y
     self.owner = owner
-    self.type = type
+    self.type = type # 0 - Digger , 1 - Filler
     self.hasAttacked = hasAttacked
     self.hasDigged = hasDigged
     self.hasBuilt = hasBuilt
@@ -141,16 +141,102 @@ class Unit(Mappable):
     return True
 
   def fill(self, tile):
-    #TODO: Unit Fill Function
-    pass
+    x = tile.x
+    y = tile.y
+
+    #FILLERS ARE OF TYPE 1
+    
+    if self.owner != self.game.playerID:
+      return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
+    elif self.type != 1:
+      return 'Turn {}: Your digger unit {} cannot fill.'.format(self.game.turnNumber, self.id)
+    elif self.hasBuilt == 1:
+      return 'Turn {}: Your unit {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
+    elif abs(self.x-x) + abs(self.y-y) != 1:
+      return 'Turn {}: Your unit {} can only fill adjacent Tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.isTrench == 0:
+      return 'Turn {}: Your unit {} cannot fill something that is not a trench. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.waterAmount > 0:
+      return 'Turn {}: Your unit {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
+    elif len(self.game.grid[x][y]) > 1:
+      return 'Turn {}: Your unit {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
+    
+    # Set the Tile to not be a trench
+    tile.isTrench = 0
+    # Unit can no longer move
+    self.movementLeft = 0
+    
+    self.hasBuilt = 1
+    
+    self.game.addAnimation(FillAnimation(self.id, tile.id))
+    
+    return True
 
   def dig(self, tile):
-    #TODO: Unit Dig Function
-    pass
+    x = tile.x
+    y = tile.y
+
+    # DIGGERS ARE TYPE 0
+    
+    if self.owner != self.game.playerID:
+      return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
+    elif self.type != 0:
+      return 'Turn {}: Your filler {} cannot dig.'.format(self.game.turnNumber, self.id)
+    elif self.hasDigged == 1:
+      return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
+    elif abs(self.x-x) + abs(self.y-y) != 1:
+      return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.isTrench == 1:
+      return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.type != 0:
+      return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
+    elif tile.owner == 0 or tile.owner == 1:
+      return 'Turn {}: Your {} can not dig trenches on spawn tiles. ({},{}) digs ({},{})'.format(self.game.turn, self.id, self.x, self.y, x, y)
+    elif len(self.game.grid[x][y]) > 1:
+      return 'Turn {}: Your {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    
+    # Set the Tile to be a trench
+    tile.isTrench = 1
+    # Unit can no longer move
+    self.movementLeft = 0
+    
+    self.hasDigged = 1
+    
+    self.game.addAnimation(DigAnimation(self.id, tile.id))
+    
+    return True
 
   def attack(self, target):
-    #TODO: Unit Attack Function
-    pass
+    x = target.x
+    y = target.y
+    
+    if self.owner != self.game.playerID:
+      return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
+    elif abs(self.x-x) + abs(self.y-y) != 1:
+      return 'Turn {}: Your {} can only attack adjacent Units. ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif self.hasAttacked == 1:
+      return 'Turn {}: Your {} has already attacked this turn.'.format(self.game.turnNumber, self.id)
+    elif not isinstance(target, Unit):
+      return 'Turn {}: Your {} can only attack other units.'.format(self.game.turnNumber, self.id)
+    elif target.owner == self.owner:
+      return 'Turn {}: Your {} cannot attack a friendly unit {}.'.format(self.game.turnNumber, self.id, target.id)
+      
+    self.hasAttacked = 1
+    
+    # Unit can no longer move
+    self.movementLeft = 0
+    
+    self.game.addAnimation(AttackAnimation(self.id, target.id))
+    
+    # Deal damage
+    target.healthLeft -= self.game.attackDamage
+    
+    # Check if target is dead
+    if target.healthLeft <= 0:
+      self.game.grid[x][y].remove(target)
+      self.game.removeObject(target)
+    
+    return True
 
   def __setattr__(self, name, value):
       if name in self.game_state_attributes:
@@ -189,7 +275,7 @@ class Tile(Mappable):
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.spawnResources < self.game.unitCost:
       return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.spawnResources, self.game.unitCost, tile.x, tile.y)
-    if type not in [1,2]:
+    if type not in [0,1]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
 
     if len(self.game.grid[self.x][self.y]) > 1:
@@ -281,4 +367,3 @@ class DigAnimation:
 
   def toJson(self):
     return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
-
