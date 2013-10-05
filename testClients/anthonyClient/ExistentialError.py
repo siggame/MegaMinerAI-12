@@ -1,2 +1,0 @@
-class ExistentialError(LookupError):
-  pass
