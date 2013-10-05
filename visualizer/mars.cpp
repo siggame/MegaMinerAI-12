@@ -44,6 +44,8 @@ void Mars::preDraw()
 	renderer->setColor(Color());
 	renderer->drawTexturedQuad(0.0f,0.0f,m_game->states[0].mapWidth,m_game->states[0].mapHeight,"mars");
 
+	drawGrid();
+
 // Handle player input here
 }
 
