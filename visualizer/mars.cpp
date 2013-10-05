@@ -56,7 +56,10 @@ void Mars::postDraw()
 
 void Mars::drawGrid()
 {
-	int h = m_game->states[0].mapHeight;
+      bool bEnableGrid = options->getNumber("Enable Grid") > 0;
+      if(bEnableGrid)
+      {
+        int h = m_game->states[0].mapHeight;
         int w = m_game->states[0].mapWidth;
 
         //draw horizontal lines
@@ -71,6 +74,7 @@ void Mars::drawGrid()
         {
             renderer->drawLine(i,0,i,h,1.0f);
         }
+      }
 }
 
 PluginInfo Mars::getPluginInfo()
