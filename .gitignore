@@ -2,8 +2,8 @@
 .idea/
 
 # Gamelogs
-.glog
-.gamelog
+*.glog
+*.gamelog
 
 ## Python Stuff
 *.pyc
