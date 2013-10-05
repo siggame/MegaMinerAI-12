@@ -1,6 +1,7 @@
 #include "animations.h"
 #include "mars.h"
 
+
 namespace visualizer
 {
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)
@@ -12,19 +13,19 @@ namespace visualizer
 	
 	}
 	
-	void DrawSmoothMoveSprite::animate(const float& t, AnimData* d, IGame * game)
+	void DrawSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
 		unsigned int index = (unsigned int)(m_Sprite->m_Moves.size() * t);
 		float subT = m_Sprite->m_Moves.size() * t - index;
 		MoveableSprite::Move& thisMove = m_Sprite->m_Moves[index];
 		
 		
-		glm::vec2 diff = thisMove.to - thisMove.from;
-		glm::vec2 pos = thisMove.from + diff * subT; 
+		glm::vec2 diff = m_Sprite->m_Moves[index].to - m_Sprite->m_Moves[index].from;
+		glm::vec2 pos = m_Sprite->m_Moves[index].from + diff * subT; 
 		
 		// TODO: give it the option of being flipped
 		game->renderer->drawTexturedQuad(pos.x, pos.y, 1.0f, 1.0f,
-										 m_SpriteName, true);
+										 m_Sprite->m_SpriteName, true);
 		
 	}
 

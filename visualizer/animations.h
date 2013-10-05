@@ -1,6 +1,9 @@
 #ifndef ANIMATIONS_H
 #define ANIMATIONS_H
 
+//TODO : Remove IOSTREAM just for testing
+#include <iostream>
+
 #include "marsAnimatable.h"
 
 namespace visualizer
@@ -24,11 +27,10 @@ namespace visualizer
 			m_Sprite(sprite)
 			{}
 		
-		void animate( const float& t, AnimData* d, IGame* game);
+		void animate( const float& t, AnimData* d, IGame* game );
 		
 	private:
 		MoveableSprite * m_Sprite;
-		string m_SpriteName;
 	};
 
 }

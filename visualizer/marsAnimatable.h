@@ -23,8 +23,9 @@ namespace visualizer
 	struct MoveableSprite :
 		public Animatable
 	{
-	public:
-		MoveableSprite() {}
+		MoveableSprite(const string& sprite) :
+			m_SpriteName(sprite)
+			{}
 	
 		struct Move
 		{
@@ -38,6 +39,7 @@ namespace visualizer
 			glm::vec2 from;
 		};
 		
+		std::string m_SpriteName;
 		std::vector<Move> m_Moves;
 	};
 

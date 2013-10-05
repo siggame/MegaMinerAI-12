@@ -130,9 +130,21 @@ void Mars::run()
 
 		for(auto& unitIter : m_game->states[state].units)
 		{
-			SmartPointer<BaseSprite> pUnit = new BaseSprite(glm::vec2(unitIter.second.x,unitIter.second.y), glm::vec2(1.0f), "digger");
-			pUnit->addKeyFrame(new DrawSprite(pUnit));
+			SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
+			pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit));
 			turn.addAnimatable(pUnit);
+			
+			for(auto& animationIter : m_game->states[state].animations[unitIter.second.id])
+			{
+				if(animationIter->type == parser::MOVE)
+				{
+					parser::move& move = (parser::move&)*animationIter;
+					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
+				}
+			}
+			
+			if(pUnit->m_Moves.empty())
+				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
 		}
 
 		animationEngine->buildAnimations(turn);
