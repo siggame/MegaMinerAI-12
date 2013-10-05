@@ -44,6 +44,8 @@ void Mars::preDraw()
 	renderer->setColor(Color());
 	renderer->drawTexturedQuad(0.0f,0.0f,m_game->states[0].mapWidth,m_game->states[0].mapHeight,"mars");
 
+	drawGrid();
+
 // Handle player input here
 }
 
@@ -52,6 +54,24 @@ void Mars::postDraw()
 
 }
 
+void Mars::drawGrid()
+{
+	int h = m_game->states[0].mapHeight;
+        int w = m_game->states[0].mapWidth;
+
+        //draw horizontal lines
+        renderer->setColor(Color(0.0f,0.0f,0.0f,1.0f));
+        for(unsigned int i = 0; i < h; i++)
+        {
+            renderer->drawLine(0,i,w,i,1.0f);
+        }
+
+        //draw vertical lines
+        for(unsigned int i = 0; i < w; i++)
+        {
+            renderer->drawLine(i,0,i,h,1.0f);
+        }
+}
 
 PluginInfo Mars::getPluginInfo()
 {
@@ -130,9 +150,21 @@ void Mars::run()
 
 		for(auto& unitIter : m_game->states[state].units)
 		{
-			SmartPointer<BaseSprite> pUnit = new BaseSprite(glm::vec2(unitIter.second.x,unitIter.second.y), glm::vec2(1.0f), "digger");
-			pUnit->addKeyFrame(new DrawSprite(pUnit));
+			SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
+			pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit));
 			turn.addAnimatable(pUnit);
+			
+			for(auto& animationIter : m_game->states[state].animations[unitIter.second.id])
+			{
+				if(animationIter->type == parser::MOVE)
+				{
+					parser::move& move = (parser::move&)*animationIter;
+					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
+				}
+			}
+			
+			if(pUnit->m_Moves.empty())
+				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
 		}
 
 		animationEngine->buildAnimations(turn);
