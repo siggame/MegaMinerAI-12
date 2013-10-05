@@ -44,6 +44,8 @@ void Mars::preDraw()
 	renderer->setColor(Color());
 	renderer->drawTexturedQuad(0.0f,0.0f,m_game->states[0].mapWidth,m_game->states[0].mapHeight,"mars");
 
+	drawGrid();
+
 // Handle player input here
 }
 
@@ -52,6 +54,24 @@ void Mars::postDraw()
 
 }
 
+void Mars::drawGrid()
+{
+	int h = m_game->states[0].mapHeight;
+        int w = m_game->states[0].mapWidth;
+
+        //draw horizontal lines
+        renderer->setColor(Color(0.0f,0.0f,0.0f,1.0f));
+        for(unsigned int i = 0; i < h; i++)
+        {
+            renderer->drawLine(0,i,w,i,1.0f);
+        }
+
+        //draw vertical lines
+        for(unsigned int i = 0; i < w; i++)
+        {
+            renderer->drawLine(i,0,i,h,1.0f);
+        }
+}
 
 PluginInfo Mars::getPluginInfo()
 {
