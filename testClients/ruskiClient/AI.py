@@ -5,14 +5,12 @@ from GameObject import *
 import time
 from time import sleep
 import random
-
-import game_history
-
-
+import game_utils
 
 class AI(BaseAI):
 
-  history = game_history.game_history()
+  history = None
+  spawnTiles = []
 
   """The class implementing gameplay logic."""
   @staticmethod
@@ -23,13 +21,6 @@ class AI(BaseAI):
   def password():
     return "password"
 
-  DIGGER = 0
-  FILLER = 1
-
-  #USEFUL FOR GETTING TILES
-  def getTile(self, x, y):
-    return self.tiles[x * self.mapHeight + y]
-
   def getSpawnTiles(self):
     for tile in self.tiles:
       if tile.owner == self.playerID:
@@ -37,7 +28,7 @@ class AI(BaseAI):
 
   def spawnUnits(self):
     for tile in self.spawnTiles:
-      tile.spawn(random.choice([self.DIGGER, self.FILLER]))
+      tile.spawn(random.choice([game_utils.DIGGER, game_utils.FILLER]))
 
   def moveUnits(self):
     for unit in self.units:
@@ -49,15 +40,15 @@ class AI(BaseAI):
         offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
         #Check if off map
         if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
-          tile = self.getTile(unit.x+offset[0], unit.y+offset[1])
+          tile = game_utils.get_tile(self, unit.x+offset[0], unit.y+offset[1])
           unit.dig(tile)
           unit.fill(tile)
 
   ##This function is called once, before your first turn
   def init(self):
     self.getSpawnTiles()
-
-
+    self.history = game_utils.game_history(self, True)
+    self.history.set_nonmoving_elements()
     return
 
   ##This function is called once, after your last turn
