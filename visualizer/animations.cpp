@@ -24,6 +24,7 @@ namespace visualizer
 		glm::vec2 pos = m_Sprite->m_Moves[index].from + diff * subT; 
 		
 		// TODO: give it the option of being flipped
+		game->renderer->setColor(Color());
 		game->renderer->drawTexturedQuad(pos.x, pos.y, 1.0f, 1.0f,
 										 m_Sprite->m_SpriteName, true);
 		
