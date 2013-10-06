@@ -23,6 +23,9 @@ class Player(object):
         newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
       self.spawnQueue = []
+
+      self.game.waterFlow()
+
     return True
 
   def talk(self, message):
