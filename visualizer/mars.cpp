@@ -39,7 +39,7 @@ void Mars::destroy()
 
 void Mars::preDraw()
 {
-	const Input& input = gui->getInput();
+	//const Input& input = gui->getInput();
 
 	renderer->setColor(Color());
 	renderer->drawTexturedQuad(0.0f,0.0f,m_game->states[0].mapWidth,m_game->states[0].mapHeight,"mars");
@@ -59,8 +59,8 @@ void Mars::drawGrid()
       bool bEnableGrid = options->getNumber("Enable Grid") > 0;
       if(bEnableGrid)
       {
-        int h = m_game->states[0].mapHeight;
-        int w = m_game->states[0].mapWidth;
+		unsigned int h = m_game->states[0].mapHeight;
+		unsigned int w = m_game->states[0].mapWidth;
 
         //draw horizontal lines
         renderer->setColor(Color(0.0f,0.0f,0.0f,1.0f));
@@ -147,6 +147,14 @@ void Mars::run()
 
 	animationEngine->registerGame(0, 0);
 
+	const char* playerName = m_game->states[0].players[m_game->winner].playerName;
+	SmartPointer<SplashScreen> splashScreen = new SplashScreen(m_game->winReason,playerName,
+															   m_game->states[0].mapWidth,
+															   m_game->states[0].mapHeight
+															   );
+
+	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
+
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
 	{
@@ -170,6 +178,11 @@ void Mars::run()
 			
 			if(pUnit->m_Moves.empty())
 				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
+		}
+
+		if(state >= (int)(m_game->states.size() - 10))
+		{
+			turn.addAnimatable(splashScreen);
 		}
 
 		animationEngine->buildAnimations(turn);

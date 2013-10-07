@@ -61,6 +61,18 @@ namespace visualizer
 		MoveableSprite * m_Sprite;
 	};
 
+	class DrawSplashScreen : public Anim
+	{
+	public:
+
+		DrawSplashScreen(SplashScreen* screen) : m_SplashScreen(screen) {}
+
+		void animate(const float &t, AnimData *d, IGame *game);
+
+	private:
+		SplashScreen* m_SplashScreen;
+	};
+
 }
 
 #endif // ANIMATION_H

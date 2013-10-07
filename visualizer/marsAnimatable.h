@@ -58,6 +58,17 @@ namespace visualizer
 		std::vector<Move> m_Moves;
 	};
 
+	struct SplashScreen : public Animatable
+	{
+		SplashScreen(const string& reason, const string& nam, int w, int h) :
+			winReason(reason), name(nam), width(w), height(h) {}
+
+		string winReason;
+		string name;
+		int width;
+		int height;
+	};
+
 } // visualizer
 
 #endif // MARS_ANIMATABLE_H
