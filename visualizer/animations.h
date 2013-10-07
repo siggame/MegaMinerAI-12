@@ -5,15 +5,30 @@
 
 namespace visualizer
 {
+
+    class ColorSprite : public Anim
+    {
+    public:
+        ColorSprite(const glm::vec3& c) : m_color(c)
+        {
+        }
+
+       void animate( const float& t, AnimData* d, IGame* game );
+
+    private:
+        glm::vec3 m_color;
+
+    };
+
     /** @name DrawSprite
       * @inherits Anim
       * @purpose Draws an unmoving sprite at the grid coordinates specified in
       *     m_sprite.
       */
-	class DrawSprite : public Anim
+    class DrawSprite : public ColorSprite
 	{
 	public:
-		DrawSprite( BaseSprite* sprite ) : m_sprite(sprite) {}
+        DrawSprite( BaseSprite* sprite, const glm::vec3& c ) : ColorSprite(c), m_sprite(sprite) {}
 		void animate( const float& t, AnimData* d, IGame* game );
 
 	private:
@@ -33,10 +48,10 @@ namespace visualizer
       *     all that turn.
       */
 	class DrawSmoothMoveSprite :
-		public Anim
+        public ColorSprite
 	{
 	public:
-		DrawSmoothMoveSprite(MoveableSprite * sprite) :
+        DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec3& c) : ColorSprite(c),
 			m_Sprite(sprite)
 			{}
 

@@ -154,8 +154,9 @@ void Mars::run()
 
 		for(auto& unitIter : m_game->states[state].units)
 		{
+
 			SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
-			pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit));
+            pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter.second.owner == 1? glm::vec3(1,0,0) : glm::vec3(0,0,1) ));
 			turn.addAnimatable(pUnit);
 			
 			for(auto& animationIter : m_game->states[state].animations[unitIter.second.id])
