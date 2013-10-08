@@ -37,9 +37,85 @@ void Mars::destroy()
 
 } // Mars::~Mars()
 
+void Mars::GetSelectedRect(Rect &out) const
+{
+	const Input& input = gui->getInput();
+
+	int x = input.x;
+	int y = input.y /*- SEA_OFFSET*/;
+	int width = input.sx - x;
+	int height = input.sy - y;
+
+	int right = x + width;
+	int bottom = y + height /*- SEA_OFFSET*/;
+
+	out.left = min(x,right);
+	out.top = min(y,bottom);
+	out.right = max(x,right);
+	out.bottom = max(y,bottom);
+}
+
+void Mars::ProccessInput()
+{
+	const Input& input = gui->getInput();
+	if( input.leftRelease )
+	{
+		int turn = timeManager->getTurn();
+
+		Rect R;
+		GetSelectedRect(R);
+
+		m_selectedUnitIDs.clear();
+
+		/*for(auto& iter : m_Trash[turn])
+		{
+			const auto& trash = iter.second;
+
+			if(trash.amount > 0)
+			{
+				// todo: move this logic into another function
+				if(R.left <= trash.x && R.right >= trash.x && R.top <= trash.y && R.bottom >= trash.y)
+				{
+					m_selectedUnitIDs.push_back(iter.first);
+				}
+			}
+		}*/
+
+		for(auto& iter : m_game->states[ turn ].units)
+		{
+			const auto& unit = iter.second;
+
+			// todo: move this logic into another function
+			if(R.left <= unit.x && R.right >= unit.x && R.top <= unit.y && R.bottom >= unit.y)
+			{
+				m_selectedUnitIDs.push_back(unit.id);
+			}
+		}
+
+		cout<<"Selected Units:" << m_selectedUnitIDs.size() << endl;
+	}
+}
+
+void Mars::drawObjectSelection() const
+{
+	int turn = timeManager->getTurn();
+
+	for(auto& iter : m_selectedUnitIDs)
+	{
+		drawQuadAroundObj(m_game->states[turn].units,iter);
+	}
+	/*for(auto iter = m_selectedUnitIDs.begin(); iter != m_selectedUnitIDs.end(); ++iter)
+	{
+	  if(!DrawQuadAroundObj(m_Trash[turn],*iter))
+	  {
+		DrawQuadAroundObj(m_game->states[turn].fishes,*iter);
+	  }
+	}*/
+}
+
 void Mars::preDraw()
 {
-	//const Input& input = gui->getInput();
+	ProccessInput();
 
 	renderer->setColor(Color());
 	renderer->drawTexturedQuad(0.0f,0.0f,m_game->states[0].mapWidth,m_game->states[0].mapHeight,"mars");
@@ -51,7 +127,7 @@ void Mars::preDraw()
 
 void Mars::postDraw()
 {
-
+	drawObjectSelection();
 }
 
 void Mars::drawGrid()
@@ -100,8 +176,7 @@ void Mars::setup()
 // Give the Debug Info widget the selected object IDs in the Gamelog
 list<int> Mars::getSelectedUnits()
 {
-	// TODO Selection logic
-	return list<int>();  // return the empty list
+	return m_selectedUnitIDs;
 }
 
 void Mars::loadGamelog( std::string gamelog )
@@ -133,15 +208,17 @@ void Mars::loadGamelog( std::string gamelog )
 	renderer->setCamera( 0, 0, m_game->states[0].mapWidth, m_game->states[0].mapHeight);
 	renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight);
 
+	m_selectedUnitIDs.clear();
+
 	start();
 } // Mars::loadGamelog()
 
 // The "main" function
 void Mars::run()
 {
-	// Build the Debug Table's Headers
 	QStringList header;
-	header << "one" << "two" << "three";
+	header<<"owner" << "hasAttacked" << "hasDigged" << "hasBuilt" << "healthLeft" << "maxHealth" << "movementLeft" << "maxMovement" <<"X" << "Y" ;
+
 	gui->setDebugHeader( header );
 	timeManager->setNumTurns( 0 );
 
@@ -198,10 +275,9 @@ void Mars::run()
 
 			if(pUnit->m_Moves.empty())
 				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
+
+			 turn[unitIter.second.id]["owner"] = unitIter.second.owner;
 		}
-
-
-
 
 		if(state >= (int)(m_game->states.size() - 10))
 		{
