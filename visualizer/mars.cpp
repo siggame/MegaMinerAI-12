@@ -277,6 +277,15 @@ void Mars::run()
 				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
 
 			 turn[unitIter.second.id]["owner"] = unitIter.second.owner;
+			 turn[unitIter.second.id]["hasAttacked"] = unitIter.second.hasAttacked;
+			 turn[unitIter.second.id]["hasDigged"] = unitIter.second.hasDigged;
+			 turn[unitIter.second.id]["hasBuilt"] = unitIter.second.hasBuilt;
+			 turn[unitIter.second.id]["healthLeft"] = unitIter.second.healthLeft;
+			 turn[unitIter.second.id]["maxHealth"] = unitIter.second.maxHealth;
+			 turn[unitIter.second.id]["movementLeft"] = unitIter.second.movementLeft;
+			 turn[unitIter.second.id]["maxMovement"] = unitIter.second.maxMovement;
+			 turn[unitIter.second.id]["X"] = unitIter.second.x;
+			 turn[unitIter.second.id]["Y"] = unitIter.second.y;
 		}
 
 		if(state >= (int)(m_game->states.size() - 10))
