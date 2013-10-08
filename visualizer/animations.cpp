@@ -5,7 +5,7 @@ namespace visualizer
 {
 	void ColorSprite::animate(const float &, AnimData*, IGame *game)
     {
-         game->renderer->setColor( Color(m_color.r, m_color.g, m_color.b, 1) );
+		 game->renderer->setColor( Color(m_color.r, m_color.g, m_color.b, m_color.a) );
     }
 
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)

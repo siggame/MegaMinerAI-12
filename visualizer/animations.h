@@ -12,14 +12,14 @@ namespace visualizer
     class ColorSprite : public Anim
     {
     public:
-        ColorSprite(const glm::vec3& c) : m_color(c)
+		ColorSprite(const glm::vec4& c) : m_color(c)
         {
         }
 
        void animate( const float& t, AnimData* d, IGame* game );
 
     private:
-        glm::vec3 m_color;
+		glm::vec4 m_color;
 
     };
 
@@ -31,7 +31,7 @@ namespace visualizer
     class DrawSprite : public ColorSprite
 	{
 	public:
-        DrawSprite( BaseSprite* sprite, const glm::vec3& c ) : ColorSprite(c), m_sprite(sprite) {}
+		DrawSprite( BaseSprite* sprite, const glm::vec4& c ) : ColorSprite(c), m_sprite(sprite) {}
 		void animate( const float& t, AnimData* d, IGame* game );
 
 	private:
@@ -54,7 +54,7 @@ namespace visualizer
         public ColorSprite
 	{
 	public:
-        DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec3& c) : ColorSprite(c),
+		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c) : ColorSprite(c),
 			m_Sprite(sprite)
 			{}
 
