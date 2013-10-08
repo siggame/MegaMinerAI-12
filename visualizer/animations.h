@@ -6,6 +6,9 @@
 namespace visualizer
 {
 
+
+    // NOTE: consider combining color sprite and DrawSprite since they are
+    //    essentially the same, except that DrawSprite is drawn with white.
     class ColorSprite : public Anim
     {
     public:

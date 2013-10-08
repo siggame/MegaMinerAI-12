@@ -160,13 +160,33 @@ void Mars::run()
 	{
 		Frame turn;  // The frame that will be drawn
 
+        // For each TILE in the frame
+        for(auto& tileIter : m_game->states[state].tiles)
+		{
+            // if there is water then render water
+            if(tileIter.second.waterAmount != 0)
+            {
+                SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.second.x, tileIter.second.y), glm::vec2(1.0f, 1.0f), "water");
+                pTile->addKeyFrame(new DrawSprite(pTile, glm::vec3(1.0f, 1.0f, 1.0f)));
+                turn.addAnimatable(pTile);
+            }
+            // if there is no water, but a trench then render a trench
+            else if(tileIter.second.isTrench == true)
+            {
+                SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.second.x, tileIter.second.y), glm::vec2(1.0f, 1.0f), "trench");
+                pTile->addKeyFrame(new DrawSprite(pTile, glm::vec3(1.0f, 1.0f, 1.0f)));
+                turn.addAnimatable(pTile);
+            }
+		}
+
+        // For each UNIT in the frame
 		for(auto& unitIter : m_game->states[state].units)
 		{
 
 			SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
             pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter.second.owner == 1? glm::vec3(1,0,0) : glm::vec3(0,0,1) ));
 			turn.addAnimatable(pUnit);
-			
+
 			for(auto& animationIter : m_game->states[state].animations[unitIter.second.id])
 			{
 				if(animationIter->type == parser::MOVE)
@@ -175,10 +195,13 @@ void Mars::run()
 					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
 				}
 			}
-			
+
 			if(pUnit->m_Moves.empty())
 				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
 		}
+
+
+
 
 		if(state >= (int)(m_game->states.size() - 10))
 		{
