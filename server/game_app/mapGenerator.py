@@ -42,8 +42,10 @@ class MapGenerator(object):
             otherTile = self.match.getTile(self.match.mapWidth - x - 1, y)
             if col == ' ':
               tile.owner = otherTile.owner = 2
-            else:
+            elif col == 'I':
               tile.owner = otherTile.owner = 3
+            else:
+              tile.owner = otherTile.owner = 4
 
   def connect_map(self):
     while True:
@@ -86,5 +88,5 @@ class MapGenerator(object):
 def set_tiles(match):
   gen = MapGenerator(match)
   gen.lay_tiles()
-  gen.set_coves()
+  #gen.set_coves()
   gen.connect_map()

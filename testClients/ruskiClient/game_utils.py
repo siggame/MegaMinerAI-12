@@ -38,7 +38,7 @@ class game_history:
 
     for tile in self.ai.tiles:
       #Assume tile.type == 1 means ICE
-      if tile.type == 1:
+      if tile.owner == 3:
         self.notmoving[tile.x][tile.y].append(self.colorText('I', self.CYAN, self.WHITE))
       elif tile.owner == 0:
         self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.RED))
