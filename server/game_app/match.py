@@ -277,9 +277,9 @@ class Match(DefaultGameWorld):
             p2h = 0
             for unit in self.objects.units:
               if unit.owner == 0:
-                p1h += unit.curHealth
+                p1h += unit.healthLeft
               else:
-                p2h += unit.curHealth
+                p2h += unit.healthLeft
             # Player 1 wins if they have more health
             if p1h > p2h:
               self.declareWinner(self.players[0], "Player 1 wins through more total health")
