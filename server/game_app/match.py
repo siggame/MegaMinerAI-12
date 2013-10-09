@@ -8,7 +8,7 @@ import os
 import itertools
 import scribe
 import jsonLogger
-import mapGenerator
+from mapGenerator import set_tiles
 import random
 #import set_tiles
 
@@ -47,6 +47,8 @@ class Match(DefaultGameWorld):
     self.playerID = -1
     self.gameNumber = id
     self.turnLimit = self.turnLimit
+
+    self.ice = []
 
   #this is here to be wrapped
   def __del__(self):
@@ -90,29 +92,78 @@ class Match(DefaultGameWorld):
     self.turnNumber = -1
 
     # ['id', 'x', 'y', 'owner', 'type', 'pumpID', 'waterAmount', 'isTrench']
-    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, 0, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
-    self.setTiles()
-    #set_tiles(self)
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, -1, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+
+    self.create_ice()
+    self.create_spawns()
 
     self.nextTurn()
+
     return True
 
-  def setTiles(self):
+  def getTile(self, x, y):
+    return self.grid[x][y][0]
+
+  def create_ice(self):
+    set_tiles(self)
+
+  def create_spawns(self):
     #TODO: Better spawner spawning
     #Set Tiles on far sides as spawns
     for y in range(self.mapHeight):
       for x in range(self.mapWidth/2):
-        rand = random.random()
-        if rand > .95:
-            self.grid[x][y][0].owner = 0
-            self.grid[self.mapWidth-x-1][y][0].owner = 1
-
-
-    pass
+          tile = self.grid[x][y][0]
+          othertile = self.grid[self.mapWidth-x-1][y][0]
+          rand = random.random()
+          if rand > .98 and tile.owner == 2 and othertile.owner == 2:
+            tile.owner = 0
+            othertile.owner = 1
+    return
 
   def waterFlow(self):
-      #TODO: Create water flow conditions to move water from icecaps to pump stations
-      pass
+    print('Water flow.')
+    #TODO: Create water flow conditions to move water from icecaps to pump stations
+    #The way I see it working right now is:
+    #we pick an ice cap tile (owner == 3)
+    #add this tile to an list (open)
+    #check every neighbor of it, add it to open if it is already has water on it and isn't in closed
+    #if a neighbor needs to have water on it (dug and has no water on it, or pump station), then add water and put it in closed
+    #remove original tile from open, add to closed
+    #pick a new tile from open, repeat
+    #end when open is empty
+
+    open = []
+    closed = []
+
+    offsets = [(0,1),(0,-1),(1,0),(-1,0)]
+
+    for tile in self.objects.tiles:
+      if tile.owner == 3:
+        open.append(tile)
+
+    while len(open) > 0:
+
+      #Check neighbors
+      tile = open[-1]
+      for offset in offsets:
+        newx = tile.x + offset[0]
+        newy = tile.y + offset[1]
+
+        #check if valid tile
+        if (0 <= newx < self.mapWidth) and (0 <= newy < self.mapHeight):
+          neighbor = self.getTile(newx, newy)
+          if neighbor.waterAmount > 0 and neighbor not in closed and neighbor not in open:
+            open.append(neighbor)
+          if neighbor.isTrench == 1 or neighbor.pumpID != -1:
+            print('ADD WATER ({},{})'.format(neighbor.x, neighbor.y))
+            neighbor.waterAmount = 1
+            closed.append(neighbor)
+
+      open.remove(tile)
+      closed.append(tile)
+
+    print('End water flow.')
+    return
 
   def nextTurn(self):
     self.turnNumber += 1
@@ -177,7 +228,7 @@ class Match(DefaultGameWorld):
     # Get the total water left in ice caps
     totalWater = 0
     for tile in self.objects.tiles:
-      totalWater += tile.waterAmount
+        totalWater += tile.waterAmount
 
     earlyWin = abs(p1w-p2w) > totalWater
 
@@ -185,10 +236,10 @@ class Match(DefaultGameWorld):
     if self.turnNumber >= self.turnLimit or earlyWin:
       # Player 1 wins if they have more water stored
       if p1w > p2w:
-        self.declareWinner(self.players[0], "Player 1 wins through more water stored")
+          self.declareWinner(self.players[0], "Player 1 wins through more water stored")
       # Player 2 wins if they have more water stored
       elif p2w > p1w:
-        self.declareWinner(self.players[1], "Player 2 wins through more water stored")
+          self.declareWinner(self.players[1], "Player 2 wins through more water stored")
       #TIE CONDITIONS:
       else:
         #TODO: Tie condition, number of bases owned might determine winner
@@ -200,13 +251,12 @@ class Match(DefaultGameWorld):
             p1p += 1
           else:
             p2p += 1
-
         # Player 1 wins if they own more pump stations
         if p1p > p2p:
           self.declareWinner(self.players[0], "Player 1 wins through more pump stations")
         # Player 2 wins if they own more pump stations
         elif p1p < p2p:
-          self.declareWinner(self.players[1], "Player 1 wins through more pump stations")
+          self.declareWinner(self.players[1], "Player 2 wins through more pump stations")
         else:
           # Get the total number of units
           p1u = 0
@@ -216,21 +266,20 @@ class Match(DefaultGameWorld):
               p1u += 1
             else:
               p2u += 1
-
           # Player 1 wins if they have more units
           if p1u > p2u:
-              self.declareWinner(self.players[0], "Player 2 wins through more units")
+            self.declareWinner(self.players[0], "Player 1 wins through more units")
           elif p2u > p1u:
-              self.declareWinner(self.players[1], "Player 2 wins through more units")
+            self.declareWinner(self.players[1], "Player 2 wins through more units")
           else:
             # Get the total current health
             p1h = 0
             p2h = 0
             for unit in self.objects.units:
               if unit.owner == 0:
-                p1h += unit.healthLeft
+                p1h += unit.curHealth
               else:
-                p2h += unit.healthLeft
+                p2h += unit.curHealth
             # Player 1 wins if they have more health
             if p1h > p2h:
               self.declareWinner(self.players[0], "Player 1 wins through more total health")

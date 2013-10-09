@@ -23,6 +23,9 @@ class Player(object):
         newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
       self.spawnQueue = []
+
+      self.game.waterFlow()
+
     return True
 
   def talk(self, message):
@@ -187,9 +190,13 @@ class Unit(Mappable):
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.isTrench == 1:
-      return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+      return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.type != 0:
-      return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your {} can only dig empty tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.pumpID != -1:
+      return 'Turn {}: Your {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.waterAmount > 0:
+      return 'Turn {}: Your {} can not dig trenches on ice cap tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.owner == 0 or tile.owner == 1:
       return 'Turn {}: Your {} can not dig trenches on spawn tiles. ({},{}) digs ({},{})'.format(self.game.turn, self.id, self.x, self.y, x, y)
     elif len(self.game.grid[x][y]) > 1:
@@ -280,6 +287,14 @@ class Tile(Mappable):
 
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
+
+    count = 0
+    for unit in self.game.objects.units:
+      if unit.owner == self.game.playerID:
+        count += 1
+    
+    if count >= self.game.maxUnits:
+      return 'Turn {} You cannot spawn a unit because you already have the maximum amount of units ({})'.format(self.game.turnNumber, self.game.maxUnits)
 
     player.spawnResources -= self.game.unitCost
 
