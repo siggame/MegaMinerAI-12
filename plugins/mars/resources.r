@@ -4,3 +4,4 @@ texture mars textures/mars.jpg
 texture digger textures/digger.png
 texture water textures/water.png
 texture trench textures/trench.png
+texture glacier textures/glacier.png
