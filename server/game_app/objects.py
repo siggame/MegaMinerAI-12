@@ -113,6 +113,13 @@ class Unit(Mappable):
   def nextTurn(self):
     tile = self.game.grid[self.x][self.y][0]
   
+    # Reset flags if it is unit owner's turn
+    if self.owner == self.game.playerID:
+      self.movementLeft = self.maxMovement
+      self.hasAttacked = 0
+      self.hasBuilt = 0
+      self.hasDigged = 0
+  
     # Apply damage if the unit is in a water filled trench
     if tile.isTrench and tile.waterAmount > 0:
       self.healthLeft -= self.game.waterDamage
@@ -121,13 +128,6 @@ class Unit(Mappable):
       if self.healthLeft <= 0:
         self.game.grid[self.x][self.y].remove(self)
         self.game.removeObject(self)
-  
-    # Reset flags if it is unit owner's turn
-    if self.owner != self.game.playerID:
-      self.movementLeft = self.maxMovement
-      self.hasAttacked = 0
-      self.hasBuilt = 0
-      self.hasDigged = 0
       
     return True
 
