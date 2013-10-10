@@ -232,6 +232,8 @@ void Mars::run()
 
 	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
 
+
+
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
 	{
@@ -240,20 +242,28 @@ void Mars::run()
         // For each TILE in the frame
         for(auto& tileIter : m_game->states[state].tiles)
 		{
+			std::string texture;
+
             // if there is water then render water
-            if(tileIter.second.waterAmount != 0)
+			if(tileIter.second.owner == 3) // if the tile is a glacier
+			{
+				texture = "glacier";
+			}
+			else if(tileIter.second.waterAmount != 0)
             {
-                SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.second.x, tileIter.second.y), glm::vec2(1.0f, 1.0f), "water");
-				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,1.0f)));
-                turn.addAnimatable(pTile);
-            }
-            // if there is no water, but a trench then render a trench
-            else if(tileIter.second.isTrench == true)
+				texture = "water";
+			}
+			else if(tileIter.second.isTrench == true) // if there is no water, but a trench then render a trench
             {
-                SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.second.x, tileIter.second.y), glm::vec2(1.0f, 1.0f), "trench");
-				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.85f)));
-                turn.addAnimatable(pTile);
+				texture = "trench";
             }
+
+			if(!texture.empty())
+			{
+				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.second.x, tileIter.second.y), glm::vec2(1.0f, 1.0f), texture);
+				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
+				turn.addAnimatable(pTile);
+			}
 		}
 
         // For each UNIT in the frame
