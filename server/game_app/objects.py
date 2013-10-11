@@ -23,6 +23,9 @@ class Player(object):
         newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
       self.spawnQueue = []
+
+      self.game.waterFlow()
+
     return True
 
   def talk(self, message):
@@ -108,10 +111,24 @@ class Unit(Mappable):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDigged = self.hasDigged, hasBuilt = self.hasBuilt, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, )
   
   def nextTurn(self):
-    self.movementLeft = self.maxMovement
-    self.hasAttacked = 0
-    self.hasBuilt = 0
-    self.hasDigged = 0
+    tile = self.game.grid[self.x][self.y][0]
+  
+    # Reset flags if it is unit owner's turn
+    if self.owner == self.game.playerID:
+      self.movementLeft = self.maxMovement
+      self.hasAttacked = 0
+      self.hasBuilt = 0
+      self.hasDigged = 0
+  
+    # Apply damage if the unit is in a water filled trench
+    if tile.isTrench and tile.waterAmount > 0:
+      self.healthLeft -= self.game.waterDamage
+      
+      # Check if the unit died
+      if self.healthLeft <= 0:
+        self.game.grid[self.x][self.y].remove(self)
+        self.game.removeObject(self)
+      
     return True
 
   def move(self, x, y):
@@ -187,9 +204,13 @@ class Unit(Mappable):
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.isTrench == 1:
-      return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+      return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.type != 0:
-      return 'Turn {}: Your {} can only dig empty tiles.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your {} can only dig empty tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.pumpID != -1:
+      return 'Turn {}: Your {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.waterAmount > 0:
+      return 'Turn {}: Your {} can not dig trenches on ice cap tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.owner == 0 or tile.owner == 1:
       return 'Turn {}: Your {} can not dig trenches on spawn tiles. ({},{}) digs ({},{})'.format(self.game.turn, self.id, self.x, self.y, x, y)
     elif len(self.game.grid[x][y]) > 1:
@@ -263,10 +284,6 @@ class Tile(Mappable):
   # This will not work if the object has variables other than primitives
   def toJson(self):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, pumpID = self.pumpID, waterAmount = self.waterAmount, isTrench = self.isTrench, )
-  
-  def nextTurn(self):
-    #TODO: Tile Next Turn (Possible Flow Logic?)
-    pass
 
   def spawn(self, type):
     player = self.game.objects.players[self.game.playerID]
@@ -280,6 +297,14 @@ class Tile(Mappable):
 
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
+
+    count = 0
+    for unit in self.game.objects.units:
+      if unit.owner == self.game.playerID:
+        count += 1
+    
+    if count >= self.game.maxUnits:
+      return 'Turn {} You cannot spawn a unit because you already have the maximum amount of units ({})'.format(self.game.turnNumber, self.game.maxUnits)
 
     player.spawnResources -= self.game.unitCost
 

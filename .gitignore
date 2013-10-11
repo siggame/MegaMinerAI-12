@@ -1,6 +1,10 @@
 ## PyCharm Stuff
 .idea/
 
+# Gamelogs
+*.glog
+*.gamelog
+
 ## Python Stuff
 *.pyc
 

@@ -6,6 +6,7 @@
 #include <utility>
 #include <time.h>
 #include <list>
+#include <chrono>
 
 namespace visualizer
 {
@@ -37,21 +38,121 @@ void Mars::destroy()
 
 } // Mars::~Mars()
 
-void Mars::preDraw()
+void Mars::GetSelectedRect(Rect &out) const
 {
 	const Input& input = gui->getInput();
 
-	renderer->setColor(Color());
-	renderer->drawTexturedQuad(0.0f,0.0f,m_game->states[0].mapWidth,m_game->states[0].mapHeight,"mars");
+	int x = input.x;
+	int y = input.y /*- SEA_OFFSET*/;
+	int width = input.sx - x;
+	int height = input.sy - y;
+
+	int right = x + width;
+	int bottom = y + height /*- SEA_OFFSET*/;
+
+	out.left = min(x,right);
+	out.top = min(y,bottom);
+	out.right = max(x,right);
+	out.bottom = max(y,bottom);
+}
+
+void Mars::ProccessInput()
+{
+	const Input& input = gui->getInput();
+	if( input.leftRelease )
+	{
+		int turn = timeManager->getTurn();
+
+		Rect R;
+		GetSelectedRect(R);
+
+		m_selectedUnitIDs.clear();
+
+		/*for(auto& iter : m_Trash[turn])
+		{
+			const auto& trash = iter.second;
+
+			if(trash.amount > 0)
+			{
+				// todo: move this logic into another function
+				if(R.left <= trash.x && R.right >= trash.x && R.top <= trash.y && R.bottom >= trash.y)
+				{
+					m_selectedUnitIDs.push_back(iter.first);
+				}
+			}
+		}*/
+
+		for(auto& iter : m_game->states[ turn ].units)
+		{
+			const auto& unit = iter.second;
+
+			// todo: move this logic into another function
+			if(R.left <= unit.x && R.right >= unit.x && R.top <= unit.y && R.bottom >= unit.y)
+			{
+				m_selectedUnitIDs.push_back(unit.id);
+			}
+		}
+
+		cout<<"Selected Units:" << m_selectedUnitIDs.size() << endl;
+	}
+}
+
+void Mars::drawObjectSelection() const
+{
+	int turn = timeManager->getTurn();
+
+	for(auto& iter : m_selectedUnitIDs)
+	{
+		drawQuadAroundObj(m_game->states[turn].units,iter);
+	}
+	/*for(auto iter = m_selectedUnitIDs.begin(); iter != m_selectedUnitIDs.end(); ++iter)
+	{
+	  if(!DrawQuadAroundObj(m_Trash[turn],*iter))
+	  {
+		DrawQuadAroundObj(m_game->states[turn].fishes,*iter);
+	  }
+	}*/
+}
+
+void Mars::preDraw()
+{
+	ProccessInput();
+
+    renderer->setColor(Color());
+    renderer->drawTexturedQuad(0.0f,0.0f,m_game->states[0].mapWidth,m_game->states[0].mapHeight,"dirt");
+
+	drawGrid();
 
 // Handle player input here
 }
 
 void Mars::postDraw()
 {
-
+	drawObjectSelection();
 }
 
+void Mars::drawGrid()
+{
+      bool bEnableGrid = options->getNumber("Enable Grid") > 0;
+      if(bEnableGrid)
+      {
+		unsigned int h = m_game->states[0].mapHeight;
+		unsigned int w = m_game->states[0].mapWidth;
+
+        //draw horizontal lines
+        renderer->setColor(Color(0.0f,0.0f,0.0f,1.0f));
+        for(unsigned int i = 0; i < h; i++)
+        {
+            renderer->drawLine(0,i,w,i,1.0f);
+        }
+
+        //draw vertical lines
+        for(unsigned int i = 0; i < w; i++)
+        {
+            renderer->drawLine(i,0,i,h,1.0f);
+        }
+      }
+}
 
 PluginInfo Mars::getPluginInfo()
 {
@@ -76,8 +177,7 @@ void Mars::setup()
 // Give the Debug Info widget the selected object IDs in the Gamelog
 list<int> Mars::getSelectedUnits()
 {
-	// TODO Selection logic
-	return list<int>();  // return the empty list
+	return m_selectedUnitIDs;
 }
 
 void Mars::loadGamelog( std::string gamelog )
@@ -109,30 +209,99 @@ void Mars::loadGamelog( std::string gamelog )
 	renderer->setCamera( 0, 0, m_game->states[0].mapWidth, m_game->states[0].mapHeight);
 	renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight);
 
+	m_selectedUnitIDs.clear();
+
 	start();
 } // Mars::loadGamelog()
 
 // The "main" function
 void Mars::run()
 {
-	// Build the Debug Table's Headers
 	QStringList header;
-	header << "one" << "two" << "three";
+	header<<"owner" << "hasAttacked" << "hasDigged" << "hasBuilt" << "healthLeft" << "maxHealth" << "movementLeft" << "maxMovement" <<"X" << "Y" ;
+
 	gui->setDebugHeader( header );
 	timeManager->setNumTurns( 0 );
 
 	animationEngine->registerGame(0, 0);
+
+	const char* playerName = m_game->states[0].players[m_game->winner].playerName;
+	SmartPointer<SplashScreen> splashScreen = new SplashScreen(m_game->winReason,playerName,
+															   m_game->states[0].mapWidth,
+															   m_game->states[0].mapHeight
+															   );
+
+	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
+
+
 
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
 	{
 		Frame turn;  // The frame that will be drawn
 
+        // For each TILE in the frame
+        for(auto& tileIter : m_game->states[state].tiles)
+		{
+			std::string texture;
+
+            // if there is water then render water
+			if(tileIter.second.owner == 3) // if the tile is a glacier
+			{
+				texture = "glacier";
+			}
+			else if(tileIter.second.waterAmount != 0)
+            {
+				texture = "water";
+			}
+			else if(tileIter.second.isTrench == true) // if there is no water, but a trench then render a trench
+            {
+				texture = "trench";
+            }
+
+			if(!texture.empty())
+			{
+				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.second.x, tileIter.second.y), glm::vec2(1.0f, 1.0f), texture);
+				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
+				turn.addAnimatable(pTile);
+			}
+		}
+
+        // For each UNIT in the frame
 		for(auto& unitIter : m_game->states[state].units)
 		{
-			SmartPointer<BaseSprite> pUnit = new BaseSprite(glm::vec2(unitIter.second.x,unitIter.second.y), glm::vec2(1.0f), "digger");
-			pUnit->addKeyFrame(new DrawSprite(pUnit));
+
+			SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
+			pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter.second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f) ));
 			turn.addAnimatable(pUnit);
+
+			for(auto& animationIter : m_game->states[state].animations[unitIter.second.id])
+			{
+				if(animationIter->type == parser::MOVE)
+				{
+					parser::move& move = (parser::move&)*animationIter;
+					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
+				}
+			}
+
+			if(pUnit->m_Moves.empty())
+				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
+
+			 turn[unitIter.second.id]["owner"] = unitIter.second.owner;
+			 turn[unitIter.second.id]["hasAttacked"] = unitIter.second.hasAttacked;
+			 turn[unitIter.second.id]["hasDigged"] = unitIter.second.hasDigged;
+			 turn[unitIter.second.id]["hasBuilt"] = unitIter.second.hasBuilt;
+			 turn[unitIter.second.id]["healthLeft"] = unitIter.second.healthLeft;
+			 turn[unitIter.second.id]["maxHealth"] = unitIter.second.maxHealth;
+			 turn[unitIter.second.id]["movementLeft"] = unitIter.second.movementLeft;
+			 turn[unitIter.second.id]["maxMovement"] = unitIter.second.maxMovement;
+			 turn[unitIter.second.id]["X"] = unitIter.second.x;
+			 turn[unitIter.second.id]["Y"] = unitIter.second.y;
+		}
+
+		if(state >= (int)(m_game->states.size() - 10))
+		{
+			turn.addAnimatable(splashScreen);
 		}
 
 		animationEngine->buildAnimations(turn);
