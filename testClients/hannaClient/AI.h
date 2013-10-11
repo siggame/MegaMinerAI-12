@@ -13,6 +13,7 @@ public:
   virtual void init();
   virtual bool run();
   virtual void end();
+  Tile * getTile(int x, int y);
 };
 
 #endif
