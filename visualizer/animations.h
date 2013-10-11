@@ -24,7 +24,7 @@ namespace visualizer
     };
 
     /** @name DrawSprite
-      * @inherits Anim
+      * @inherits ColorSprite
       * @purpose Draws an unmoving sprite at the grid coordinates specified with
       *     the color added to the textures color.
       */
@@ -61,7 +61,7 @@ namespace visualizer
         BaseSprite* m_sprite;
     };
 
-	/** @name DrawSprite
+	/** @name DrawSmoothMoveSprite
       * @inherits Anim
       * @purpose Will draw any MoveableSprite. These sprites contain a list
       *     of moves to adjacent squares in a single turn. The animation engine

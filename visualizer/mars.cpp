@@ -266,39 +266,39 @@ void Mars::run()
 				turn.addAnimatable(pTile);
 			}
 
-			if(tileIter.second.isTrench == true)
+			if(tileIter.second.isTrench == true && tileIter.second.owner != 3)
 			{
                 int surroundingTrenches = 0;
                 bool North = false, South = false, East = false, West = false;
                 std::string overlayTexture;
                 float overlayRotation;
                 if(tileIter.second.x > 0 &&
-                   m_game->states[state].tiles[tileIter.first - m_game->states[state].mapWidth].isTrench == true &&
-                   m_game->states[state].tiles[tileIter.first - m_game->states[state].mapWidth].owner != 3)
+                   m_game->states[state].tiles[tileIter.first - 1].isTrench == true &&
+                   m_game->states[state].tiles[tileIter.first - 1].owner != 3)
                 {
                     surroundingTrenches++;
                     North = true;
                 }
 
                 if(tileIter.second.x < m_game->states[state].mapWidth &&
-                   m_game->states[state].tiles[tileIter.first + m_game->states[state].mapWidth].isTrench == true &&
-                   m_game->states[state].tiles[tileIter.first + m_game->states[state].mapWidth].owner != 3)
+                   m_game->states[state].tiles[tileIter.first + 1].isTrench == true &&
+                   m_game->states[state].tiles[tileIter.first + 1].owner != 3)
                 {
                     surroundingTrenches++;
                     South = true;
                 }
 
                 if(tileIter.second.y > 0 &&
-                   m_game->states[state].tiles[tileIter.first - 1].isTrench == true &&
-                   m_game->states[state].tiles[tileIter.first - 1].owner != 3)
+                   m_game->states[state].tiles[tileIter.first - m_game->states[state].mapHeight].isTrench == true &&
+                   m_game->states[state].tiles[tileIter.first - m_game->states[state].mapHeight].owner != 3)
                 {
                     surroundingTrenches++;
                     West = true;
                 }
 
                 if(tileIter.second.y < m_game->states[state].mapWidth &&
-                   m_game->states[state].tiles[tileIter.first + 1].isTrench == true &&
-                   m_game->states[state].tiles[tileIter.first + 1].owner != 3)
+                   m_game->states[state].tiles[tileIter.first + m_game->states[state].mapHeight].isTrench == true &&
+                   m_game->states[state].tiles[tileIter.first + m_game->states[state].mapHeight].owner != 3)
                 {
                     surroundingTrenches++;
                     East = true;
@@ -316,7 +316,7 @@ void Mars::run()
                         overlayRotation = 0;
                     else if(East)
                         overlayRotation = 90;
-                    else if(West)
+                    else if(South)
                         overlayRotation = 180;
                     else
                         overlayRotation = 270;
@@ -337,7 +337,7 @@ void Mars::run()
                             overlayRotation = 0;
                         else if(South && West)
                             overlayRotation = 90;
-                        else if(West && East)
+                        else if(West && North)
                             overlayRotation = 180;
                         else
                             overlayRotation = 270;
