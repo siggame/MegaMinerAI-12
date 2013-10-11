@@ -254,6 +254,35 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+ 
+  Connection* c = object->_c;
+ 
+  // Only owner can control unit
+  if (object->owner == getPlayerID(c))
+    return 0;
+  // Cannot move outside map
+  if (0 < x || x >= getMapWidth(c) || 0 < y || y >= getMapHeight(c))
+    return 0;
+  // Cannot move onto another unit
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+      return 0;
+  }
+  // Cannot move onto enemy spawn tiles
+  if (getTile(c, x * getMapHeight(c) + y)->pumpID == -1 && getTile(c, x * getMapHeight(c) + y)->owner != getPlayerID(c))
+    return 0;
+  // Can only move to adjacent coords
+  if ((object->x - x != 1 && object->x != -1) || (object->y - y != 1 && object->y - y != -1))
+    return 0;
+    
+  // Move the unit
+  object->x = x;
+  object->y = y;
+  
+  // Decrement movement
+  object->movementLeft -= 1;
+  
   return 1;
 }
 
