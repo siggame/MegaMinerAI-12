@@ -258,11 +258,18 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   Connection* c = object->_c;
  
   // Only owner can control unit
-  if (object->owner == getPlayerID(c))
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Must have moves left
+  if (object->movementLeft <= 0)
     return 0;
   // Cannot move outside map
   if (0 < x || x >= getMapWidth(c) || 0 < y || y >= getMapHeight(c))
     return 0;
+  
+  // Get the tile we're standing on
+  _Tile* tile = getTile(c, x * getMapHeight(c) + y);
+    
   // Cannot move onto another unit
   for (int i = 0; i < getUnitCount(c); ++i)
   {
@@ -270,7 +277,7 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
       return 0;
   }
   // Cannot move onto enemy spawn tiles
-  if (getTile(c, x * getMapHeight(c) + y)->pumpID == -1 && getTile(c, x * getMapHeight(c) + y)->owner != getPlayerID(c))
+  if (tile->pumpID == -1 && tile->owner != getPlayerID(c))
     return 0;
   // Can only move to adjacent coords
   if ((object->x - x != 1 && object->x != -1) || (object->y - y != 1 && object->y - y != -1))
@@ -282,6 +289,17 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   
   // Decrement movement
   object->movementLeft -= 1;
+  
+  // Apply damage for moving into trenches
+  if (tile->isTrench)
+  {
+    if (tile->waterAmount > 0)
+      object->healthLeft -= getWaterDamage(c);
+    else
+      object->healthLeft -= getTrenchDamage(c);
+  }
+  
+  // Don't do any client-side object deletion?
   
   return 1;
 }
