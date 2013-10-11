@@ -25,8 +25,8 @@ namespace visualizer
 
     /** @name DrawSprite
       * @inherits Anim
-      * @purpose Draws an unmoving sprite at the grid coordinates specified in
-      *     m_sprite.
+      * @purpose Draws an unmoving sprite at the grid coordinates specified with
+      *     the color added to the textures color.
       */
     class DrawSprite : public ColorSprite
 	{
@@ -38,6 +38,28 @@ namespace visualizer
 		BaseSprite* m_sprite;
 	};
 
+    /** @name DrawRotatedSprite
+      * @inherits ColorSprite
+      * @purpose Draws an unmoving sprite at the grid coordinate with the color
+      *     added to the textures color. The texture will also be rotated by
+      *     the amount specified (in degrees).
+      */
+    class DrawRotatedSprite :
+        public ColorSprite
+    {
+    public:
+        DrawRotatedSprite( BaseSprite* sprite, const glm::vec4& c, const float& rot ) :
+            m_sprite(sprite),
+            ColorSprite(c),
+            m_rot(rot)
+            {}
+
+		void animate( const float& t, AnimData* d, IGame* game);
+
+    private:
+        const float m_rot;
+        BaseSprite* m_sprite;
+    };
 
 	/** @name DrawSprite
       * @inherits Anim

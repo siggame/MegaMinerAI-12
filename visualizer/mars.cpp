@@ -265,7 +265,108 @@ void Mars::run()
 				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
 				turn.addAnimatable(pTile);
 			}
-		}
+
+			if(tileIter.second.isTrench == true)
+			{
+                int surroundingTrenches = 0;
+                bool North = false, South = false, East = false, West = false;
+                std::string overlayTexture;
+                float overlayRotation;
+                if(tileIter.second.x > 0 &&
+                   m_game->states[state].tiles[tileIter.first - m_game->states[state].mapWidth].isTrench == true &&
+                   m_game->states[state].tiles[tileIter.first - m_game->states[state].mapWidth].owner != 3)
+                {
+                    surroundingTrenches++;
+                    North = true;
+                }
+
+                if(tileIter.second.x < m_game->states[state].mapWidth &&
+                   m_game->states[state].tiles[tileIter.first + m_game->states[state].mapWidth].isTrench == true &&
+                   m_game->states[state].tiles[tileIter.first + m_game->states[state].mapWidth].owner != 3)
+                {
+                    surroundingTrenches++;
+                    South = true;
+                }
+
+                if(tileIter.second.y > 0 &&
+                   m_game->states[state].tiles[tileIter.first - 1].isTrench == true &&
+                   m_game->states[state].tiles[tileIter.first - 1].owner != 3)
+                {
+                    surroundingTrenches++;
+                    West = true;
+                }
+
+                if(tileIter.second.y < m_game->states[state].mapWidth &&
+                   m_game->states[state].tiles[tileIter.first + 1].isTrench == true &&
+                   m_game->states[state].tiles[tileIter.first + 1].owner != 3)
+                {
+                    surroundingTrenches++;
+                    East = true;
+                }
+
+                switch(surroundingTrenches)
+                {
+                case 0:
+                    overlayTexture = "trench_hole";
+                    overlayRotation = 0;
+                    break;
+                case 1:
+                    overlayTexture = "trench_tail";
+                    if(North)
+                        overlayRotation = 0;
+                    else if(East)
+                        overlayRotation = 90;
+                    else if(West)
+                        overlayRotation = 180;
+                    else
+                        overlayRotation = 270;
+                    break;
+                case 2:
+                    if(North && South || East && West)
+                    {
+                        overlayTexture = "trench_canal";
+                        if(North && South)
+                            overlayRotation = 0;
+                        else
+                            overlayRotation = 90;
+                    }
+                    else
+                    {
+                        overlayTexture = "trench_corner";
+                        if(East && South)
+                            overlayRotation = 0;
+                        else if(South && West)
+                            overlayRotation = 90;
+                        else if(West && East)
+                            overlayRotation = 180;
+                        else
+                            overlayRotation = 270;
+                    }
+                    break;
+                case 3:
+                    overlayTexture = "trench_wall";
+                    if(!North)
+                        overlayRotation = 90;
+                    else if(!West)
+                        overlayRotation = 180;
+                    else if(!South)
+                        overlayRotation = 270;
+                    else
+                        overlayRotation = 0;
+
+                    break;
+                case 4:
+                    break;
+                }
+
+                if(overlayTexture != "")
+                {
+                    SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.second.x, tileIter.second.y), glm::vec2(1.0f, 1.0f), overlayTexture);
+                    pTile->addKeyFrame(new DrawRotatedSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,1.0f), overlayRotation));
+                    turn.addAnimatable(pTile);
+                }
+            }
+        }
 
         // For each UNIT in the frame
 		for(auto& unitIter : m_game->states[state].units)
