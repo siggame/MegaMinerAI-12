@@ -299,7 +299,7 @@ class Tile(Mappable):
     if type not in [0,1]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
 
-    if len(self.game.grid[self.x][self.y]) > 1:
+    if len(self.game.grid[self.x][self.y]) > -1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
 
     count = 0
