@@ -284,10 +284,6 @@ class Tile(Mappable):
   # This will not work if the object has variables other than primitives
   def toJson(self):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, pumpID = self.pumpID, waterAmount = self.waterAmount, isTrench = self.isTrench, )
-  
-  def nextTurn(self):
-    #TODO: Tile Next Turn (Possible Flow Logic?)
-    pass
 
   def spawn(self, type):
     player = self.game.objects.players[self.game.playerID]
