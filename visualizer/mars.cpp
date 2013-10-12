@@ -235,6 +235,7 @@ void Mars::run()
 
 	std::deque<glm::ivec2> trail;
 
+	// todo: maybe flip this so that x is first, then y
 	std::vector<std::vector<int>> idMap(m_game->states[0].mapHeight);
 	for(auto& idMapiter : idMap)
 	{
@@ -273,21 +274,19 @@ void Mars::run()
 			}
 		}
 
+		// todo: clean this up
 		for(auto iter = trail.begin(); iter != trail.end();)
 		{
 			ColorSprite::Fade fade = ColorSprite::None;
-			/*if(idMap[iter->second.y][iter->second.x] == 0)
+			if(idMap[iter->y][iter->x] == 0)
 			{
 				fade = ColorSprite::FadeOut;
-			}*/
-
-			//if(idMap[iter->second.y][iter->second.x] > 0)
-			{
-				// First Draw trail at iter->second
-				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->x, iter->y), glm::vec2(1.0f, 1.0f), "trail");
-				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.5f),fade));
-				turn.addAnimatable(pTile);
 			}
+
+			// First Draw trail at iter->second
+			SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->x, iter->y), glm::vec2(1.0f, 1.0f), "trail");
+			pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.5f),fade));
+			turn.addAnimatable(pTile);
 
 			// Then pop them if turnDiff > n
 			if(idMap[iter->y][iter->x] == 0)
@@ -301,7 +300,7 @@ void Mars::run()
 			}
 		}
 
-        // For each UNIT in the frame
+		// For each UNIT in the frame
 		for(auto& unitIter : m_game->states[state].units)
 		{
 
@@ -316,18 +315,21 @@ void Mars::run()
 					parser::move& move = (parser::move&)*animationIter;
 					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
 
-					if(idMap[move.fromY][move.fromX] == 0)
+					if(idMap[move.toY][move.toX] == 0)
 					{
-						trail.push_back(glm::ivec2(move.fromX, move.fromY));
+						trail.push_back(glm::ivec2(move.toX, move.toY));
 					}
 
-					idMap[move.fromY][move.fromX] = 3;
-					
+					// todo: move the path length var into a const
+					idMap[move.toY][move.toX] = 5;
 				}
 			}
 
 			if(pUnit->m_Moves.empty())
+			{
 				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
+				idMap[unitIter.second.y][unitIter.second.x] = 5;
+			}
 
 			 turn[unitIter.second.id]["owner"] = unitIter.second.owner;
 			 turn[unitIter.second.id]["hasAttacked"] = unitIter.second.hasAttacked;
@@ -340,6 +342,8 @@ void Mars::run()
 			 turn[unitIter.second.id]["X"] = unitIter.second.x;
 			 turn[unitIter.second.id]["Y"] = unitIter.second.y;
 		}
+
+
 
 		if(state >= (int)(m_game->states.size() - 10))
 		{
