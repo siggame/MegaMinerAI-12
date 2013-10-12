@@ -267,6 +267,32 @@ void Mars::run()
 			}
 		}
 
+		for(auto iter = trail.begin(); iter != trail.end();)
+		{
+			int turnDiff = (state - trail.front().first);
+
+			ColorSprite::Fade fade = ColorSprite::None;
+			if(turnDiff == 4)
+			{
+				fade = ColorSprite::FadeOut;
+			}
+
+			// First Draw trail at iter->second
+			SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->second.x, iter->second.y), glm::vec2(1.0f, 1.0f), "trail");
+			pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f),fade));
+			turn.addAnimatable(pTile);
+
+			// Then pop them if turnDiff > n
+			if(turnDiff >= 4)
+			{
+				iter = trail.erase(iter);
+			}
+			else
+			{
+				iter++;
+			}
+		}
+
         // For each UNIT in the frame
 		for(auto& unitIter : m_game->states[state].units)
 		{
@@ -281,7 +307,6 @@ void Mars::run()
 				{
 					parser::move& move = (parser::move&)*animationIter;
 					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
-					//texture = "footprint";
 		
 					trail.push_back(make_pair(state,glm::vec2(move.fromX, move.fromY)));
 					
@@ -301,26 +326,6 @@ void Mars::run()
 			 turn[unitIter.second.id]["maxMovement"] = unitIter.second.maxMovement;
 			 turn[unitIter.second.id]["X"] = unitIter.second.x;
 			 turn[unitIter.second.id]["Y"] = unitIter.second.y;
-		}
-		
-		for(auto iter = trail.begin(); iter != trail.end();)
-		{
-			//trail.pop_back();
-			
-			// First Draw trail at iter->second
-			SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->second.x, iter->second.y), glm::vec2(1.0f, 1.0f), "trail");
-			pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
-			turn.addAnimatable(pTile);
-			
-			// Then pop them if (State - first) > n
-			if((state - trail.front().first) > 2)
-			{
-				iter = trail.erase(iter);
-			}
-			else
-			{
-				iter++;
-			}
 		}
 
 		if(state >= (int)(m_game->states.size() - 10))

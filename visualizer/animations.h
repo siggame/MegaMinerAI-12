@@ -5,14 +5,20 @@
 
 namespace visualizer
 {
-
-
     // NOTE: consider combining color sprite and DrawSprite since they are
     //    essentially the same, except that DrawSprite is drawn with white.
     class ColorSprite : public Anim
     {
     public:
-		ColorSprite(const glm::vec4& c) : m_color(c)
+
+		enum Fade
+		{
+			None,
+			FadeIn,
+			FadeOut
+		};
+
+		ColorSprite(const glm::vec4& c, Fade f = None) : m_color(c), m_fade(f)
         {
         }
 
@@ -20,7 +26,7 @@ namespace visualizer
 
     private:
 		glm::vec4 m_color;
-
+		Fade m_fade;
     };
 
     /** @name DrawSprite
@@ -31,7 +37,7 @@ namespace visualizer
     class DrawSprite : public ColorSprite
 	{
 	public:
-		DrawSprite( BaseSprite* sprite, const glm::vec4& c ) : ColorSprite(c), m_sprite(sprite) {}
+		DrawSprite( BaseSprite* sprite, const glm::vec4& c, Fade f = None) : ColorSprite(c,f), m_sprite(sprite) {}
 		void animate( const float& t, AnimData* d, IGame* game );
 
 	private:
@@ -54,7 +60,7 @@ namespace visualizer
         public ColorSprite
 	{
 	public:
-		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c) : ColorSprite(c),
+		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, Fade f = None) : ColorSprite(c,f),
 			m_Sprite(sprite)
 			{}
 
