@@ -14,6 +14,13 @@ namespace visualizer
 		game->renderer->drawTexturedQuad(m_sprite->pos.x, m_sprite->pos.y, m_sprite->scale.x, m_sprite->scale.y,m_sprite->m_sprite);
 	}
 
+	void DrawRotatedSprite::animate(const float &t, AnimData *d, IGame *game)
+	{
+        ColorSprite::animate(t,d,game);
+        game->renderer->drawRotatedTexturedQuad(m_sprite->pos.x, m_sprite->pos.y,
+                  m_sprite->scale.x, m_sprite->scale.y, m_rot, m_sprite->m_sprite);
+	}
+
 	void DrawSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
 		unsigned int index = (unsigned int)(m_Sprite->m_Moves.size() * t);

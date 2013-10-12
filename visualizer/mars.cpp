@@ -279,6 +279,128 @@ void Mars::RenderWorld(int state, Frame& turn)
                 SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), texture);
                 pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
                 turn.addAnimatable(pTile);
+
+				// if there is water then render water
+				if(tileIter.owner == 3) // if the tile is a glacier
+				{
+					texture = "glacier";
+				}
+				else if(tileIter.waterAmount != 0)
+				{
+					texture = "water";
+				}
+				else if(tileIter.isTrench == true) // if there is no water, but a trench then render a trench
+				{
+					texture = "trench";
+				}
+
+				if(!texture.empty())
+				{
+					SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), texture);
+					pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
+					turn.addAnimatable(pTile);
+				}
+
+				if(tileIter.isTrench == true && tileIter.owner != 3)
+				{
+					int surroundingTrenches = 0;
+					bool North = false, South = false, East = false, West = false;
+					std::string overlayTexture;
+					float overlayRotation;
+					if(tileIter.x > 0 &&
+					   m_game->states[state].tiles[tileIter.id - 1].isTrench == true &&
+					   m_game->states[state].tiles[tileIter.id - 1].owner != 3)
+					{
+						surroundingTrenches++;
+						North = true;
+					}
+
+					if(tileIter.x < m_game->states[state].mapWidth &&
+					   m_game->states[state].tiles[tileIter.id + 1].isTrench == true &&
+					   m_game->states[state].tiles[tileIter.id + 1].owner != 3)
+					{
+						surroundingTrenches++;
+						South = true;
+					}
+
+					if(tileIter.y > 0 &&
+					   m_game->states[state].tiles[tileIter.id - m_game->states[state].mapHeight].isTrench == true &&
+					   m_game->states[state].tiles[tileIter.id - m_game->states[state].mapHeight].owner != 3)
+					{
+						surroundingTrenches++;
+						West = true;
+					}
+
+					if(tileIter.y < m_game->states[state].mapWidth &&
+					   m_game->states[state].tiles[tileIter.id + m_game->states[state].mapHeight].isTrench == true &&
+					   m_game->states[state].tiles[tileIter.id + m_game->states[state].mapHeight].owner != 3)
+					{
+						surroundingTrenches++;
+						East = true;
+					}
+
+					switch(surroundingTrenches)
+					{
+					case 0:
+						overlayTexture = "trench_hole";
+						overlayRotation = 0;
+						break;
+					case 1:
+						overlayTexture = "trench_tail";
+						if(North)
+							overlayRotation = 0;
+						else if(East)
+							overlayRotation = 90;
+						else if(South)
+							overlayRotation = 180;
+						else
+							overlayRotation = 270;
+						break;
+					case 2:
+						if(North && South || East && West)
+						{
+							overlayTexture = "trench_canal";
+							if(North && South)
+								overlayRotation = 0;
+							else
+								overlayRotation = 90;
+						}
+						else
+						{
+							overlayTexture = "trench_corner";
+							if(East && South)
+								overlayRotation = 0;
+							else if(South && West)
+								overlayRotation = 90;
+							else if(West && North)
+								overlayRotation = 180;
+							else
+								overlayRotation = 270;
+						}
+						break;
+					case 3:
+						overlayTexture = "trench_wall";
+						if(!North)
+							overlayRotation = 90;
+						else if(!West)
+							overlayRotation = 0;
+						else if(!South)
+							overlayRotation = 270;
+						else
+							overlayRotation = 180;
+
+						break;
+					case 4:
+						break;
+					}
+
+					if(!overlayTexture.empty())
+					{
+						SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), overlayTexture);
+						pTile->addKeyFrame(new DrawRotatedSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,1.0f), overlayRotation));
+						turn.addAnimatable(pTile);
+					}
+				}
             }
         }
     }
@@ -343,12 +465,17 @@ void Mars::run()
 		Frame turn;  // The frame that will be drawn
 
         UpdateWorld(state);
-        RenderWorld(state, turn);
+		RenderWorld(state, turn);
 
         if(state >= (int)(m_game->states.size() - 10))
         {
             turn.addAnimatable(splashScreen);
-        }
+		}
+
+		if(state >= (int)(m_game->states.size() - 10))
+		{
+			turn.addAnimatable(splashScreen);
+		}
 
         animationEngine->buildAnimations(turn);
         addFrame(turn);
