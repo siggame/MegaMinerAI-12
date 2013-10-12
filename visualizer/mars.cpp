@@ -244,7 +244,7 @@ void Mars::UpdateWorld(int state)
 
     for(auto& UnitIter: m_game->states[state].units)
     {
-        if(m_Units.count(UnitIter.second.id) == true)
+        if(m_Units.count(UnitIter.second.id) == 1)
             m_Units[UnitIter.second.id] = UnitIter.second;
         else
             m_Units.insert(std::pair<int, parser::Unit>(UnitIter.second.id, UnitIter.second));
