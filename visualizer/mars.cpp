@@ -225,6 +225,7 @@ void Mars::BuildWorld()
 
     for(auto& tileIter: m_game->states[0].tiles)
     {
+        std::cout << tileIter.second.x << ", " << tileIter.second.y << std::endl;
         m_Tiles[tileIter.second.x][tileIter.second.y] = tileIter.second;
     }
 
@@ -307,33 +308,34 @@ void Mars::RenderWorld(int state, Frame& turn)
 					bool North = false, South = false, East = false, West = false;
 					std::string overlayTexture;
 					float overlayRotation;
-					if(tileIter.x > 0 &&
-					   m_game->states[state].tiles[tileIter.id - 1].isTrench == true &&
-					   m_game->states[state].tiles[tileIter.id - 1].owner != 3)
+
+					if(tileIter.y > 0 &&
+					   GetTileAt(tileIter.x, tileIter.y - 1).isTrench == true &&
+					   GetTileAt(tileIter.x, tileIter.y - 1).owner != 3)
 					{
 						surroundingTrenches++;
 						North = true;
 					}
 
-					if(tileIter.x < m_game->states[state].mapWidth &&
-					   m_game->states[state].tiles[tileIter.id + 1].isTrench == true &&
-					   m_game->states[state].tiles[tileIter.id + 1].owner != 3)
+					if(tileIter.y < m_game->states[state].mapHeight - 1 &&
+					   GetTileAt(tileIter.x, tileIter.y + 1).isTrench == true &&
+					   GetTileAt(tileIter.x, tileIter.y + 1).owner != 3)
 					{
 						surroundingTrenches++;
 						South = true;
 					}
 
-					if(tileIter.y > 0 &&
-					   m_game->states[state].tiles[tileIter.id - m_game->states[state].mapHeight].isTrench == true &&
-					   m_game->states[state].tiles[tileIter.id - m_game->states[state].mapHeight].owner != 3)
+					if(tileIter.x > 0 &&
+					   GetTileAt(tileIter.x - 1, tileIter.y).isTrench == true &&
+					   GetTileAt(tileIter.x - 1, tileIter.y).owner != 3)
 					{
 						surroundingTrenches++;
 						West = true;
 					}
 
-					if(tileIter.y < m_game->states[state].mapWidth &&
-					   m_game->states[state].tiles[tileIter.id + m_game->states[state].mapHeight].isTrench == true &&
-					   m_game->states[state].tiles[tileIter.id + m_game->states[state].mapHeight].owner != 3)
+					if(tileIter.x < m_game->states[state].mapWidth - 1 &&
+					   GetTileAt(tileIter.x + 1, tileIter.y).isTrench == true &&
+					   GetTileAt(tileIter.x + 1, tileIter.y).owner != 3)
 					{
 						surroundingTrenches++;
 						East = true;
@@ -394,6 +396,8 @@ void Mars::RenderWorld(int state, Frame& turn)
 						break;
 					}
 
+
+
 					if(!overlayTexture.empty())
 					{
 						SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), overlayTexture);
@@ -436,6 +440,11 @@ void Mars::RenderWorld(int state, Frame& turn)
          turn[unitIter.second.id]["X"] = unitIter.second.x;
          turn[unitIter.second.id]["Y"] = unitIter.second.y;
     }
+}
+
+parser::Tile& Mars::GetTileAt(int x, int y)
+{
+    return m_Tiles[x][y];
 }
 
 // The "main" function

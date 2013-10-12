@@ -59,6 +59,7 @@ namespace visualizer
             void BuildWorld();
             void UpdateWorld(int state);
             void RenderWorld(int state, Frame& turn);
+            parser::Tile& GetTileAt(int x, int y);
 
 			void ProccessInput();
 
