@@ -302,6 +302,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 					turn.addAnimatable(pTile);
 				}
 
+                // Canal Overlays
 				if(tileIter.isTrench == true && tileIter.owner != 3)
 				{
 					int surroundingTrenches = 0;
@@ -310,6 +311,10 @@ void Mars::RenderWorld(int state, Frame& turn)
 					std::string overlayTexture;
 					float overlayRotation = 0;
 
+                    // STEP 1: figure out if all the trenches adjacent to this one are also
+                    //         trenches, INCLUDING diagonals.
+                    //         If they are are directly adjacent, (not diagonal) AND also a
+                    //         trench, then you will need a trench overlay with one less channel.
 					if(tileIter.y > 0 &&
                       (GetTileAt(tileIter.x, tileIter.y - 1).isTrench == true ||
 					   GetTileAt(tileIter.x, tileIter.y - 1).owner == 3))
@@ -371,6 +376,10 @@ void Mars::RenderWorld(int state, Frame& turn)
                         SouthEast = true;
                     }
 
+                    // STEP 2: given the number of directly adjacent, (not diagonal),
+                    //     trenches, figure which sprite you (number of channels), and
+                    //     given which ones in particular, figure the directions the
+                    //     sprite should be facing to meet adjoining trenches
 					switch(surroundingTrenches)
 					{
 					case 0:
@@ -426,6 +435,8 @@ void Mars::RenderWorld(int state, Frame& turn)
 						break;
 					}
 
+                    // STEP 3: If there is an overlay to render on the trench, (meaning there are less than 4 channels needed), then render
+                    //     the overlay, given the rotation specified ealier.
 					if(!overlayTexture.empty())
 					{
 						SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), overlayTexture);
@@ -433,19 +444,22 @@ void Mars::RenderWorld(int state, Frame& turn)
 						turn.addAnimatable(pTile);
 					}
 
-
+                    // STEP 4 (optional) :  if a little corner bit is required, (only needed for 3 2-channel-corner
+                    // 3-channel and 4 channel overlay), then figure out which corners need to be rendered. For example
+                    // if you have a trench to the north and east, but not a trench in the NorthEast, you will need a corner
+                    // bit to make the turn smooth. Then you render that corner bit directly on the tile.
 					if(overlayTexture == "trench_corner")
 					{
                         float tipRotation = -1.0f;
 
-                        if(overlayRotation == 0 && !SouthEast)
-                            tipRotation = 180;
-                        else if(overlayRotation == 90 && !SouthWest)
-                            tipRotation = 270;
-                        else if(overlayRotation == 180 && !NorthWest)
-                            tipRotation = 0;
-                        else if(overlayRotation == 270 && !NorthEast)
-                            tipRotation = 90;
+                        if(overlayRotation == 0 && !SouthEast) // if south and east are trenches, AND SouthEast isn't a trench
+                            tipRotation = 180;                 // then put a tip in the southeast corner
+                        else if(overlayRotation == 90 && !SouthWest) // if south and west are trenches, AND SouthEast isn't a trench
+                            tipRotation = 270;                       // then put a tip in the southwest corner
+                        else if(overlayRotation == 180 && !NorthWest) // if north and west are trenches, AND NorthWest isn't a trench
+                            tipRotation = 0;                          // then put a tip in northwest corner
+                        else if(overlayRotation == 270 && !NorthEast) // if north and east are trenches, AND NorthEast isn't a trench
+                            tipRotation = 90;                         // then put a tip in the northeast corner
 
                         if(tipRotation >= 0)
                         {
@@ -460,28 +474,28 @@ void Mars::RenderWorld(int state, Frame& turn)
                         float tip1Rotation = -1.0f;
                         float tip2Rotation = -1.0f;
 
-                        if(overlayRotation == 90)
+                        if(overlayRotation == 90)   // if the wall is to the north, then check southwest and southeast corners
                         {
                             if(!SouthEast)
                                 tip1Rotation = 180;
                             if(!SouthWest)
                                 tip2Rotation = 270;
                         }
-                        else if(overlayRotation == 0)
+                        else if(overlayRotation == 0) // if the wall is to the west, then check the northeast and southeast corners
                         {
                             if(!NorthEast)
                                 tip1Rotation = 90;
                             if(!SouthEast)
                                 tip2Rotation = 180;
                         }
-                        else if(overlayRotation == 270)
+                        else if(overlayRotation == 270) // if the wall is to the south, then check the northwest and southeast corners
                         {
                             if(!NorthWest)
                                 tip1Rotation = 0;
                             if(!NorthEast)
                                 tip2Rotation = 90;
                         }
-                        else if(overlayRotation == 180)
+                        else if(overlayRotation == 180) // if the wall is to the east, then check the northwest and southwest corners
                         {
                             if(!NorthWest)
                                 tip1Rotation = 0;
@@ -511,7 +525,7 @@ void Mars::RenderWorld(int state, Frame& turn)
                         float tip3Rotation = -1.0f;
                         float tip4Rotation = -1.0f;
 
-                        if(!NorthWest)
+                        if(!NorthWest) // if the northwest isn't a trench, then it needs a tip and so on...
                             tip1Rotation = 0;
                         if(!NorthEast)
                             tip2Rotation = 90;
@@ -550,6 +564,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 					}
 				}
 
+                // Water amount display on water filled trenches
 				if(tileIter.waterAmount != 0)
 				{
                     std::ostringstream waterAmountString;
