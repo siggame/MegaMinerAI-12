@@ -280,7 +280,7 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   if (tile->pumpID == -1 && tile->owner != getPlayerID(c))
     return 0;
   // Can only move to adjacent coords
-  if ((object->x - x != 1 && object->x != -1) || (object->y - y != 1 && object->y - y != -1))
+  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
     return 0;
     
   // Move the unit
