@@ -10,6 +10,8 @@ class Player(object):
     self.updatedAt = game.turnNumber
     self.spawnQueue = []
 
+    self.totalUnits = 0
+
   def toList(self):
     return [self.id, self.playerName, self.time, self.waterStored, self.spawnResources, ]
   
@@ -70,6 +72,10 @@ class PumpStation(object):
     self.siegeCount = siegeCount
     self.updatedAt = game.turnNumber
 
+    self.maxSiege = 100
+
+    self.siegeTiles = [tile for tile in self.game.objects.tiles if tile.pumpID == self.id]
+
   def toList(self):
     return [self.id, self.owner, self.waterAmount, self.siegeCount, ]
   
@@ -78,7 +84,27 @@ class PumpStation(object):
     return dict(id = self.id, owner = self.owner, waterAmount = self.waterAmount, siegeCount = self.siegeCount, )
   
   def nextTurn(self):
-    pass
+    for siegeTile in self.siegeTiles:
+      unit = [unit for unit in self.game.grid[siegeTile.x][siegeTile.y] if isinstance(unit, Unit)][0]
+
+      #Defending
+      if unit.owner == self.owner:
+        self.siegeCount -= self.game.defenseCount
+      elif unit.owner == self.owner^1:
+        self.siegeCount += self.game.offenseCount
+      else:
+        print('Unit owner not 0 or 1: {}'.format(self.owner))
+
+    if self.siegeCount < 0:
+      self.siegeCount = 0
+    elif self.siegeCount >= self.maxSiege:
+      self.siegeCount = 0
+      self.owner ^= 1
+
+      for siegeTile in self.siegeTiles:
+        siegeTile.owner = self.owner
+
+    return
 
   def __setattr__(self, name, value):
       if name in self.game_state_attributes:
@@ -111,7 +137,6 @@ class Unit(Mappable):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDigged = self.hasDigged, hasBuilt = self.hasBuilt, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, )
   
   def nextTurn(self):
-    tile = self.game.grid[self.x][self.y][0]
   
     # Reset flags if it is unit owner's turn
     if self.owner == self.game.playerID:
@@ -119,13 +144,9 @@ class Unit(Mappable):
       self.hasAttacked = 0
       self.hasBuilt = 0
       self.hasDigged = 0
-  
-    # Apply damage if the unit is in a water filled trench
-    if tile.isTrench and tile.waterAmount > 0:
-      self.healthLeft -= self.game.waterDamage
-      
-      # Check if the unit died
+          # Check if the unit died
       if self.healthLeft <= 0:
+        self.game.objects.players[self.owner].totalUnits -= 1
         self.game.grid[self.x][self.y].remove(self)
         self.game.removeObject(self)
       
@@ -140,10 +161,10 @@ class Unit(Mappable):
       return 'Turn {}: Your unit {} cannot move off the map. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your unit {} can only move one unit away. ({}.{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-
-    #Check for units running into each other
     if len(self.game.grid[x][y]) > 1:
         return 'Turn {}: Your unit {} is trying to run into something. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+
+
 
 
     self.game.grid[self.x][self.y].remove(self)
@@ -153,6 +174,19 @@ class Unit(Mappable):
     self.y = y
     self.movementLeft -= 1
     self.game.grid[self.x][self.y].append(self)
+
+    # Apply damage if the unit is in a water filled trench
+    tile = self.game.getTile(x, y)
+    if tile.isTrench:
+      self.healthLeft -= self.game.trenchDamage
+    if tile.waterAmount > 0:
+      self.healthLeft -= self.game.waterDamage
+
+    # Check if the unit died
+    if self.healthLeft <= 0:
+      self.game.objects.players[self.owner].totalUnits -= 1
+      self.game.grid[self.x][self.y].remove(self)
+      self.game.removeObject(self)
 
 
     return True
@@ -254,6 +288,7 @@ class Unit(Mappable):
     
     # Check if target is dead
     if target.healthLeft <= 0:
+      self.game.objects.players[self.owner].totalUnits -= 1
       self.game.grid[x][y].remove(target)
       self.game.removeObject(target)
     
@@ -298,16 +333,9 @@ class Tile(Mappable):
       return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.spawnResources, self.game.unitCost, tile.x, tile.y)
     if type not in [0,1]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
-
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
-
-    count = 0
-    for unit in self.game.objects.units:
-      if unit.owner == self.game.playerID:
-        count += 1
-    
-    if count >= self.game.maxUnits:
+    if player.totalUnits >= self.game.maxUnits:
       return 'Turn {} You cannot spawn a unit because you already have the maximum amount of units ({})'.format(self.game.turnNumber, self.game.maxUnits)
 
     player.spawnResources -= self.game.unitCost
@@ -315,6 +343,7 @@ class Tile(Mappable):
     #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDigged', 'hasBuilt', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
     newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, 1, 1 ]
     player.spawnQueue.append(newUnitStats)
+    player.totalUnits += 1
 
     #TODO: Add spawning animation
 
