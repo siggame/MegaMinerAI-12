@@ -10,3 +10,4 @@ texture trench_wall textures/Trench_Wall.png
 texture trench_canal textures/Trench_Canal.png
 texture trench_corner textures/Trench_Corner.png
 texture trench_tail textures/Trench_Tail.png
+texture trench_tip textures/Trench_Tip.png

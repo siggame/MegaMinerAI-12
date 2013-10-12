@@ -306,8 +306,9 @@ void Mars::RenderWorld(int state, Frame& turn)
 				{
 					int surroundingTrenches = 0;
 					bool North = false, South = false, East = false, West = false;
+					bool NorthWest = false, NorthEast = false, SouthWest = false, SouthEast = false;
 					std::string overlayTexture;
-					float overlayRotation;
+					float overlayRotation = 0;
 
 					if(tileIter.y > 0 &&
                       (GetTileAt(tileIter.x, tileIter.y - 1).isTrench == true ||
@@ -341,6 +342,35 @@ void Mars::RenderWorld(int state, Frame& turn)
 						East = true;
 					}
 
+					if(tileIter.x > 0 && tileIter.y > 0 &&
+                      (GetTileAt(tileIter.x - 1, tileIter.y - 1).isTrench == true  ||
+                       GetTileAt(tileIter.x - 1, tileIter.y - 1).owner == 3))
+					{
+                        NorthWest = true;
+					}
+
+					if(tileIter.x < m_game->states[state].mapWidth - 1 && tileIter.y > 0 &&
+                      (GetTileAt(tileIter.x + 1, tileIter.y - 1).isTrench == true ||
+                       GetTileAt(tileIter.x + 1, tileIter.y - 1).owner == 3))
+                    {
+                        NorthEast = true;
+                    }
+
+                    if(tileIter.x > 0 && tileIter.y < m_game->states[state].mapHeight - 1 &&
+                      (GetTileAt(tileIter.x - 1, tileIter.y + 1).isTrench == true ||
+                       GetTileAt(tileIter.x - 1, tileIter.y + 1).owner == 3))
+                    {
+                        SouthWest = true;
+                    }
+
+                    if(tileIter.x < m_game->states[state].mapWidth - 1 &&
+                       tileIter.y < m_game->states[state].mapHeight - 1 &&
+                      (GetTileAt(tileIter.x + 1, tileIter.y + 1).isTrench == true ||
+                       GetTileAt(tileIter.x + 1, tileIter.y + 1).owner == 3))
+                    {
+                        SouthEast = true;
+                    }
+
 					switch(surroundingTrenches)
 					{
 					case 0:
@@ -359,7 +389,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 							overlayRotation = 270;
 						break;
 					case 2:
-						if(North && South || East && West)
+						if((North && South) || (East && West))
 						{
 							overlayTexture = "trench_canal";
 							if(North && South)
@@ -375,7 +405,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 							else if(South && West)
 								overlayRotation = 90;
 							else if(West && North)
-								overlayRotation = 180;
+                                overlayRotation = 180;
 							else
 								overlayRotation = 270;
 						}
@@ -396,13 +426,127 @@ void Mars::RenderWorld(int state, Frame& turn)
 						break;
 					}
 
-
-
 					if(!overlayTexture.empty())
 					{
 						SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), overlayTexture);
 						pTile->addKeyFrame(new DrawRotatedSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,1.0f), overlayRotation));
 						turn.addAnimatable(pTile);
+					}
+
+
+					if(overlayTexture == "trench_corner")
+					{
+                        float tipRotation = -1.0f;
+
+                        if(overlayRotation == 0 && !SouthEast)
+                            tipRotation = 180;
+                        else if(overlayRotation == 90 && !SouthWest)
+                            tipRotation = 270;
+                        else if(overlayRotation == 180 && !NorthWest)
+                            tipRotation = 0;
+                        else if(overlayRotation == 270 && !NorthEast)
+                            tipRotation = 90;
+
+                        if(tipRotation >= 0)
+                        {
+                            SmartPointer<BaseSprite> pTip = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "trench_tip");
+                            pTip->addKeyFrame(new DrawRotatedSprite(pTip, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), tipRotation));
+                            turn.addAnimatable(pTip);
+                        }
+					}
+
+					if(overlayTexture == "trench_wall")
+					{
+                        float tip1Rotation = -1.0f;
+                        float tip2Rotation = -1.0f;
+
+                        if(overlayRotation == 90)
+                        {
+                            if(!SouthEast)
+                                tip1Rotation = 180;
+                            if(!SouthWest)
+                                tip2Rotation = 270;
+                        }
+                        else if(overlayRotation == 0)
+                        {
+                            if(!NorthEast)
+                                tip1Rotation = 90;
+                            if(!SouthEast)
+                                tip2Rotation = 180;
+                        }
+                        else if(overlayRotation == 270)
+                        {
+                            if(!NorthWest)
+                                tip1Rotation = 0;
+                            if(!NorthEast)
+                                tip2Rotation = 90;
+                        }
+                        else if(overlayRotation == 180)
+                        {
+                            if(!NorthWest)
+                                tip1Rotation = 0;
+                            if(!SouthWest)
+                                tip2Rotation = 270;
+                        }
+
+                        if(tip1Rotation >= 0)
+                        {
+                            SmartPointer<BaseSprite> pTip = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "trench_tip");
+                            pTip->addKeyFrame(new DrawRotatedSprite(pTip, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), tip1Rotation));
+                            turn.addAnimatable(pTip);
+                        }
+
+                        if(tip2Rotation >= 0)
+                        {
+                            SmartPointer<BaseSprite> pTip = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "trench_tip");
+                            pTip->addKeyFrame(new DrawRotatedSprite(pTip, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), tip2Rotation));
+                            turn.addAnimatable(pTip);
+                        }
+					}
+
+					if(surroundingTrenches == 4)
+					{
+                        float tip1Rotation = -1.0f;
+                        float tip2Rotation = -1.0f;
+                        float tip3Rotation = -1.0f;
+                        float tip4Rotation = -1.0f;
+
+                        if(!NorthWest)
+                            tip1Rotation = 0;
+                        if(!NorthEast)
+                            tip2Rotation = 90;
+                        if(!SouthEast)
+                            tip3Rotation = 180;
+                        if(!SouthWest)
+                            tip4Rotation = 270;
+
+                        if(tip1Rotation >= 0)
+                        {
+                            SmartPointer<BaseSprite> pTip = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "trench_tip");
+                            pTip->addKeyFrame(new DrawRotatedSprite(pTip, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), tip1Rotation));
+                            turn.addAnimatable(pTip);
+                        }
+
+                        if(tip2Rotation >= 0)
+                        {
+                            SmartPointer<BaseSprite> pTip = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "trench_tip");
+                            pTip->addKeyFrame(new DrawRotatedSprite(pTip, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), tip2Rotation));
+                            turn.addAnimatable(pTip);
+                        }
+
+                        if(tip3Rotation >= 0)
+                        {
+                            SmartPointer<BaseSprite> pTip = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "trench_tip");
+                            pTip->addKeyFrame(new DrawRotatedSprite(pTip, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), tip3Rotation));
+                            turn.addAnimatable(pTip);
+                        }
+
+                        if(tip4Rotation >= 0)
+                        {
+                            SmartPointer<BaseSprite> pTip = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "trench_tip");
+                            pTip->addKeyFrame(new DrawRotatedSprite(pTip, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), tip4Rotation));
+                            turn.addAnimatable(pTip);
+                        }
 					}
 				}
 
