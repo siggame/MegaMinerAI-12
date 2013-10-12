@@ -410,14 +410,14 @@ void Mars::RenderWorld(int state, Frame& turn)
     }
 
     // For each UNIT in the frame
-    for(auto& unitIter : m_Units)
-    {
-
+	auto unitIter = m_Units.begin();
+	while(unitIter != m_Units.end())
+	{
         SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
-        pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter.second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f) ));
+		pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter->second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f) ));
         turn.addAnimatable(pUnit);
 
-        for(auto& animationIter : m_game->states[state].animations[unitIter.second.id])
+		for(auto& animationIter : m_game->states[state].animations[unitIter->second.id])
         {
             if(animationIter->type == parser::MOVE)
             {
@@ -427,18 +427,31 @@ void Mars::RenderWorld(int state, Frame& turn)
         }
 
         if(pUnit->m_Moves.empty())
-            pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
+			pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter->second.x, unitIter->second.y), glm::vec2(unitIter->second.x, unitIter->second.y)));
 
-         turn[unitIter.second.id]["owner"] = unitIter.second.owner;
-         turn[unitIter.second.id]["hasAttacked"] = unitIter.second.hasAttacked;
-         turn[unitIter.second.id]["hasDigged"] = unitIter.second.hasDigged;
-         turn[unitIter.second.id]["hasBuilt"] = unitIter.second.hasBuilt;
-         turn[unitIter.second.id]["healthLeft"] = unitIter.second.healthLeft;
-         turn[unitIter.second.id]["maxHealth"] = unitIter.second.maxHealth;
-         turn[unitIter.second.id]["movementLeft"] = unitIter.second.movementLeft;
-         turn[unitIter.second.id]["maxMovement"] = unitIter.second.maxMovement;
-         turn[unitIter.second.id]["X"] = unitIter.second.x;
-         turn[unitIter.second.id]["Y"] = unitIter.second.y;
+		turn[unitIter->second.id]["owner"] = unitIter->second.owner;
+		turn[unitIter->second.id]["hasAttacked"] = unitIter->second.hasAttacked;
+		turn[unitIter->second.id]["hasDigged"] = unitIter->second.hasDigged;
+		turn[unitIter->second.id]["hasBuilt"] = unitIter->second.hasBuilt;
+		turn[unitIter->second.id]["healthLeft"] = unitIter->second.healthLeft;
+		turn[unitIter->second.id]["maxHealth"] = unitIter->second.maxHealth;
+		turn[unitIter->second.id]["movementLeft"] = unitIter->second.movementLeft;
+		turn[unitIter->second.id]["maxMovement"] = unitIter->second.maxMovement;
+		turn[unitIter->second.id]["X"] = unitIter->second.x;
+		turn[unitIter->second.id]["Y"] = unitIter->second.y;
+
+		// todo: this line of code could be simplified
+		if((state < (int)(m_game->states.size() - 1)) && (m_game->states[state + 1].units.find(unitIter->first) == m_game->states[state + 1].units.end()))
+		//if(unitIter->second.healthLeft <= 0)
+		{
+			cout << "Die at: " << unitIter->second.healthLeft << endl;
+			unitIter = m_Units.erase(unitIter);
+		}
+		else
+		{
+			++unitIter;
+		}
+
     }
 }
 
