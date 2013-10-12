@@ -348,11 +348,11 @@ void Mars::run()
                     if(!North)
                         overlayRotation = 90;
                     else if(!West)
-                        overlayRotation = 180;
+                        overlayRotation = 0;
                     else if(!South)
                         overlayRotation = 270;
                     else
-                        overlayRotation = 0;
+                        overlayRotation = 180;
 
                     break;
                 case 4:
