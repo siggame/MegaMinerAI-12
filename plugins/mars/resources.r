@@ -5,4 +5,4 @@ texture water textures/water.png
 texture trench textures/trench.png
 texture glacier textures/glacier.png
 texture dirt textures/dirt.png
-texture trail textures/trail.jpg
+texture trail textures/footprint.png

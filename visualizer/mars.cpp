@@ -233,7 +233,13 @@ void Mars::run()
 	
 	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
 
-	std::deque<std::pair<int,glm::vec2>> trail;
+	std::deque<glm::ivec2> trail;
+
+	std::vector<std::vector<int>> idMap(m_game->states[0].mapHeight);
+	for(auto& idMapiter : idMap)
+	{
+		idMapiter.resize(m_game->states[0].mapWidth,0);
+	}
 
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
@@ -269,27 +275,29 @@ void Mars::run()
 
 		for(auto iter = trail.begin(); iter != trail.end();)
 		{
-			int turnDiff = (state - trail.front().first);
-
 			ColorSprite::Fade fade = ColorSprite::None;
-			if(turnDiff == 4)
+			/*if(idMap[iter->second.y][iter->second.x] == 0)
 			{
 				fade = ColorSprite::FadeOut;
+			}*/
+
+			//if(idMap[iter->second.y][iter->second.x] > 0)
+			{
+				// First Draw trail at iter->second
+				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->x, iter->y), glm::vec2(1.0f, 1.0f), "trail");
+				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.5f),fade));
+				turn.addAnimatable(pTile);
 			}
 
-			// First Draw trail at iter->second
-			SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->second.x, iter->second.y), glm::vec2(1.0f, 1.0f), "trail");
-			pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f),fade));
-			turn.addAnimatable(pTile);
-
 			// Then pop them if turnDiff > n
-			if(turnDiff >= 4)
+			if(idMap[iter->y][iter->x] == 0)
 			{
 				iter = trail.erase(iter);
 			}
 			else
 			{
-				iter++;
+				--idMap[iter->y][iter->x];
+				++iter;
 			}
 		}
 
@@ -307,8 +315,13 @@ void Mars::run()
 				{
 					parser::move& move = (parser::move&)*animationIter;
 					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
-		
-					trail.push_back(make_pair(state,glm::vec2(move.fromX, move.fromY)));
+
+					if(idMap[move.fromY][move.fromX] == 0)
+					{
+						trail.push_back(glm::ivec2(move.fromX, move.fromY));
+					}
+
+					idMap[move.fromY][move.fromX] = 3;
 					
 				}
 			}
