@@ -12,7 +12,7 @@ namespace visualizer
 
 			if(m_fade == FadeOut)
 			{
-				alpha = 1.0f - alpha;
+				alpha = m_color.a - alpha;
 			}
 		}
 
