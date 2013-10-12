@@ -214,6 +214,108 @@ void Mars::loadGamelog( std::string gamelog )
 	start();
 } // Mars::loadGamelog()
 
+void Mars::BuildWorld()
+{
+    // start by setting up the tiles in a multi-dimensional array
+    m_Tiles.resize(m_game->states[0].mapWidth);
+    for(auto& v: m_Tiles)
+    {
+        v.resize(m_game->states[0].mapHeight);
+    }
+
+    for(auto& tileIter: m_game->states[0].tiles)
+    {
+        m_Tiles[tileIter.second.x][tileIter.second.y] = tileIter.second;
+    }
+
+    // set up the unit map so that the index is it's id, the second is the unit itself
+    for(auto& unitIter: m_game->states[0].units)
+    {
+        m_Units.insert(std::pair<int, parser::Unit>(unitIter.second.id, unitIter.second));
+    }
+}
+
+void Mars::UpdateWorld(int state)
+{
+    for(auto& tileIter: m_game->states[state].tiles)
+    {
+        m_Tiles[tileIter.second.x][tileIter.second.y] = tileIter.second;
+    }
+
+    for(auto& UnitIter: m_game->states[state].units)
+    {
+        if(m_Units.count(UnitIter.second.id) == true)
+            m_Units[UnitIter.second.id] = UnitIter.second;
+        else
+            m_Units.insert(std::pair<int, parser::Unit>(UnitIter.second.id, UnitIter.second));
+    }
+
+}
+
+void Mars::RenderWorld(int state, Frame& turn)
+{
+    for(auto& row : m_Tiles)
+    {
+        for(auto& tileIter : row)
+        {
+            std::string texture;
+
+            // if there is water then render water
+            if(tileIter.owner == 3) // if the tile is a glacier
+            {
+                texture = "glacier";
+            }
+            else if(tileIter.waterAmount != 0)
+            {
+                texture = "water";
+            }
+            else if(tileIter.isTrench == true) // if there is no water, but a trench then render a trench
+            {
+                texture = "trench";
+            }
+
+            if(!texture.empty())
+            {
+                SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), texture);
+                pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
+                turn.addAnimatable(pTile);
+            }
+        }
+    }
+
+    // For each UNIT in the frame
+    for(auto& unitIter : m_Units)
+    {
+
+        SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
+        pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter.second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f) ));
+        turn.addAnimatable(pUnit);
+
+        for(auto& animationIter : m_game->states[state].animations[unitIter.second.id])
+        {
+            if(animationIter->type == parser::MOVE)
+            {
+                parser::move& move = (parser::move&)*animationIter;
+                pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
+            }
+        }
+
+        if(pUnit->m_Moves.empty())
+            pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
+
+         turn[unitIter.second.id]["owner"] = unitIter.second.owner;
+         turn[unitIter.second.id]["hasAttacked"] = unitIter.second.hasAttacked;
+         turn[unitIter.second.id]["hasDigged"] = unitIter.second.hasDigged;
+         turn[unitIter.second.id]["hasBuilt"] = unitIter.second.hasBuilt;
+         turn[unitIter.second.id]["healthLeft"] = unitIter.second.healthLeft;
+         turn[unitIter.second.id]["maxHealth"] = unitIter.second.maxHealth;
+         turn[unitIter.second.id]["movementLeft"] = unitIter.second.movementLeft;
+         turn[unitIter.second.id]["maxMovement"] = unitIter.second.maxMovement;
+         turn[unitIter.second.id]["X"] = unitIter.second.x;
+         turn[unitIter.second.id]["Y"] = unitIter.second.y;
+    }
+}
+
 // The "main" function
 void Mars::run()
 {
@@ -233,100 +335,44 @@ void Mars::run()
 
 	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
 
-
+    BuildWorld();
 
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
 	{
 		Frame turn;  // The frame that will be drawn
 
-        // For each TILE in the frame
-        for(auto& tileIter : m_game->states[state].tiles)
-		{
-			std::string texture;
+        UpdateWorld(state);
+        RenderWorld(state, turn);
 
-            // if there is water then render water
-			if(tileIter.second.owner == 3) // if the tile is a glacier
-			{
-				texture = "glacier";
-			}
-			else if(tileIter.second.waterAmount != 0)
+        if(state >= (int)(m_game->states.size() - 10))
+        {
+            turn.addAnimatable(splashScreen);
+        }
+
+        animationEngine->buildAnimations(turn);
+        addFrame(turn);
+
+        // Register the game and begin playing delayed due to multithreading
+        if(state > 5)
+        {
+            timeManager->setNumTurns(state - 5);
+            animationEngine->registerGame( this, this );
+            if(state == 6)
             {
-				texture = "water";
-			}
-			else if(tileIter.second.isTrench == true) // if there is no water, but a trench then render a trench
-            {
-				texture = "trench";
+                animationEngine->registerGame(this, this);
+                timeManager->setTurn(0);
+                timeManager->play();
             }
-
-			if(!texture.empty())
-			{
-				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.second.x, tileIter.second.y), glm::vec2(1.0f, 1.0f), texture);
-				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
-				turn.addAnimatable(pTile);
-			}
-		}
-
-        // For each UNIT in the frame
-		for(auto& unitIter : m_game->states[state].units)
-		{
-
-			SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
-			pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter.second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f) ));
-			turn.addAnimatable(pUnit);
-
-			for(auto& animationIter : m_game->states[state].animations[unitIter.second.id])
-			{
-				if(animationIter->type == parser::MOVE)
-				{
-					parser::move& move = (parser::move&)*animationIter;
-					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
-				}
-			}
-
-			if(pUnit->m_Moves.empty())
-				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter.second.x, unitIter.second.y), glm::vec2(unitIter.second.x, unitIter.second.y)));
-
-			 turn[unitIter.second.id]["owner"] = unitIter.second.owner;
-			 turn[unitIter.second.id]["hasAttacked"] = unitIter.second.hasAttacked;
-			 turn[unitIter.second.id]["hasDigged"] = unitIter.second.hasDigged;
-			 turn[unitIter.second.id]["hasBuilt"] = unitIter.second.hasBuilt;
-			 turn[unitIter.second.id]["healthLeft"] = unitIter.second.healthLeft;
-			 turn[unitIter.second.id]["maxHealth"] = unitIter.second.maxHealth;
-			 turn[unitIter.second.id]["movementLeft"] = unitIter.second.movementLeft;
-			 turn[unitIter.second.id]["maxMovement"] = unitIter.second.maxMovement;
-			 turn[unitIter.second.id]["X"] = unitIter.second.x;
-			 turn[unitIter.second.id]["Y"] = unitIter.second.y;
-		}
-
-		if(state >= (int)(m_game->states.size() - 10))
-		{
-			turn.addAnimatable(splashScreen);
-		}
-
-		animationEngine->buildAnimations(turn);
-		addFrame(turn);
-
-		// Register the game and begin playing delayed due to multithreading
-		if(state > 5)
-		{
-			timeManager->setNumTurns(state - 5);
-			animationEngine->registerGame( this, this );
-			if(state == 6)
-			{
-				animationEngine->registerGame(this, this);
-				timeManager->setTurn(0);
-				timeManager->play();
-			}
-		}
-		else
-		{
-			timeManager->setNumTurns(state);
-			animationEngine->registerGame( this, this );
-			animationEngine->registerGame(this, this);
-			timeManager->setTurn(0);
-			timeManager->play();
-		}
+        }
+        else
+        {
+            timeManager->setNumTurns(state);
+            animationEngine->registerGame( this, this );
+            animationEngine->registerGame(this, this);
+            timeManager->setTurn(0);
+            timeManager->play();
+        }
 	}
 
 	if(!m_suicide)
