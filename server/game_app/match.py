@@ -103,7 +103,10 @@ class Match(DefaultGameWorld):
     return True
 
   def getTile(self, x, y):
-    return self.grid[x][y][0]
+    if (0 <= x < self.mapWidth) and (0 <= y < self.mapHeight):
+      return self.grid[x][y][0]
+    else:
+      return None
     
   def getPump(self, pumpID):
     return next((pump for pump in self.objects.pumpStations if pump.id == pumpID), None)
@@ -116,29 +119,34 @@ class Match(DefaultGameWorld):
       x = random.randint(0, self.mapWidth / 2 - 1)
       y = random.randint(0, self.mapHeight - 1)
       tile = self.getTile(x, y)
+      othertile = self.getTile(self.mapWidth - x - 1, y)
       # Check if it is an empty tile
-      if tile.owner == 2 and not tile.isTrench and tile.pumpID == -1:
-        otherTile = self.getTile(self.mapWidth - x - 1, self.mapHeight - y - 1)
+      if tile and othertile and tile.owner == 2 and tile.pumpID == -1:
         pump = self.addObject(PumpStation,[0, 0, 0])
         tile.owner = 0
         tile.pumpID = pump.id
-        pump = self.addObject(PumpStation,[1, 0, 0])
-        otherTile.owner = 1
-        otherTile.pumpID = pump.id
+
+        otherpump = self.addObject(PumpStation,[1, 0, 0])
+        othertile.owner = 1
+        othertile.pumpID = otherpump.id
     
   def create_ice(self):
     #set_tiles(self)
     for i in range(10):
       x = random.randint(0, self.mapWidth / 2 - 1)
       y = random.randint(0, self.mapHeight - 1)
+
       tile = self.getTile(x, y)
-      # Check if it is an empty tile
-      if tile.owner == 2 and not tile.isTrench and tile.pumpID == -1:
-        otherTile = self.getTile(self.mapWidth - x - 1, self.mapHeight - y - 1)
+      othertile = self.getTile(self.mapWidth - x - 1, y)
+
+      if tile and othertile and tile.owner == 2 and tile.pumpID == -1:
+        randwater = random.randint(10, 50)
+
         tile.owner = 3
-        tile.waterAmount = random.randint(5, 20)
-        otherTile.owner = 3
-        otherTile.waterAmount = tile.waterAmount
+        othertile.owner = 3
+
+        tile.waterAmount = randwater
+        othertile.waterAmount = randwater
       
 
   def create_spawns(self):
@@ -147,9 +155,9 @@ class Match(DefaultGameWorld):
     for y in range(self.mapHeight):
       for x in range(self.mapWidth/2):
           tile = self.getTile(x, y)
-          othertile = self.grid[self.mapWidth-x-1][y][0]
+          othertile = self.getTile(self.mapWidth - x - 1, y)
           rand = random.random()
-          if rand > .98 and tile.owner == 2 and othertile.owner == 2:
+          if tile and othertile and rand > .98 and tile.owner == 2 and othertile.owner == 2:
             tile.owner = 0
             othertile.owner = 1
     return
@@ -182,8 +190,8 @@ class Match(DefaultGameWorld):
             newy = tile.y + offset[1]
             
             # Check if a valid tile
-            if (0 <= newx < self.mapWidth) and (0 <= newy < self.mapHeight):
-              neighbor = self.getTile(newx, newy)
+            neighbor = self.getTile(newx, newy)
+            if neighbor != None:
               if neighbor not in closed and neighbor not in open:
                 # Trench
                 if neighbor.isTrench:

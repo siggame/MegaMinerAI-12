@@ -78,6 +78,7 @@ class PumpStation(object):
     return dict(id = self.id, owner = self.owner, waterAmount = self.waterAmount, siegeCount = self.siegeCount, )
   
   def nextTurn(self):
+    #TODO SEIGE LOGIC
     pass
 
   def __setattr__(self, name, value):
@@ -111,7 +112,6 @@ class Unit(Mappable):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDigged = self.hasDigged, hasBuilt = self.hasBuilt, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, )
   
   def nextTurn(self):
-    tile = self.game.grid[self.x][self.y][0]
   
     # Reset flags if it is unit owner's turn
     if self.owner == self.game.playerID:
@@ -119,15 +119,6 @@ class Unit(Mappable):
       self.hasAttacked = 0
       self.hasBuilt = 0
       self.hasDigged = 0
-  
-    # Apply damage if the unit is in a water filled trench
-    if tile.isTrench and tile.waterAmount > 0:
-      self.healthLeft -= self.game.waterDamage
-      
-      # Check if the unit died
-      if self.healthLeft <= 0:
-        self.game.grid[self.x][self.y].remove(self)
-        self.game.removeObject(self)
       
     return True
 
@@ -146,6 +137,8 @@ class Unit(Mappable):
         return 'Turn {}: Your unit {} is trying to run into something. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
 
 
+
+
     self.game.grid[self.x][self.y].remove(self)
 
     self.game.addAnimation(MoveAnimation(self.id,self.x,self.y,x,y))
@@ -154,6 +147,17 @@ class Unit(Mappable):
     self.movementLeft -= 1
     self.game.grid[self.x][self.y].append(self)
 
+    # Apply damage if the unit is in a water filled trench
+    tile = self.game.getTile(x, y)
+    if tile.isTrench:
+      self.healthLeft -= self.game.trenchDamage
+    if tile.waterAmount > 0:
+      self.healthLeft -= self.game.waterDamage
+
+    # Check if the unit died
+    if self.healthLeft <= 0:
+      self.game.grid[self.x][self.y].remove(self)
+      self.game.removeObject(self)
 
     return True
 
@@ -299,7 +303,7 @@ class Tile(Mappable):
     if type not in [0,1]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
 
-    if len(self.game.grid[self.x][self.y]) > -1:
+    if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
 
     count = 0

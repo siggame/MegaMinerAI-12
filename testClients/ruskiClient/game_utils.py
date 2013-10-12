@@ -6,15 +6,16 @@ DIGGER = 0
 FILLER = 1
 
 def get_tile(ai, x, y):
-  return ai.tiles[x * ai.mapHeight + y]
+  if (0 <= x < ai.mapWidth) and (0 <= y < ai.mapHeight):
+    return ai.tiles[x * ai.mapHeight + y]
+  else:
+    return None
 
 class game_history:
   def __init__(self, ai, use_colors = False):
     self.use_colors = use_colors
     self.history = []
     self.ai = ai
-
-    self.notmoving = None
 
     self.BLACK = 0
     self.RED = 1
@@ -34,35 +35,30 @@ class game_history:
     else:
       return text
 
-  def set_nonmoving_elements(self):
-    self.notmoving = [[[] for _ in range( self.ai.mapHeight ) ] for _ in range( self.ai.mapWidth ) ]
-
-    for tile in self.ai.tiles:
-      #Assume tile.type == 1 means ICE
-      
-      if tile.owner == 0:
-        if tile.pumpID == -1:
-          self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.RED))
-        else:
-          self.notmoving[tile.x][tile.y].append(self.colorText('P', self.GREEN, self.RED))
-      elif tile.owner == 1:
-        if tile.pumpID == -1:
-          self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.BLUE))
-        else:
-          self.notmoving[tile.x][tile.y].append(self.colorText('P', self.GREEN, self.BLUE))
-        
-
-
-    return
-
   def save_snapshot(self):
-    tempGrid = copy.deepcopy(self.notmoving)
+    tempGrid = [[[] for _ in range( self.ai.mapHeight ) ] for _ in range( self.ai.mapWidth ) ]
 
     for tile in self.ai.tiles:
-      if tile.owner == 3:
+
+      #PUMPS
+      if tile.pumpID != -1:
+        tempGrid[tile.x][tile.y].append(self.colorText(str(tile.owner), self.WHITE, self.GREEN))
+
+      #SPAWNS
+      if tile.owner == 0:
+        tempGrid[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.RED))
+      elif tile.owner == 1:
+        tempGrid[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.BLUE))
+
+      #GLACIERS
+      if tile.owner == 3 and tile.waterAmount > 0:
         tempGrid[tile.x][tile.y].append(self.colorText('I', self.CYAN, self.WHITE))
+
+      #WATER
       elif tile.waterAmount > 0:
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.BLUE))
+
+      #TRENCH
       elif tile.isTrench == 1:
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.YELLOW))
 
@@ -87,18 +83,16 @@ class game_history:
     for y in range(self.ai.mapHeight):
       for x in range(self.ai.mapWidth):
         if len(snapshot[x][y]) > 0:
-          sys.stdout.write(snapshot[x][y][0])
-          sys.stdout.write(snapshot[x][y][0])
+          print(snapshot[x][y][0]),
         else:
-          sys.stdout.write(' ')
-          sys.stdout.write(' ')
+          print(' '),
       print
     return
 
   def print_history(self):
     turnNumber = 0
     for snapshot in self.history:
-      print(turnNumber/2)
+      print(turnNumber)
       turnNumber += 1
       self.print_snapshot(snapshot)
       time.sleep(.1)
