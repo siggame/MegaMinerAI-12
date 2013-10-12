@@ -310,32 +310,32 @@ void Mars::RenderWorld(int state, Frame& turn)
 					float overlayRotation;
 
 					if(tileIter.y > 0 &&
-					   GetTileAt(tileIter.x, tileIter.y - 1).isTrench == true &&
-					   GetTileAt(tileIter.x, tileIter.y - 1).owner != 3)
+                      (GetTileAt(tileIter.x, tileIter.y - 1).isTrench == true ||
+					   GetTileAt(tileIter.x, tileIter.y - 1).owner == 3))
 					{
 						surroundingTrenches++;
 						North = true;
 					}
 
 					if(tileIter.y < m_game->states[state].mapHeight - 1 &&
-					   GetTileAt(tileIter.x, tileIter.y + 1).isTrench == true &&
-					   GetTileAt(tileIter.x, tileIter.y + 1).owner != 3)
+                      (GetTileAt(tileIter.x, tileIter.y + 1).isTrench == true ||
+					   GetTileAt(tileIter.x, tileIter.y + 1).owner == 3))
 					{
 						surroundingTrenches++;
 						South = true;
 					}
 
 					if(tileIter.x > 0 &&
-					   GetTileAt(tileIter.x - 1, tileIter.y).isTrench == true &&
-					   GetTileAt(tileIter.x - 1, tileIter.y).owner != 3)
+                      (GetTileAt(tileIter.x - 1, tileIter.y).isTrench == true ||
+					   GetTileAt(tileIter.x - 1, tileIter.y).owner == 3))
 					{
 						surroundingTrenches++;
 						West = true;
 					}
 
 					if(tileIter.x < m_game->states[state].mapWidth - 1 &&
-					   GetTileAt(tileIter.x + 1, tileIter.y).isTrench == true &&
-					   GetTileAt(tileIter.x + 1, tileIter.y).owner != 3)
+                      (GetTileAt(tileIter.x + 1, tileIter.y).isTrench == true ||
+					   GetTileAt(tileIter.x + 1, tileIter.y).owner == 3))
 					{
 						surroundingTrenches++;
 						East = true;
