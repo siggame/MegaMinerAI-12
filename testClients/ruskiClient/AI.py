@@ -38,9 +38,8 @@ class AI(BaseAI):
             unit.move(unit.x+offset[0], unit.y+offset[1])
 
         offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
-        #Check if off map
-        if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
-          tile = game_utils.get_tile(self, unit.x+offset[0], unit.y+offset[1])
+        tile = game_utils.get_tile(self, unit.x+offset[0], unit.y+offset[1])
+        if tile:
           unit.dig(tile)
           unit.fill(tile)
 
@@ -48,7 +47,6 @@ class AI(BaseAI):
   def init(self):
     self.getSpawnTiles()
     self.history = game_utils.game_history(self, True)
-    self.history.set_nonmoving_elements()
     return
 
   ##This function is called once, after your last turn
