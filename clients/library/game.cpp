@@ -403,10 +403,12 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   
   // Cannot spawn unit on top of another unit
   for (int i = 0; i < getUnitCount(c); ++i)
+  {
     if (getUnit(c, i)->owner == getPlayerID(c))
       count++;
     if (getUnit(c, i)->x == object->x && getUnit(c, i)->y == object->y)
       blocked = true;
+  }
   
   if (blocked)
     return 0;
@@ -415,7 +417,7 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   if (count >= getMaxUnits(c))
     return 0;
   
-  getPlayer(getPlayerID(c))->spawnResources -= getUnitCost(c);
+  getPlayer(c, getPlayerID(c))->spawnResources -= getUnitCost(c);
   
   return 1;
 }
