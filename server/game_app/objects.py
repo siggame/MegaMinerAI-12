@@ -104,7 +104,6 @@ class PumpStation(object):
       for siegeTile in self.siegeTiles:
         siegeTile.owner = self.owner
 
-    #TODO SEIGE LOGIC
     return
 
   def __setattr__(self, name, value):
