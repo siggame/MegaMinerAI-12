@@ -283,7 +283,7 @@ void Mars::run()
 					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
 					//texture = "footprint";
 		
-					trail.push_front(make_pair(state,glm::vec2(move.toX, move.toY)));
+					trail.push_back(make_pair(state,glm::vec2(move.fromX, move.fromY)));
 					
 				}
 			}
@@ -313,12 +313,13 @@ void Mars::run()
 			turn.addAnimatable(pTile);
 			
 			// Then pop them if (State - first) > n
-			if(State - trail.front(int) > 7)
+			if((state - trail.front().first) > 2)
 			{
-				for(auto iter = trail.begin(); iter != trail.end();)
-				{
-					trail.pop_back();
-				}
+				iter = trail.erase(iter);
+			}
+			else
+			{
+				iter++;
 			}
 		}
 
