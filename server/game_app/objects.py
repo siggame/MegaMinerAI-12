@@ -209,8 +209,8 @@ class Unit(Mappable):
       return 'Turn {}: Your {} can only dig empty tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.pumpID != -1:
       return 'Turn {}: Your {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.waterAmount > 0:
-      return 'Turn {}: Your {} can not dig trenches on ice cap tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.owner == 3:
+      return 'Turn {}: Your {} can not dig trenches on ice tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.owner == 0 or tile.owner == 1:
       return 'Turn {}: Your {} can not dig trenches on spawn tiles. ({},{}) digs ({},{})'.format(self.game.turn, self.id, self.x, self.y, x, y)
     elif len(self.game.grid[x][y]) > 1:
