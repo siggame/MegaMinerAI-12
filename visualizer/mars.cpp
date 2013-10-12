@@ -405,6 +405,21 @@ void Mars::RenderWorld(int state, Frame& turn)
 						turn.addAnimatable(pTile);
 					}
 				}
+
+				if(tileIter.waterAmount != 0)
+				{
+                    std::ostringstream waterAmountString;
+                    SmartPointer<Animatable> pText = new Animatable;
+                    waterAmountString << tileIter.waterAmount;
+                    DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
+                                                            glm::vec2(tileIter.x + 0.5, tileIter.y + 0.25),
+                                                            glm::vec4(0.0f,0.0f,0.0f,1.0f),
+                                                            2.0f,
+                                                            "Roboto");
+
+                    pText->addKeyFrame(textBox);
+                    turn.addAnimatable(pText);
+				}
             }
         }
     }

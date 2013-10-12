@@ -86,6 +86,33 @@ namespace visualizer
 		MoveableSprite * m_Sprite;
 	};
 
+	/** @name DrawTextBox
+      * @inherits Anim
+      * @purpose Draws the TextBox to the screen.
+      */
+    class DrawTextBox :
+        public Anim
+    {
+    public:
+        DrawTextBox(const std::string& text, const glm::vec2& pos, const glm::vec4& color,
+                const float& size, const std::string& font) :
+            m_Text(text),
+            m_Pos(pos),
+            m_Color(color),
+            m_Size(size),
+            m_Font(font)
+            {}
+
+        void animate(const float &t, AnimData *d, IGame *game);
+
+    private:
+        std::string m_Text;
+        glm::vec2 m_Pos;
+        glm::vec4 m_Color;
+        float m_Size;
+        std::string m_Font;
+    };
+
 	class DrawSplashScreen : public Anim
 	{
 	public:

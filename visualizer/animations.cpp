@@ -38,6 +38,14 @@ namespace visualizer
 
 	}
 
+	void DrawTextBox::animate(const float &, AnimData*, IGame* game)
+	{
+        game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
+
+        game->renderer->drawText(m_Pos.x, m_Pos.y, m_Font, m_Text, m_Size, IRenderer::Center);
+
+	};
+
 	void DrawSplashScreen::animate(const float &, AnimData*, IGame *game)
 	{
 		game->renderer->setColor(Color(1.0f,1.0f,1.0f,0.5f));
