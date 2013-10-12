@@ -309,7 +309,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 					bool North = false, South = false, East = false, West = false;
 					bool NorthWest = false, NorthEast = false, SouthWest = false, SouthEast = false;
 					std::string overlayTexture;
-					float overlayRotation = 0;
+					int overlayRotation = 0;
 
                     // STEP 1: figure out if all the trenches adjacent to this one are also
                     //         trenches, INCLUDING diagonals.
