@@ -472,11 +472,6 @@ void Mars::run()
             turn.addAnimatable(splashScreen);
 		}
 
-		if(state >= (int)(m_game->states.size() - 10))
-		{
-			turn.addAnimatable(splashScreen);
-		}
-
         animationEngine->buildAnimations(turn);
         addFrame(turn);
 
