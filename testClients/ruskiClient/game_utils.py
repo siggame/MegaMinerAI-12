@@ -1,5 +1,6 @@
 import copy
 import time
+import sys
 
 DIGGER = 0
 FILLER = 1
@@ -38,18 +39,19 @@ class game_history:
 
     for tile in self.ai.tiles:
       #Assume tile.type == 1 means ICE
-      if tile.owner == 3:
-        self.notmoving[tile.x][tile.y].append(self.colorText('I', self.CYAN, self.WHITE))
-      elif tile.owner == 0:
-        self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.RED))
+      
+      if tile.owner == 0:
+        if tile.pumpID == -1:
+          self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.RED))
+        else:
+          self.notmoving[tile.x][tile.y].append(self.colorText('P', self.GREEN, self.RED))
       elif tile.owner == 1:
-        self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.BLUE))
+        if tile.pumpID == -1:
+          self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.BLUE))
+        else:
+          self.notmoving[tile.x][tile.y].append(self.colorText('P', self.GREEN, self.BLUE))
+        
 
-    for pump in self.ai.pumpStations:
-      if pump.owner == 0:
-        self.notmoving[pump.x][pump.y].append(self.colorText('P', self.GREEN))
-      elif pump.owner == 1:
-        self.notmoving[pump.x][pump.y].append(self.colorText('p', self.GREEN))
 
     return
 
@@ -57,9 +59,11 @@ class game_history:
     tempGrid = copy.deepcopy(self.notmoving)
 
     for tile in self.ai.tiles:
-      if tile.waterAmount > 0:
+      if tile.owner == 3:
+        tempGrid[tile.x][tile.y].append(self.colorText('I', self.CYAN, self.WHITE))
+      elif tile.waterAmount > 0:
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.BLUE))
-      if tile.isTrench == 1:
+      elif tile.isTrench == 1:
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.YELLOW))
 
     for unit in self.ai.units:
@@ -83,9 +87,11 @@ class game_history:
     for y in range(self.ai.mapHeight):
       for x in range(self.ai.mapWidth):
         if len(snapshot[x][y]) > 0:
-            print(snapshot[x][y][0]),
+          sys.stdout.write(snapshot[x][y][0])
+          sys.stdout.write(snapshot[x][y][0])
         else:
-          print(' '),
+          sys.stdout.write(' ')
+          sys.stdout.write(' ')
       print
     return
 
