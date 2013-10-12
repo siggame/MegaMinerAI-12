@@ -3,9 +3,20 @@
 
 namespace visualizer
 {
-	void ColorSprite::animate(const float &, AnimData*, IGame *game)
+	void ColorSprite::animate(const float &t, AnimData*, IGame *game)
     {
-		 game->renderer->setColor( Color(m_color.r, m_color.g, m_color.b, m_color.a) );
+		float alpha = m_color.a;
+		if(m_fade != None)
+		{
+			alpha *= t;
+
+			if(m_fade == FadeOut)
+			{
+				alpha = m_color.a - alpha;
+			}
+		}
+
+		game->renderer->setColor( Color(m_color.r, m_color.g, m_color.b, alpha) );
     }
 
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)

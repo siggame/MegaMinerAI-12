@@ -8,6 +8,8 @@
 #include <map>
 #include <string>
 #include <list>
+#include <deque>
+#include <glm/glm.hpp>
 
 // The Codegen's Parser
 #include "parser/parser.h"
@@ -58,7 +60,7 @@ namespace visualizer
 
             void BuildWorld();
             void UpdateWorld(int state);
-            void RenderWorld(int state, Frame& turn);
+			void RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& turnMap, Frame& turn);
             parser::Tile& GetTileAt(int x, int y);
 
 			void ProccessInput();
