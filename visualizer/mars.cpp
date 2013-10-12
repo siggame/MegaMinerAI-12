@@ -6,7 +6,7 @@
 #include <utility>
 #include <time.h>
 #include <list>
-#include <chrono>
+#include <queue>
 
 namespace visualizer
 {
@@ -230,10 +230,10 @@ void Mars::run()
 															   m_game->states[0].mapWidth,
 															   m_game->states[0].mapHeight
 															   );
-
+	
 	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
 
-
+	std::deque<std::pair<int,glm::vec2>> trail;
 
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
@@ -281,6 +281,10 @@ void Mars::run()
 				{
 					parser::move& move = (parser::move&)*animationIter;
 					pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
+					//texture = "footprint";
+		
+					trail.push_front(make_pair(state,glm::vec2(move.toX, move.toY)));
+					
 				}
 			}
 
@@ -297,6 +301,25 @@ void Mars::run()
 			 turn[unitIter.second.id]["maxMovement"] = unitIter.second.maxMovement;
 			 turn[unitIter.second.id]["X"] = unitIter.second.x;
 			 turn[unitIter.second.id]["Y"] = unitIter.second.y;
+		}
+		
+		for(auto iter = trail.begin(); iter != trail.end();)
+		{
+			//trail.pop_back();
+			
+			// First Draw trail at iter->second
+			SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->second.x, iter->second.y), glm::vec2(1.0f, 1.0f), "trail");
+			pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
+			turn.addAnimatable(pTile);
+			
+			// Then pop them if (State - first) > n
+			if(State - trail.front(int) > 7)
+			{
+				for(auto iter = trail.begin(); iter != trail.end();)
+				{
+					trail.pop_back();
+				}
+			}
 		}
 
 		if(state >= (int)(m_game->states.size() - 10))
