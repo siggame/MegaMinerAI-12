@@ -15,12 +15,13 @@ def costOfMove(self, tile):
     else:
       return float(self.getTrenchDamage()) / self.getMaxHealth()
   else:
-    return 1.0
+    return 0.0
      
 def validTrench(self, tile):
   return tile.owner == 2
   
-def costOfTrench(self, tile)
+def costOfTrench(self, tile):
+  return 1 - tile.isTrench
 
 def getTile(self, x, y):
   return self.tiles[x * self.getMapHeight() + y]
