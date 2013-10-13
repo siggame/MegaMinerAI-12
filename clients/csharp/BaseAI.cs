@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 public abstract class BaseAI
 {
   public static Player[] players;
-  public static Mappable[] mappables;
   public static PumpStation[] pumpStations;
+  public static Mappable[] mappables;
   public static Unit[] units;
   public static Tile[] tiles;
   IntPtr connection;
@@ -52,17 +52,17 @@ public abstract class BaseAI
     {
       players[i] = new Player(Client.getPlayer(connection, i));
     }
-    count = Client.getMappableCount(connection);
-    mappables = new Mappable[count];
-    for(int i = 0; i < count; i++)
-    {
-      mappables[i] = new Mappable(Client.getMappable(connection, i));
-    }
     count = Client.getPumpStationCount(connection);
     pumpStations = new PumpStation[count];
     for(int i = 0; i < count; i++)
     {
       pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
+    }
+    count = Client.getMappableCount(connection);
+    mappables = new Mappable[count];
+    for(int i = 0; i < count; i++)
+    {
+      mappables[i] = new Mappable(Client.getMappable(connection, i));
     }
     count = Client.getUnitCount(connection);
     units = new Unit[count];
@@ -128,16 +128,22 @@ public abstract class BaseAI
     int value = Client.getAttackDamage(connection);
     return value;
   }
-  ///How quickly a unit will siege a base.
-  public int offenseCount()
+  ///How quickly a unit will siege a PumpStation.
+  public int offensePower()
   {
-    int value = Client.getOffenseCount(connection);
+    int value = Client.getOffensePower(connection);
     return value;
   }
-  ///The much a unit will slow a  siege.
-  public int defenseCount()
+  ///The much a unit will slow a siege.
+  public int defensePower()
   {
-    int value = Client.getDefenseCount(connection);
+    int value = Client.getDefensePower(connection);
+    return value;
+  }
+  ///The maximum siege value before the PumpStation is sieged.
+  public int maxSiege()
+  {
+    int value = Client.getMaxSiege(connection);
     return value;
   }
   ///The maximum number of units allowed per player.

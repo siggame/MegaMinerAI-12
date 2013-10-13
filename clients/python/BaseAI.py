@@ -16,21 +16,21 @@ class BaseAI:
   connection = None
   #\endcond
   players = []
-  mappables = []
   pumpStations = []
+  mappables = []
   units = []
   tiles = []
   #\cond
   def startTurn(self):
     from GameObject import Player
-    from GameObject import Mappable
     from GameObject import PumpStation
+    from GameObject import Mappable
     from GameObject import Unit
     from GameObject import Tile
 
     BaseAI.players = [Player(library.getPlayer(self.connection, i)) for i in xrange(library.getPlayerCount(self.connection))]
-    BaseAI.mappables = [Mappable(library.getMappable(self.connection, i)) for i in xrange(library.getMappableCount(self.connection))]
     BaseAI.pumpStations = [PumpStation(library.getPumpStation(self.connection, i)) for i in xrange(library.getPumpStationCount(self.connection))]
+    BaseAI.mappables = [Mappable(library.getMappable(self.connection, i)) for i in xrange(library.getMappableCount(self.connection))]
     BaseAI.units = [Unit(library.getUnit(self.connection, i)) for i in xrange(library.getUnitCount(self.connection))]
     BaseAI.tiles = [Tile(library.getTile(self.connection, i)) for i in xrange(library.getTileCount(self.connection))]
 
@@ -85,15 +85,20 @@ class BaseAI:
   #\endcond
   attackDamage = property(getAttackDamage)
   #\cond
-  def getOffenseCount(self):
-    return library.getOffenseCount(self.connection)
+  def getOffensePower(self):
+    return library.getOffensePower(self.connection)
   #\endcond
-  offenseCount = property(getOffenseCount)
+  offensePower = property(getOffensePower)
   #\cond
-  def getDefenseCount(self):
-    return library.getDefenseCount(self.connection)
+  def getDefensePower(self):
+    return library.getDefensePower(self.connection)
   #\endcond
-  defenseCount = property(getDefenseCount)
+  defensePower = property(getDefensePower)
+  #\cond
+  def getMaxSiege(self):
+    return library.getMaxSiege(self.connection)
+  #\endcond
+  maxSiege = property(getMaxSiege)
   #\cond
   def getMaxUnits(self):
     return library.getMaxUnits(self.connection)

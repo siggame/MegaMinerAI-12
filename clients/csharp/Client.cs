@@ -53,9 +53,11 @@ public class Client {
   [DllImport("client")]
   public static extern int getAttackDamage(IntPtr connection);
   [DllImport("client")]
-  public static extern int getOffenseCount(IntPtr connection);
+  public static extern int getOffensePower(IntPtr connection);
   [DllImport("client")]
-  public static extern int getDefenseCount(IntPtr connection);
+  public static extern int getDefensePower(IntPtr connection);
+  [DllImport("client")]
+  public static extern int getMaxSiege(IntPtr connection);
   [DllImport("client")]
   public static extern int getMaxUnits(IntPtr connection);
   [DllImport("client")]
@@ -70,13 +72,13 @@ public class Client {
   [DllImport("client")]
   public static extern int getPlayerCount(IntPtr connection);
   [DllImport("client")]
-  public static extern IntPtr getMappable(IntPtr connection, int num);
-  [DllImport("client")]
-  public static extern int getMappableCount(IntPtr connection);
-  [DllImport("client")]
   public static extern IntPtr getPumpStation(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getPumpStationCount(IntPtr connection);
+  [DllImport("client")]
+  public static extern IntPtr getMappable(IntPtr connection, int num);
+  [DllImport("client")]
+  public static extern int getMappableCount(IntPtr connection);
   [DllImport("client")]
   public static extern IntPtr getUnit(IntPtr connection, int num);
   [DllImport("client")]
@@ -100,20 +102,20 @@ public class Client {
   public static extern int playerGetSpawnResources(IntPtr ptr);
 
   [DllImport("client")]
-  public static extern int mappableGetId(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int mappableGetX(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int mappableGetY(IntPtr ptr);
-
-  [DllImport("client")]
   public static extern int pumpStationGetId(IntPtr ptr);
   [DllImport("client")]
   public static extern int pumpStationGetOwner(IntPtr ptr);
   [DllImport("client")]
   public static extern int pumpStationGetWaterAmount(IntPtr ptr);
   [DllImport("client")]
-  public static extern int pumpStationGetSiegeCount(IntPtr ptr);
+  public static extern int pumpStationGetSiegeAmount(IntPtr ptr);
+
+  [DllImport("client")]
+  public static extern int mappableGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int mappableGetX(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int mappableGetY(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int unitGetId(IntPtr ptr);
@@ -128,9 +130,9 @@ public class Client {
   [DllImport("client")]
   public static extern int unitGetHasAttacked(IntPtr ptr);
   [DllImport("client")]
-  public static extern int unitGetHasDigged(IntPtr ptr);
+  public static extern int unitGetHasDug(IntPtr ptr);
   [DllImport("client")]
-  public static extern int unitGetHasBuilt(IntPtr ptr);
+  public static extern int unitGetHasFilled(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetHealthLeft(IntPtr ptr);
   [DllImport("client")]
@@ -148,8 +150,6 @@ public class Client {
   public static extern int tileGetY(IntPtr ptr);
   [DllImport("client")]
   public static extern int tileGetOwner(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetType(IntPtr ptr);
   [DllImport("client")]
   public static extern int tileGetPumpID(IntPtr ptr);
   [DllImport("client")]

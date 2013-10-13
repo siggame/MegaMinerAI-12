@@ -9,8 +9,8 @@
 #include "game.h"
 
 #include "Player.h"
-#include "Mappable.h"
 #include "PumpStation.h"
+#include "Mappable.h"
 #include "Unit.h"
 #include "Tile.h"
 
@@ -27,8 +27,8 @@ class BaseAI
 protected:
   Connection* c;
   std::vector<Player> players;
-  std::vector<Mappable> mappables;
   std::vector<PumpStation> pumpStations;
+  std::vector<Mappable> mappables;
   std::vector<Unit> units;
   std::vector<Tile> tiles;
 public:
@@ -46,10 +46,12 @@ public:
   int turnNumber();
   ///The amount of damage a unit will deal.
   int attackDamage();
-  ///How quickly a unit will siege a base.
-  int offenseCount();
-  ///The much a unit will slow a  siege.
-  int defenseCount();
+  ///How quickly a unit will siege a PumpStation.
+  int offensePower();
+  ///The much a unit will slow a siege.
+  int defensePower();
+  ///The maximum siege value before the PumpStation is sieged.
+  int maxSiege();
   ///The maximum number of units allowed per player.
   int maxUnits();
   ///The cost of spawning in a new unit

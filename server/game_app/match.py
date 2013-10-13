@@ -37,8 +37,9 @@ class Match(DefaultGameWorld):
     self.waterDamage = None
     self.turnNumber = None
     self.attackDamage = None
-    self.offenseCount = None
-    self.defenseCount = None
+    self.offensePower = None
+    self.defensePower = None
+    self.maxSiege = None
     self.maxUnits = None
     self.unitCost = None
     self.playerID = None
@@ -119,15 +120,16 @@ class Match(DefaultGameWorld):
           waterDamage = self.waterDamage,
           turnNumber = self.turnNumber,
           attackDamage = self.attackDamage,
-          offenseCount = self.offenseCount,
-          defenseCount = self.defenseCount,
+          offensePower = self.offensePower,
+          defensePower = self.defensePower,
+          maxSiege = self.maxSiege,
           maxUnits = self.maxUnits,
           unitCost = self.unitCost,
           playerID = self.playerID,
           gameNumber = self.gameNumber,
           Players = [i.toJson() for i in self.objects.values() if i.__class__ is Player],
-          Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
+          Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
           Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
           animations = self.jsonAnimations
@@ -223,14 +225,14 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offenseCount, self.defenseCount, self.maxUnits, self.unitCost, self.playerID, self.gameNumber])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxSiege, self.maxUnits, self.unitCost, self.playerID, self.gameNumber])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
-    typeLists.append(["Mappable"] + [i.toList() for i in self.objects.values() if i.__class__ is Mappable])
     updated = [i for i in self.objects.values() if i.__class__ is PumpStation and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["PumpStation"] + [i.toList() for i in updated])
+    typeLists.append(["Mappable"] + [i.toList() for i in self.objects.values() if i.__class__ is Mappable])
     typeLists.append(["Unit"] + [i.toList() for i in self.objects.values() if i.__class__ is Unit])
     updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
     if updated:

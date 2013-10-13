@@ -38,8 +38,9 @@ struct Connection
   int waterDamage;
   int turnNumber;
   int attackDamage;
-  int offenseCount;
-  int defenseCount;
+  int offensePower;
+  int defensePower;
+  int maxSiege;
   int maxUnits;
   int unitCost;
   int playerID;
@@ -47,10 +48,10 @@ struct Connection
 
   _Player* Players;
   int PlayerCount;
-  _Mappable* Mappables;
-  int MappableCount;
   _PumpStation* PumpStations;
   int PumpStationCount;
+  _Mappable* Mappables;
+  int MappableCount;
   _Unit* Units;
   int UnitCount;
   _Tile* Tiles;
@@ -101,8 +102,9 @@ DLLEXPORT int getTrenchDamage(Connection* c);
 DLLEXPORT int getWaterDamage(Connection* c);
 DLLEXPORT int getTurnNumber(Connection* c);
 DLLEXPORT int getAttackDamage(Connection* c);
-DLLEXPORT int getOffenseCount(Connection* c);
-DLLEXPORT int getDefenseCount(Connection* c);
+DLLEXPORT int getOffensePower(Connection* c);
+DLLEXPORT int getDefensePower(Connection* c);
+DLLEXPORT int getMaxSiege(Connection* c);
 DLLEXPORT int getMaxUnits(Connection* c);
 DLLEXPORT int getUnitCost(Connection* c);
 DLLEXPORT int getPlayerID(Connection* c);
@@ -111,11 +113,11 @@ DLLEXPORT int getGameNumber(Connection* c);
 DLLEXPORT _Player* getPlayer(Connection* c, int num);
 DLLEXPORT int getPlayerCount(Connection* c);
 
-DLLEXPORT _Mappable* getMappable(Connection* c, int num);
-DLLEXPORT int getMappableCount(Connection* c);
-
 DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num);
 DLLEXPORT int getPumpStationCount(Connection* c);
+
+DLLEXPORT _Mappable* getMappable(Connection* c, int num);
+DLLEXPORT int getMappableCount(Connection* c);
 
 DLLEXPORT _Unit* getUnit(Connection* c, int num);
 DLLEXPORT int getUnitCount(Connection* c);

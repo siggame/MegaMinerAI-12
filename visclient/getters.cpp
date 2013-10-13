@@ -23,18 +23,6 @@ DLLEXPORT int playerGetSpawnResources(_Player* ptr)
 {
   return ptr->spawnResources;
 }
-DLLEXPORT int mappableGetId(_Mappable* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT int mappableGetX(_Mappable* ptr)
-{
-  return ptr->x;
-}
-DLLEXPORT int mappableGetY(_Mappable* ptr)
-{
-  return ptr->y;
-}
 DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
 {
   return ptr->id;
@@ -47,9 +35,21 @@ DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
 {
   return ptr->waterAmount;
 }
-DLLEXPORT int pumpStationGetSiegeCount(_PumpStation* ptr)
+DLLEXPORT int pumpStationGetSiegeAmount(_PumpStation* ptr)
 {
-  return ptr->siegeCount;
+  return ptr->siegeAmount;
+}
+DLLEXPORT int mappableGetId(_Mappable* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT int mappableGetX(_Mappable* ptr)
+{
+  return ptr->x;
+}
+DLLEXPORT int mappableGetY(_Mappable* ptr)
+{
+  return ptr->y;
 }
 DLLEXPORT int unitGetId(_Unit* ptr)
 {
@@ -75,13 +75,13 @@ DLLEXPORT int unitGetHasAttacked(_Unit* ptr)
 {
   return ptr->hasAttacked;
 }
-DLLEXPORT int unitGetHasDigged(_Unit* ptr)
+DLLEXPORT int unitGetHasDug(_Unit* ptr)
 {
-  return ptr->hasDigged;
+  return ptr->hasDug;
 }
-DLLEXPORT int unitGetHasBuilt(_Unit* ptr)
+DLLEXPORT int unitGetHasFilled(_Unit* ptr)
 {
-  return ptr->hasBuilt;
+  return ptr->hasFilled;
 }
 DLLEXPORT int unitGetHealthLeft(_Unit* ptr)
 {
@@ -114,10 +114,6 @@ DLLEXPORT int tileGetY(_Tile* ptr)
 DLLEXPORT int tileGetOwner(_Tile* ptr)
 {
   return ptr->owner;
-}
-DLLEXPORT int tileGetType(_Tile* ptr)
-{
-  return ptr->type;
 }
 DLLEXPORT int tileGetPumpID(_Tile* ptr)
 {

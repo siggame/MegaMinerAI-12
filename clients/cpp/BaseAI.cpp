@@ -33,13 +33,17 @@ int BaseAI::attackDamage()
 {
   return getAttackDamage(c);
 }
-int BaseAI::offenseCount()
+int BaseAI::offensePower()
 {
-  return getOffenseCount(c);
+  return getOffensePower(c);
 }
-int BaseAI::defenseCount()
+int BaseAI::defensePower()
 {
-  return getDefenseCount(c);
+  return getDefensePower(c);
+}
+int BaseAI::maxSiege()
+{
+  return getMaxSiege(c);
 }
 int BaseAI::maxUnits()
 {
@@ -70,20 +74,20 @@ bool BaseAI::startTurn()
     players[i] = Player(getPlayer(c, i));
   }
 
-  count = getMappableCount(c);
-  mappables.clear();
-  mappables.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    mappables[i] = Mappable(getMappable(c, i));
-  }
-
   count = getPumpStationCount(c);
   pumpStations.clear();
   pumpStations.resize(count);
   for(int i = 0; i < count; i++)
   {
     pumpStations[i] = PumpStation(getPumpStation(c, i));
+  }
+
+  count = getMappableCount(c);
+  mappables.clear();
+  mappables.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    mappables[i] = Mappable(getMappable(c, i));
   }
 
   count = getUnitCount(c);

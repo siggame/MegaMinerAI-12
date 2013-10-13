@@ -9,8 +9,8 @@ namespace client
 
 struct Connection;
 struct _Player;
-struct _Mappable;
 struct _PumpStation;
+struct _Mappable;
 struct _Unit;
 struct _Tile;
 
@@ -24,20 +24,20 @@ struct _Player
   int waterStored;
   int spawnResources;
 };
-struct _Mappable
-{
-  Connection* _c;
-  int id;
-  int x;
-  int y;
-};
 struct _PumpStation
 {
   Connection* _c;
   int id;
   int owner;
   int waterAmount;
-  int siegeCount;
+  int siegeAmount;
+};
+struct _Mappable
+{
+  Connection* _c;
+  int id;
+  int x;
+  int y;
 };
 struct _Unit
 {
@@ -48,8 +48,8 @@ struct _Unit
   int owner;
   int type;
   int hasAttacked;
-  int hasDigged;
-  int hasBuilt;
+  int hasDug;
+  int hasFilled;
   int healthLeft;
   int maxHealth;
   int movementLeft;
@@ -62,7 +62,6 @@ struct _Tile
   int x;
   int y;
   int owner;
-  int type;
   int pumpID;
   int waterAmount;
   int isTrench;
