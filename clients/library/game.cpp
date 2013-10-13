@@ -372,6 +372,31 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  Connection *c = object->_c;
+  int& x = target->x;
+  int& y = target->y;
+  
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Target must be adjacent
+  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
+    return 0;
+  // Can only attack once per turn
+  if (object->hasAttacked == 1)
+    return 0;
+  // Can only attack enemy units
+  if (object->owner == target->owner)
+    return 0;
+    
+  object->hasAttacked = 1;
+  
+  // Unit can no longer move
+  object->movementLeft = 0;
+  
+  target->healthLeft -= getAttackDamage();
+  
   return 1;
 }
 
