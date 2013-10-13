@@ -385,6 +385,40 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  Connection* c = object->_c;
+  
+  // Can only spawn on current player's spawn tiles
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Only spawn if player has enough resources
+  if (getPlayer(c, object->owner)->spawnResources < getUnitCost(c))
+    return 0;
+  // Can only spawn Fillers and Diggers
+  if (type != 0 && type != 1)
+    return 0;
+  
+  int count = 0;
+  bool blocked = false;
+  
+  // Cannot spawn unit on top of another unit
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->owner == getPlayerID(c))
+      count++;
+    if (getUnit(c, i)->x == object->x && getUnit(c, i)->y == object->y)
+      blocked = true;
+  }
+  
+  if (blocked)
+    return 0;
+  
+  // Cannot spawn more than MaxUnits units
+  if (count >= getMaxUnits(c))
+    return 0;
+  
+  getPlayer(c, getPlayerID(c))->spawnResources -= getUnitCost(c);
+  
   return 1;
 }
 
