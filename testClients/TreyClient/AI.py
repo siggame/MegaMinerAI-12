@@ -77,6 +77,8 @@ class AI(BaseAI):
     for tile in self.spawnTiles:
       if tile.spawn(type):
         return True
+      else:
+        print('Spawn failed')
     return False
         
   def spawnUnitClosestTo(self, type, x, y):
@@ -126,7 +128,6 @@ class AI(BaseAI):
   def init(self):
     self.getSpawnTiles()
     self.history = game_history(self, True)
-    self.history.set_nonmoving_elements()
     return
 
   ##This function is called once, after your last turn
