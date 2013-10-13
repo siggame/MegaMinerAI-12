@@ -4,6 +4,7 @@ import time
 DIGGER = 0
 FILLER = 1
 
+<<<<<<< HEAD
 offsets = ((1,0),(0,1),(-1,0),(0,-1))
 
 def taxiDis(x1, y1, x2, y2):
@@ -33,12 +34,22 @@ def costOfMove(ai, tile, healthLeft):
 def isOnMap(ai, x, y):
   return x >= 0 and x < ai.getMapWidth() and y >= 0 and y < ai.getMapHeight()
  
+=======
+def get_tile(ai, x, y):
+  return ai.tiles[x * ai.mapHeight + y]
+
+>>>>>>> origin/TreyAI
 class game_history:
   def __init__(self, ai, use_colors = False):
     self.use_colors = use_colors
     self.history = []
     self.ai = ai
 
+<<<<<<< HEAD
+=======
+    self.notmoving = None
+
+>>>>>>> origin/TreyAI
     self.BLACK = 0
     self.RED = 1
     self.GREEN = 2
@@ -57,6 +68,7 @@ class game_history:
     else:
       return text
 
+<<<<<<< HEAD
   def save_snapshot(self):
     tempGrid = [[[] for _ in range( self.ai.mapHeight ) ] for _ in range( self.ai.mapWidth ) ]
 
@@ -82,6 +94,35 @@ class game_history:
 
       #TRENCH
       elif tile.isTrench == 1:
+=======
+  def set_nonmoving_elements(self):
+    self.notmoving = [[[] for _ in range( self.ai.mapHeight ) ] for _ in range( self.ai.mapWidth ) ]
+
+    for tile in self.ai.tiles:
+      #Assume tile.type == 1 means ICE
+      if tile.owner == 3:
+        self.notmoving[tile.x][tile.y].append(self.colorText('I', self.CYAN, self.WHITE))
+      elif tile.owner == 0:
+        self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.RED))
+      elif tile.owner == 1:
+        self.notmoving[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.BLUE))
+
+    for pump in self.ai.pumpStations:
+      if pump.owner == 0:
+        self.notmoving[pump.x][pump.y].append(self.colorText('P', self.GREEN))
+      elif pump.owner == 1:
+        self.notmoving[pump.x][pump.y].append(self.colorText('p', self.GREEN))
+
+    return
+
+  def save_snapshot(self):
+    tempGrid = copy.deepcopy(self.notmoving)
+
+    for tile in self.ai.tiles:
+      if tile.waterAmount > 0:
+        tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.BLUE))
+      if tile.isTrench == 1:
+>>>>>>> origin/TreyAI
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.YELLOW))
 
     for unit in self.ai.units:
@@ -105,7 +146,11 @@ class game_history:
     for y in range(self.ai.mapHeight):
       for x in range(self.ai.mapWidth):
         if len(snapshot[x][y]) > 0:
+<<<<<<< HEAD
           print(snapshot[x][y][0]),
+=======
+            print(snapshot[x][y][0]),
+>>>>>>> origin/TreyAI
         else:
           print(' '),
       print
@@ -114,7 +159,11 @@ class game_history:
   def print_history(self):
     turnNumber = 0
     for snapshot in self.history:
+<<<<<<< HEAD
       print(turnNumber)
+=======
+      print(turnNumber/2)
+>>>>>>> origin/TreyAI
       turnNumber += 1
       self.print_snapshot(snapshot)
       time.sleep(.1)
