@@ -382,7 +382,7 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   if (object->owner != getPlayerID(c))
     return 0;
   // Target must be adjacent
-  if (abs(object->x - x) + abs(object->y - y) == 1)
+  if (abs(object->x - x) + abs(object->y - y) != 1)
     return 0;
   // Can only attack once per turn
   if (object->hasAttacked == 1)
