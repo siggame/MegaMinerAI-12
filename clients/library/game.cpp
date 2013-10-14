@@ -10,6 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
+#include <cmath>
 
 #include "game.h"
 #include "network.h"
@@ -381,7 +382,7 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   if (object->owner != getPlayerID(c))
     return 0;
   // Target must be adjacent
-  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
+  if (abs(object->x - x) + abs(object->y - y) == 1)
     return 0;
   // Can only attack once per turn
   if (object->hasAttacked == 1)
@@ -395,7 +396,7 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  target->healthLeft -= getAttackDamage();
+  target->healthLeft -= getAttackDamage(c);
   
   return 1;
 }
