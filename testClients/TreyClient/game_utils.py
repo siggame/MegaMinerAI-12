@@ -1,5 +1,6 @@
 import copy
 import time
+import sys
 
 DIGGER = 0
 FILLER = 1
@@ -32,7 +33,7 @@ def costOfMove(ai, tile, healthLeft):
 
 def isOnMap(ai, x, y):
   return x >= 0 and x < ai.getMapWidth() and y >= 0 and y < ai.getMapHeight()
- 
+
 class game_history:
   def __init__(self, ai, use_colors = False):
     self.use_colors = use_colors
@@ -105,9 +106,13 @@ class game_history:
     for y in range(self.ai.mapHeight):
       for x in range(self.ai.mapWidth):
         if len(snapshot[x][y]) > 0:
-          print(snapshot[x][y][0]),
+          sys.stdout.write(snapshot[x][y][0])
+          sys.stdout.write(snapshot[x][y][0])
+          #print(snapshot[x][y][0]),
         else:
-          print(' '),
+          sys.stdout.write(' ')
+          sys.stdout.write(' ')
+          #print(' '),
       print
     return
 
@@ -118,4 +123,3 @@ class game_history:
       turnNumber += 1
       self.print_snapshot(snapshot)
       time.sleep(.1)
-
