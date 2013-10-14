@@ -314,6 +314,44 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  Connection* c = object->_c;
+  int& x = tile->x;
+  int& y = tile->y;
+  
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Only fillers can fill
+  if (object->type != 1)
+    return 0;
+  // Can only fill once per turn
+  if (object->hasBuilt == 1)
+    return 0;
+  // Can only fill adjacent tiles
+  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
+    return 0;
+  
+  // Must fill in trenches
+  if (tile->isTrench == 0)
+    return 0;
+  // Can't fill in trenches with water
+  if (tile->waterAmount > 0)
+    return 0;
+  // Can't fill in a trench with a unit on it
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+      return 0;
+  }
+  
+  // Set the tile to not be a trench
+  tile->isTrench = 0;
+  // Unit can no longer move
+  object->movementLeft = 0;
+  
+  object->hasBuilt = 1;
+  
   return 1;
 }
 
@@ -326,6 +364,50 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  Connection* c = object->_c;
+  int& x = tile->x;
+  int& y = tile->y;
+  
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Only diggers can dig
+  if (object->type != 0)
+    return 0;
+  // Can only dig once per turn
+  if (object->hasDigged == 1)
+    return 0;
+  // Can only dig adjacent tiles
+  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
+    return 0;
+  
+  // Can't dig a trench on a trench
+  if (tile->isTrench == 1)
+    return 0;
+  // Can't dig a trenches on pumps
+  if (tile->pumpID != -1)
+    return 0;
+  // Can't dig on ice tiles
+  if (tile->owner == 3)
+    return 0;
+  // Can't dig on spawn tiles
+  if (tile->owner == 0 || tile->owner == 1)
+    return 0;
+  // Can't dig a trench under another unit
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+      return 0;
+  }
+  
+  // Set the tile to be a trench
+  tile->isTrench = 1;
+  // Unit can no longer move
+  object->movementLeft = 0;
+  
+  object->hasDigged = 1;
+  
   return 1;
 }
 
@@ -338,6 +420,31 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  Connection *c = object->_c;
+  int& x = target->x;
+  int& y = target->y;
+  
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Target must be adjacent
+  if (abs(object->x - x) + abs(object->y - y) != 1)
+    return 0;
+  // Can only attack once per turn
+  if (object->hasAttacked == 1)
+    return 0;
+  // Can only attack enemy units
+  if (object->owner == target->owner)
+    return 0;
+    
+  object->hasAttacked = 1;
+  
+  // Unit can no longer move
+  object->movementLeft = 0;
+  
+  target->healthLeft -= getAttackDamage(c);
+  
   return 1;
 }
 
@@ -351,6 +458,36 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  Connection* c = object->_c;
+  
+  // Can only spawn on current player's spawn tiles
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Only spawn if player has enough resources
+  if (getPlayer(c, object->owner)->spawnResources < getUnitCost(c))
+    return 0;
+  // Can only spawn Fillers and Diggers
+  if (type != 0 && type != 1)
+    return 0;
+  
+  int count = 0;
+  
+  // Cannot spawn unit on top of another unit
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->owner == getPlayerID(c))
+      count++;
+    if (getUnit(c, i)->x == object->x && getUnit(c, i)->y == object->y)
+      return 0;
+  }
+  
+  // Cannot spawn more than MaxUnits units
+  if (count >= getMaxUnits(c))
+    return 0;
+  
+  getPlayer(c, getPlayerID(c))->spawnResources -= getUnitCost(c);
+  
   return 1;
 }
 

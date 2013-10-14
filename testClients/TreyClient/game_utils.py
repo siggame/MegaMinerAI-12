@@ -1,16 +1,38 @@
 import copy
 import time
-import sys
 
 DIGGER = 0
 FILLER = 1
 
-def get_tile(ai, x, y):
-  if (0 <= x < ai.mapWidth) and (0 <= y < ai.mapHeight):
-    return ai.tiles[x * ai.mapHeight + y]
-  else:
-    return None
+offsets = ((1,0),(0,1),(-1,0),(0,-1))
 
+def taxiDis(x1, y1, x2, y2):
+  return (abs(x2 - x1) + abs(y2 - y1))
+
+def validMove(ai, tile, healthLeft):
+  if tile.owner != (self.getPlayerID()^1) and ai.getUnitAt(tile.x, tile.y) is None:
+    if tile.isTrench:
+      if (tile.waterAmount > 0):
+        return healthLeft > ai.getWaterDamage()
+      else:
+        return healthLeft > ai.getTrenchDamage()
+    else:
+      return 1
+  else:
+    return 0
+
+def costOfMove(ai, tile, healthLeft):
+  if (tile.isTrench):
+    if (tile.waterAmount > 0):
+      return float(ai.getWaterDamage()) / healthLeft
+    else:
+      return float(ai.getTrenchDamage()) / healthLeft
+  else:
+    return 0.0
+
+def isOnMap(ai, x, y):
+  return x >= 0 and x < ai.getMapWidth() and y >= 0 and y < ai.getMapHeight()
+ 
 class game_history:
   def __init__(self, ai, use_colors = False):
     self.use_colors = use_colors

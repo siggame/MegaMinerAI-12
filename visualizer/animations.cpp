@@ -3,15 +3,33 @@
 
 namespace visualizer
 {
-	void ColorSprite::animate(const float &, AnimData*, IGame *game)
+	void ColorSprite::animate(const float &t, AnimData*, IGame *game)
     {
-		 game->renderer->setColor( Color(m_color.r, m_color.g, m_color.b, m_color.a) );
+		float alpha = m_color.a;
+		if(m_fade != None)
+		{
+			alpha *= t;
+
+			if(m_fade == FadeOut)
+			{
+				alpha = m_color.a - alpha;
+			}
+		}
+
+		game->renderer->setColor( Color(m_color.r, m_color.g, m_color.b, alpha) );
     }
 
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
         ColorSprite::animate(t,d,game);
 		game->renderer->drawTexturedQuad(m_sprite->pos.x, m_sprite->pos.y, m_sprite->scale.x, m_sprite->scale.y,m_sprite->m_sprite);
+	}
+
+	void DrawRotatedSprite::animate(const float &t, AnimData *d, IGame *game)
+	{
+        ColorSprite::animate(t,d,game);
+        game->renderer->drawRotatedTexturedQuad(m_sprite->pos.x, m_sprite->pos.y,
+                  m_sprite->scale.x, m_sprite->scale.y, m_rot, m_sprite->m_sprite);
 	}
 
 	void DrawSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
@@ -30,6 +48,14 @@ namespace visualizer
 										 m_Sprite->m_SpriteName, true);
 
 	}
+
+	void DrawTextBox::animate(const float &, AnimData*, IGame* game)
+	{
+        game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
+
+        game->renderer->drawText(m_Pos.x, m_Pos.y, m_Font, m_Text, m_Size, IRenderer::Center);
+
+	};
 
 	void DrawSplashScreen::animate(const float &, AnimData*, IGame *game)
 	{
