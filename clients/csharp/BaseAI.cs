@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
+  public static Mappable[] mappables;
+  public static Tile[] tiles;
+  public static Unit[] units;
   public static Player[] players;
   public static PumpStation[] pumpStations;
-  public static Mappable[] mappables;
-  public static Unit[] units;
-  public static Tile[] tiles;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -46,6 +46,24 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.getMappableCount(connection);
+    mappables = new Mappable[count];
+    for(int i = 0; i < count; i++)
+    {
+      mappables[i] = new Mappable(Client.getMappable(connection, i));
+    }
+    count = Client.getTileCount(connection);
+    tiles = new Tile[count];
+    for(int i = 0; i < count; i++)
+    {
+      tiles[i] = new Tile(Client.getTile(connection, i));
+    }
+    count = Client.getUnitCount(connection);
+    units = new Unit[count];
+    for(int i = 0; i < count; i++)
+    {
+      units[i] = new Unit(Client.getUnit(connection, i));
+    }
     count = Client.getPlayerCount(connection);
     players = new Player[count];
     for(int i = 0; i < count; i++)
@@ -57,24 +75,6 @@ public abstract class BaseAI
     for(int i = 0; i < count; i++)
     {
       pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
-    }
-    count = Client.getMappableCount(connection);
-    mappables = new Mappable[count];
-    for(int i = 0; i < count; i++)
-    {
-      mappables[i] = new Mappable(Client.getMappable(connection, i));
-    }
-    count = Client.getUnitCount(connection);
-    units = new Unit[count];
-    for(int i = 0; i < count; i++)
-    {
-      units[i] = new Unit(Client.getUnit(connection, i));
-    }
-    count = Client.getTileCount(connection);
-    tiles = new Tile[count];
-    for(int i = 0; i < count; i++)
-    {
-      tiles[i] = new Tile(Client.getTile(connection, i));
     }
 
     if(!initialized)

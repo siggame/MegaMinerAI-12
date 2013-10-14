@@ -83,6 +83,7 @@ Unit = Model('Unit',
     Function('dig',[Variable('tile', Tile)],
     doc='Dig out a tile'),
     ],
+  permanent = True,
   )
 
 Unit.addFunctions([Function("attack", [ Variable("target", Unit)],
@@ -150,6 +151,5 @@ spawn = Animation('spawn',
 death = Animation('death',
   data=[
     Variable('sourceID', int),
-    Variable('unitID', int),
   ],
   )

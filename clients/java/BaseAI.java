@@ -7,11 +7,11 @@ import com.sun.jna.Pointer;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
+  static Mappable[] mappables;
+  static Tile[] tiles;
+  static Unit[] units;
   static Player[] players;
   static PumpStation[] pumpStations;
-  static Mappable[] mappables;
-  static Unit[] units;
-  static Tile[] tiles;
   Pointer connection;
   static int iteration;
   boolean initialized;
@@ -45,6 +45,24 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.INSTANCE.getMappableCount(connection);
+    mappables = new Mappable[count];
+    for(int i = 0; i < count; i++)
+    {
+      mappables[i] = new Mappable(Client.INSTANCE.getMappable(connection, i));
+    }
+    count = Client.INSTANCE.getTileCount(connection);
+    tiles = new Tile[count];
+    for(int i = 0; i < count; i++)
+    {
+      tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
+    }
+    count = Client.INSTANCE.getUnitCount(connection);
+    units = new Unit[count];
+    for(int i = 0; i < count; i++)
+    {
+      units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
+    }
     count = Client.INSTANCE.getPlayerCount(connection);
     players = new Player[count];
     for(int i = 0; i < count; i++)
@@ -56,24 +74,6 @@ public abstract class BaseAI
     for(int i = 0; i < count; i++)
     {
       pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
-    }
-    count = Client.INSTANCE.getMappableCount(connection);
-    mappables = new Mappable[count];
-    for(int i = 0; i < count; i++)
-    {
-      mappables[i] = new Mappable(Client.INSTANCE.getMappable(connection, i));
-    }
-    count = Client.INSTANCE.getUnitCount(connection);
-    units = new Unit[count];
-    for(int i = 0; i < count; i++)
-    {
-      units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
-    }
-    count = Client.INSTANCE.getTileCount(connection);
-    tiles = new Tile[count];
-    for(int i = 0; i < count; i++)
-    {
-      tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
     }
 
     if(!initialized)

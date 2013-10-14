@@ -8,11 +8,11 @@
 #include <ctime>
 #include "game.h"
 
+#include "Mappable.h"
+#include "Tile.h"
+#include "Unit.h"
 #include "Player.h"
 #include "PumpStation.h"
-#include "Mappable.h"
-#include "Unit.h"
-#include "Tile.h"
 
 namespace client
 {
@@ -26,11 +26,11 @@ class BaseAI
 {
 protected:
   Connection* c;
+  std::vector<Mappable> mappables;
+  std::vector<Tile> tiles;
+  std::vector<Unit> units;
   std::vector<Player> players;
   std::vector<PumpStation> pumpStations;
-  std::vector<Mappable> mappables;
-  std::vector<Unit> units;
-  std::vector<Tile> tiles;
 public:
   ///The width of the total map.
   int mapWidth();
