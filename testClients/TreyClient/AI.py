@@ -5,19 +5,14 @@ from GameObject import *
 import time
 from time import sleep
 import random
-<<<<<<< HEAD
 from game_utils import *
-=======
-import game_utils
 
 from Missions import *
->>>>>>> origin/TreyAI
 
 class AI(BaseAI):
 
   history = None
   spawnTiles = []
-<<<<<<< HEAD
   ourCollectionTrenches = []
   myPumpTiles = []
   myUnits = []
@@ -28,8 +23,6 @@ class AI(BaseAI):
   
   threats = []
   threatThreshold = 0.5
-=======
->>>>>>> origin/TreyAI
 
   """The class implementing gameplay logic."""
   @staticmethod
@@ -39,7 +32,6 @@ class AI(BaseAI):
   @staticmethod
   def password():
     return "password"
-<<<<<<< HEAD
   
   def getMyUnits(self):
     self.myUnits = [unit for unit in self.units if unit.owner == self.playerID]
@@ -58,16 +50,10 @@ class AI(BaseAI):
   def getTile(self, x, y):
     return self.tiles[x * self.mapHeight + y]
   
-=======
-
-  def 
-    
->>>>>>> origin/TreyAI
   def getSpawnTiles(self):
     for tile in self.tiles:
       if tile.owner == self.playerID:
         self.spawnTiles.append(tile)
-<<<<<<< HEAD
     # Sort, closest to center first
     self.spawnTiles.sort(key=lambda tile: (self.mapWidth / 2) - tile.x)
 
@@ -125,41 +111,11 @@ class AI(BaseAI):
         threatLevel[unit] = 1.0 / distToPump + 1.0 / distToSpawn
     # Smallest threat first
     return sorted([(unit, threatLevel[unit]) for unit in enemyUnits], key=lambda threat: threat[1]).reverse()
-  
-=======
-
-  def spawnUnits(self):
-    for tile in self.spawnTiles:
-      tile.spawn(random.choice([game_utils.DIGGER, game_utils.FILLER]))
-
->>>>>>> origin/TreyAI
-  def moveUnits(self):
-    for unit in self.units:
-      if unit.owner == self.playerID:
-        offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
-        if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
-            unit.move(unit.x+offset[0], unit.y+offset[1])
-
-        offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
-        #Check if off map
-        if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
-<<<<<<< HEAD
-          tile = getTile(self, unit.x+offset[0], unit.y+offset[1])
-=======
-          tile = game_utils.get_tile(self, unit.x+offset[0], unit.y+offset[1])
->>>>>>> origin/TreyAI
-          unit.dig(tile)
-          unit.fill(tile)
 
   ##This function is called once, before your first turn
   def init(self):
     self.getSpawnTiles()
-<<<<<<< HEAD
     self.history = game_history(self, True)
-=======
-    self.history = game_utils.game_history(self, True)
-    self.history.set_nonmoving_elements()
->>>>>>> origin/TreyAI
     return
 
   ##This function is called once, after your last turn
@@ -167,10 +123,6 @@ class AI(BaseAI):
     self.history.print_history()
     return
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/TreyAI
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
@@ -178,7 +130,6 @@ class AI(BaseAI):
     #SNAPSHOT AT BEGINNING
     self.history.save_snapshot()
 
-<<<<<<< HEAD
     # Find my pumps, (in case they changed?)
     self.getSpawnTiles();
     self.myPumpTiles = self.findMyPumpTiles();
@@ -201,23 +152,14 @@ class AI(BaseAI):
     # Remove missions that are done
     self.missions[:] = [mission for mission in self.missions if not mission.done]
     
-    
-    
     # Spawn units if we can
     if len(self.myUnits) < self.maxUnits - 1:
       self.spawnUnitCenter(DIGGER)
-    
-=======
-    self.spawnUnits()
-    self.moveUnits()
 
-
->>>>>>> origin/TreyAI
     #SNAPSHOT AT END
     self.history.save_snapshot()
     return 1
 
-<<<<<<< HEAD
   def aStar(self, startX, startY, goalX, goalY, isValidTile, tileCost):
     offsets = ((1,0),(0,1),(-1,0),(0,-1))
 
@@ -260,7 +202,7 @@ class AI(BaseAI):
             if neighbor not in open:
               open.append(neighbor)
 
-      return start
+    return start
   
   # Returns list of tiles
   def reconstructPath(self, came_from, current_node):
@@ -270,7 +212,5 @@ class AI(BaseAI):
     else:
       return self.getTile(current_node[0], current_node[1])
 
-=======
->>>>>>> origin/TreyAI
   def __init__(self, conn):
     BaseAI.__init__(self, conn)
