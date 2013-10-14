@@ -7,6 +7,8 @@ from time import sleep
 import random
 from game_utils import *
 
+from Missions import *
+
 class AI(BaseAI):
 
   history = None
@@ -109,20 +111,6 @@ class AI(BaseAI):
         threatLevel[unit] = 1.0 / distToPump + 1.0 / distToSpawn
     # Smallest threat first
     return sorted([(unit, threatLevel[unit]) for unit in enemyUnits], key=lambda threat: threat[1]).reverse()
-  
-  def moveUnits(self):
-    for unit in self.units:
-      if unit.owner == self.playerID:
-        offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
-        if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
-            unit.move(unit.x+offset[0], unit.y+offset[1])
-
-        offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
-        #Check if off map
-        if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
-          tile = getTile(self, unit.x+offset[0], unit.y+offset[1])
-          unit.dig(tile)
-          unit.fill(tile)
 
   ##This function is called once, before your first turn
   def init(self):
@@ -169,9 +157,6 @@ class AI(BaseAI):
       if self.spawnUnitCenter(DIGGER):
         print('Spawned Digger')
       
-    
-    
-    
     #SNAPSHOT AT END
     self.history.save_snapshot()
     return 1
@@ -218,7 +203,7 @@ class AI(BaseAI):
             if neighbor not in open:
               open.append(neighbor)
 
-      return start
+    return start
   
   # Returns list of tiles
   def reconstructPath(self, came_from, current_node):

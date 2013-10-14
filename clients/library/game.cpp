@@ -255,6 +255,53 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+ 
+  Connection* c = object->_c;
+ 
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Must have moves left
+  if (object->movementLeft <= 0)
+    return 0;
+  // Cannot move outside map
+  if (0 < x || x >= getMapWidth(c) || 0 < y || y >= getMapHeight(c))
+    return 0;
+  
+  // Get the tile we're trying to get to
+  _Tile* tile = getTile(c, x * getMapHeight(c) + y);
+    
+  // Cannot move onto another unit
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+      return 0;
+  }
+  // Cannot move onto enemy spawn tiles
+  if (tile->pumpID == -1 && tile->owner == getPlayerID(c)^1)
+    return 0;
+  // Can only move to adjacent coords
+  if (abs(object->x - x) + abs(object->y - y) != 1)
+    return 0;
+    
+  // Move the unit
+  object->x = x;
+  object->y = y;
+  
+  // Decrement movement
+  object->movementLeft -= 1;
+  
+  // Apply damage for moving into trenches
+  if (tile->isTrench)
+  {
+    if (tile->waterAmount > 0)
+      object->healthLeft -= getWaterDamage(c);
+    else
+      object->healthLeft -= getTrenchDamage(c);
+  }
+  
+  // Don't do any client-side object deletion?
+  
   return 1;
 }
 
