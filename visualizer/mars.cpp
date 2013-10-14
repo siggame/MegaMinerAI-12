@@ -224,7 +224,7 @@ void Mars::BuildWorld()
 
     for(auto& tileIter: m_game->states[0].tiles)
     {
-        std::cout << tileIter.second.x << ", " << tileIter.second.y << std::endl;
+        //std::cout << tileIter.second.x << ", " << tileIter.second.y << std::endl;
         m_Tiles[tileIter.second.x][tileIter.second.y] = tileIter.second;
     }
 
@@ -293,6 +293,11 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				{
 					texture = "trench";
 				}
+				else if(tileIter.pumpID > -1)
+		        {
+		        	cout <<"pump"<<endl;
+		        	texture = "pump";
+		        }
 
 				if(!texture.empty())
 				{
@@ -654,7 +659,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		if((state < (int)(m_game->states.size() - 1)) && (m_game->states[state + 1].units.find(unitIter->first) == m_game->states[state + 1].units.end()))
 		//if(unitIter->second.healthLeft <= 0)
 		{
-			cout << "Die at: " << unitIter->second.healthLeft << endl;
+			//cout << "Die at: " << unitIter->second.healthLeft << endl;
 			unitIter = m_Units.erase(unitIter);
 		}
 		else
