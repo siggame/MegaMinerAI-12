@@ -159,35 +159,36 @@ class Unit(Mappable):
       return 'Turn {}: Your unit {} does not have any movements left. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif not (0 <= x < self.game.mapWidth) or not (0 <= y < self.game.mapHeight):
       return 'Turn {}: Your unit {} cannot move off the map. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif len(self.game.grid[x][y]) > 1:
+      return 'Turn {}: Your unit {} is trying to run into something. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif self.game.grid[x][y][0].pumpID == -1 and (1 - self.game.grid[x][y][0].owner) == self.game.playerID:
+      return 'Turn {}: Your unit {} is trying to move onto the enemy\'s spawn base. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your unit {} can only move one unit away. ({}.{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    if len(self.game.grid[x][y]) > 1:
-        return 'Turn {}: Your unit {} is trying to run into something. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-
-
-
-
+    
     self.game.grid[self.x][self.y].remove(self)
 
     self.game.addAnimation(MoveAnimation(self.id,self.x,self.y,x,y))
+    
     self.x = x
     self.y = y
+    
     self.movementLeft -= 1
+    
     self.game.grid[self.x][self.y].append(self)
-
-    # Apply damage if the unit is in a water filled trench
+    
+    # Apply damage for moving into a trench
     tile = self.game.getTile(x, y)
     if tile.isTrench:
-      self.healthLeft -= self.game.trenchDamage
-    if tile.waterAmount > 0:
-      self.healthLeft -= self.game.waterDamage
-
-    # Check if the unit died
-    if self.healthLeft <= 0:
-      self.game.objects.players[self.owner].totalUnits -= 1
-      self.game.grid[self.x][self.y].remove(self)
-      self.game.removeObject(self)
-
+      if tile.waterAmount > 0:
+        self.healthLeft -= self.game.waterDamage
+      else:
+        self.healthLeft -= self.game.trenchDamage
+      # Check if the unit died
+      if self.healthLeft <= 0:
+        self.game.objects.players[self.owner].totalUnits -= 1
+        self.game.grid[self.x][self.y].remove(self)
+        self.game.removeObject(self)
 
     return True
 
