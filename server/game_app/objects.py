@@ -239,8 +239,6 @@ class Unit(Mappable):
       return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.isTrench == 1:
       return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.type != 0:
-      return 'Turn {}: Your {} can only dig empty tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.pumpID != -1:
       return 'Turn {}: Your {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.owner == 3:
