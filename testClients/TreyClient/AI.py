@@ -138,7 +138,7 @@ class AI(BaseAI):
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
-    print(self.turnNumber)
+    print(self.turnNumber),
     #SNAPSHOT AT BEGINNING
     self.history.save_snapshot()
 
@@ -164,11 +164,13 @@ class AI(BaseAI):
     # Remove missions that are done
     self.missions[:] = [mission for mission in self.missions if not mission.done]
     
-    
-    
     # Spawn units if we can
     if len(self.myUnits) < self.maxUnits - 1:
-      self.spawnUnitCenter(DIGGER)
+      if self.spawnUnitCenter(DIGGER):
+        print('Spawned Digger')
+      
+    
+    
     
     #SNAPSHOT AT END
     self.history.save_snapshot()
