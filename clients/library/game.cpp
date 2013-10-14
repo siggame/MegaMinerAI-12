@@ -278,7 +278,7 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
       return 0;
   }
   // Cannot move onto enemy spawn tiles
-  if (tile->pumpID == -1 && tile->owner != getPlayerID(c))
+  if (tile->pumpID == -1 && tile->owner == getPlayerID(c)^1)
     return 0;
   // Can only move to adjacent coords
   if (abs(object->x - x) + abs(object->y - y) != 1)
