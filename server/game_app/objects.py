@@ -169,19 +169,16 @@ class Unit(Mappable):
     self.game.grid[self.x][self.y].remove(self)
 
     self.game.addAnimation(MoveAnimation(self.id,self.x,self.y,x,y))
-    
     self.x = x
     self.y = y
-    
     self.movementLeft -= 1
-    
     self.game.grid[self.x][self.y].append(self)
     
     # Apply damage for moving into a trench
     tile = self.game.getTile(x, y)
     if tile.isTrench:
       if tile.waterAmount > 0:
-        self.healthLeft -= self.game.waterDamage
+        self.healthLeft -= self.game.waterDamage + self.game.trenchDamage
       else:
         self.healthLeft -= self.game.trenchDamage
       # Check if the unit died
