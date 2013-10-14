@@ -268,7 +268,7 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   if (0 < x || x >= getMapWidth(c) || 0 < y || y >= getMapHeight(c))
     return 0;
   
-  // Get the tile we're standing on
+  // Get the tile we're trying to get to
   _Tile* tile = getTile(c, x * getMapHeight(c) + y);
     
   // Cannot move onto another unit
