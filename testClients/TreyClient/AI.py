@@ -12,10 +12,16 @@ from Missions import *
 class AI(BaseAI):
 
   history = None
-  spawnTiles = []
-  ourCollectionTrenches = []
+  mySpawnTiles = []
+  enemySpawnTiles = []
   myPumpTiles = []
+  enemyPumpTiles = []
   myUnits = []
+  enemyUnits = []
+  # Distance from enemy spawn point
+  dfes = dict()
+  
+  myCollectionTrenches = []
   
   unitAt = dict()
   
@@ -32,77 +38,30 @@ class AI(BaseAI):
   @staticmethod
   def password():
     return "password"
-  
-  def getMyUnits(self):
-    self.myUnits = [unit for unit in self.units if unit.owner == self.playerID]
-  
-  def cacheUnitPositions(self):
-    self.unitAt = dict()
-    for unit in self.units:
-      self.unitAt[(unit.x,unit.y)] = unit
-  
-  def getUnitAt(self, x, y):
-    if (x,y) in self.unitAt:
-      return self.unitAt[(x,y)]
-    else:
-      return None
-  
-  def getTile(self, x, y):
-    return self.tiles[x * self.mapHeight + y]
-  
-  def getSpawnTiles(self):
-    for tile in self.tiles:
-      if tile.owner == self.playerID:
-        self.spawnTiles.append(tile)
-    # Sort, closest to center first
-    self.spawnTiles.sort(key=lambda tile: (self.mapWidth / 2) - tile.x)
 
-  def findMyPumpTiles(self):
-    pumpTiles = []
-    for tile in self.tiles:
-      if tile.pumpID != -1 and tile.owner == self.getPlayerID():
-        pumpTiles.append(tile)
-    return pumpTiles
-    
-  def findIce(self):
-    ice = []
-    for tile in self.tiles:
-      if tile.owner == 3:
-        if tile.x < getMapWidth() / 2:
-          ice.append(tile)
-    return ice
-    
-  def findNearestTile(self, x, y, tiles):
-    return min(tiles, key = lambda tile: taxiDis(x, y, tile.x, tile.y))
-    
   def spawnUnitCenter(self, type):
-    for tile in self.spawnTiles:
-      if tile.spawn(type):
-        return True
-      else:
-        print('Spawn failed')
+    for tile in self.mySpawnTiles:
+      if (tile.x, tile.y) not in unitAt:
+        return tile.spawn(type)
     return False
         
   def spawnUnitClosestTo(self, type, x, y):
-    closestTile = sorted(tile.spawnTiles, key=lambda tile: taxiDis(x, y, tile.x, tile.y))
-    for tile in closestTile:
-      if tile.spawn(type):
-        return True
+    closestTiles = findNearestTiles(self, x, y, self.mySpawnTiles)
+    for tile in closestTiles:
+      if (tile.x, tile.y) not in unitAt:
+        return tile.spawn(type)
     return False
-
-  def getUnitClosestTo(self, x, y):
-    closestUnits = sorted(
-      [unit for unit in units if unit.owner == self.playerID],
-      key=lambda unit: taxiDis(x, y, unit.x, unit.y))
-    return closestUnits[0]
-  
+    
+  def getEnoughToSpawn(self):
+    return self.players[self.playerID].spawnResources < self.
+    
   # Returns of list of tuples (threat, threatLevel), most important first
   def identifyThreats(self):
     enemyUnits = [unit for unit in self.units if unit.owner != self.playerID]
     threatLevel = dict()
     for unit in enemyUnits:
       nearestPump = self.findNearestTile(unit.x, unit.y, self.myPumpTiles)
-      nearestSpawn = self.findNearestTile(unit.x, unit.y, self.spawnTiles)
+      nearestSpawn = self.findNearestTile(unit.x, unit.y, self.mySpawnTiles)
       distToPump = taxiDis(unit.x, unit.y, nearestPump.x, nearestPump.y)
       distToSpawn = taxiDis(unit.x, unit.y, nearestSpawn.x, nearestSpawn.y)
       if (distToPump == 0 or distToSpawn == 0):
@@ -114,7 +73,10 @@ class AI(BaseAI):
 
   ##This function is called once, before your first turn
   def init(self):
-    self.getSpawnTiles()
+    self.mySpawnTiles = getMySpawnTilesSortedCenterFirst(self)
+    self.enemySpawnTiles = getEnemySpawnTilesSortedCenterFirst(self)
+    self.dfes = calculateDistanceFromEnemySpawnsMinOnly(self)
+    
     self.history = game_history(self, True)
     return
 
@@ -130,11 +92,12 @@ class AI(BaseAI):
     #SNAPSHOT AT BEGINNING
     self.history.save_snapshot()
 
-    # Find my pumps, (in case they changed?)
-    self.getSpawnTiles();
-    self.myPumpTiles = self.findMyPumpTiles();
-    self.getMyUnits()
-    self.cacheUnitPositions()
+    self.myUnits = getMyUnits(self)
+    self.enemyUnits = getEnemyUnits(self)
+    self.myPumpTiles = getMyPumpTiles(self)
+    self.enemyPumpTiles = getEnemyPumpTiles(self)
+    
+    self.unitAt = cacheUnitPositions(self)
     # Identify threats
     self.threats = self.identifyThreats()
     # Go after threats
@@ -191,8 +154,8 @@ class AI(BaseAI):
         # Calculate neighbor
         pos = map(operator.add, current, offset)
         neighbor = tuple(pos)
-        if isOnMap(self, pos[0], pos[1] and (pos == goal or isValidTile(self.getTile(pos[0], pos[1])))):
-          tentative_g_score = g_score[current] + tileCost(self.getTile(pos[0], pos[1]))
+        if isOnMap(self, pos[0], pos[1] and (pos == goal or isValidTile(getTile(self, pos[0], pos[1])))):
+          tentative_g_score = g_score[current] + tileCost(getTile(self, pos[0], pos[1]))
           tentative_f_score = tentative_g_score + taxiDis(neighbor[0], neighbor[1], goal[0], goal[1])
           if neighbor in closed and tentative_f_score >= f_score[neighbor]:
             continue
@@ -211,7 +174,7 @@ class AI(BaseAI):
       p = [reconstruct_path(came_from, came_from[current_node])]
       return p.append(current_node)
     else:
-      return self.getTile(current_node[0], current_node[1])
+      return getTile(self, current_node[0], current_node[1])
 
   def __init__(self, conn):
     BaseAI.__init__(self, conn)
