@@ -156,8 +156,8 @@ struct GameState
   int waterDamage;
   int turnNumber;
   int attackDamage;
-  int offenseCount;
-  int defenseCount;
+  int offensePower;
+  int defensePower;
   int maxUnits;
   int unitCost;
   int playerID;

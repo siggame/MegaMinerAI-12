@@ -44,9 +44,9 @@ public:
   ///The amount of damage a unit will deal.
   int attackDamage();
   ///How quickly a unit will siege a base.
-  int offenseCount();
+  int offensePower();
   ///The much a unit will slow a  siege.
-  int defenseCount();
+  int defensePower();
   ///The maximum number of units allowed per player.
   int maxUnits();
   ///The cost of spawning in a new unit

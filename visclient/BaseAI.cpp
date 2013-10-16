@@ -36,11 +36,11 @@ int BaseAI::attackDamage()
 {
   return getAttackDamage(c);
 }
-int BaseAI::offenseCount()
+int BaseAI::offensePower()
 {
   return getOffenseCount(c);
 }
-int BaseAI::defenseCount()
+int BaseAI::defensePower()
 {
   return getDefenseCount(c);
 }

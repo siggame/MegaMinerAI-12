@@ -62,8 +62,8 @@ DLLEXPORT Connection* createConnection()
   c->waterDamage = 0;
   c->turnNumber = 0;
   c->attackDamage = 0;
-  c->offenseCount = 0;
-  c->defenseCount = 0;
+  c->offensePower = 0;
+  c->defensePower = 0;
   c->maxUnits = 0;
   c->unitCost = 0;
   c->playerID = 0;
@@ -694,10 +694,10 @@ DLLEXPORT int networkLoop(Connection* c)
           c->attackDamage = atoi(sub->val);
           sub = sub->next;
 
-          c->offenseCount = atoi(sub->val);
+          c->offensePower = atoi(sub->val);
           sub = sub->next;
 
-          c->defenseCount = atoi(sub->val);
+          c->defensePower = atoi(sub->val);
           sub = sub->next;
 
           c->maxUnits = atoi(sub->val);
@@ -915,11 +915,11 @@ DLLEXPORT int getAttackDamage(Connection* c)
 }
 DLLEXPORT int getOffenseCount(Connection* c)
 {
-  return c->offenseCount;
+  return c->offensePower;
 }
 DLLEXPORT int getDefenseCount(Connection* c)
 {
-  return c->defenseCount;
+  return c->defensePower;
 }
 DLLEXPORT int getMaxUnits(Connection* c)
 {

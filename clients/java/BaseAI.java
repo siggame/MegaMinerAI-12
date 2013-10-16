@@ -121,12 +121,12 @@ public abstract class BaseAI
     return Client.INSTANCE.getAttackDamage(connection);
   }
   ///How quickly a unit will siege a base.
-  int offenseCount()
+  int offensePower()
   {
     return Client.INSTANCE.getOffenseCount(connection);
   }
   ///The much a unit will slow a  siege.
-  int defenseCount()
+  int defensePower()
   {
     return Client.INSTANCE.getDefenseCount(connection);
   }
