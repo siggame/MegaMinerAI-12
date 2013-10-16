@@ -89,9 +89,9 @@ class PumpStation(object):
 
       #Defending
       if unit.owner == self.owner:
-        self.siegeCount -= self.game.defenseCount
+        self.siegeCount -= self.game.defensePower
       elif unit.owner == self.owner^1:
-        self.siegeCount += self.game.offenseCount
+        self.siegeCount += self.game.offensePower
       else:
         print('Unit owner not 0 or 1: {}'.format(self.owner))
 

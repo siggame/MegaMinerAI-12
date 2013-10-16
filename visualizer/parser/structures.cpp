@@ -138,8 +138,8 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   stream << "waterDamage: " << ob.waterDamage  <<'\n';
   stream << "turnNumber: " << ob.turnNumber  <<'\n';
   stream << "attackDamage: " << ob.attackDamage  <<'\n';
-  stream << "offenseCount: " << ob.offenseCount  <<'\n';
-  stream << "defenseCount: " << ob.defenseCount  <<'\n';
+  stream << "offensePower: " << ob.offensePower  <<'\n';
+  stream << "defensePower: " << ob.defensePower  <<'\n';
   stream << "maxUnits: " << ob.maxUnits  <<'\n';
   stream << "unitCost: " << ob.unitCost  <<'\n';
   stream << "playerID: " << ob.playerID  <<'\n';

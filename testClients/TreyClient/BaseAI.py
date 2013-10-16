@@ -88,12 +88,12 @@ class BaseAI:
   def getOffenseCount(self):
     return library.getOffenseCount(self.connection)
   #\endcond
-  offenseCount = property(getOffenseCount)
+  offensePower = property(getOffenseCount)
   #\cond
   def getDefenseCount(self):
     return library.getDefenseCount(self.connection)
   #\endcond
-  defenseCount = property(getDefenseCount)
+  defensePower = property(getDefenseCount)
   #\cond
   def getMaxUnits(self):
     return library.getMaxUnits(self.connection)

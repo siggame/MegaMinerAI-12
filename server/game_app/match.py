@@ -40,8 +40,8 @@ class Match(DefaultGameWorld):
     self.waterDamage = self.waterDamage
     self.turnNumber = -1
     self.attackDamage = self.attackDamage
-    self.offenseCount = self.offenseCount
-    self.defenseCount = self.defenseCount
+    self.offensePower = self.offensePower
+    self.defensePower = self.defensePower
     self.maxUnits = self.maxUnits
     self.unitCost = self.unitCost
     self.playerID = -1
@@ -272,8 +272,8 @@ class Match(DefaultGameWorld):
           waterDamage = self.waterDamage,
           turnNumber = self.turnNumber,
           attackDamage = self.attackDamage,
-          offenseCount = self.offenseCount,
-          defenseCount = self.defenseCount,
+          offensePower = self.offensePower,
+          defensePower = self.defensePower,
           maxUnits = self.maxUnits,
           unitCost = self.unitCost,
           playerID = self.playerID,
@@ -450,7 +450,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offenseCount, self.defenseCount, self.maxUnits, self.unitCost, self.playerID, self.gameNumber])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
