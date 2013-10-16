@@ -1,6 +1,8 @@
 import copy
 import time
 
+from AI import *
+
 DIGGER = 0
 FILLER = 1
 
@@ -27,11 +29,11 @@ def cacheUnitPositions(ai):
 
 def getMySpawnTilesSortedCenterFirst(ai):
   return sorted([tile for tile in ai.tiles if tile.owner == ai.playerID],
-    key=lambda tile: abs((ai.mapWidth / 2) - tile.x)):
+    key=lambda tile: abs((ai.mapWidth / 2) - tile.x))
     
 def getEnemySpawnTilesSortedCenterFirst(ai):
   return sorted([tile for tile in ai.tiles if tile.owner != ai.playerID],
-    key=lambda tile: abs((ai.mapWidth / 2) - tile.x)):
+    key=lambda tile: abs((ai.mapWidth / 2) - tile.x))
 
 def calculateDistanceFromEnemySpawnsSum(ai):
   d = dict()
@@ -42,35 +44,52 @@ def calculateDistanceFromEnemySpawnsSum(ai):
 def calculateDistanceFromEnemySpawnsMinOnly(ai):
   d = dict()
   for tile in ai.tiles:
-    d.[tile] = min(taxiDis(tile.x, tile.y, spawn.x, spawn.y) for spawn in ai.enemySpawnTiles)
+    d[tile] = min(taxiDis(tile.x, tile.y, spawn.x, spawn.y) for spawn in ai.enemySpawnTiles)
   return d
 
 def calculateSumInverseDistanceFromEnemyUnits(ai):
   d = dict()
   for tile in ai.tiles:
-    d.[tile] = sum(taxiDis(tile.x, tile.y, unit.x, unit.y) for unit in ai.enemyUnits)
+    d[tile] = sum(taxiDis(tile.x, tile.y, unit.x, unit.y) for unit in ai.enemyUnits)
   return d
+
+def recordEnemyPositions(ai):
+  ## Returns a dict of unit-position pairs
+  d = dict()
+  for unit in ai.enemyUnits:
+    d[unit] = (unit.x, unit.y)
+    
+
   
-  
- 
+def calculateInterceptPosition(ai, hero, target):
+  targetPos = (target.x, target.y)
+  if len(ai.enemyUnitPositions) >= 1 and target in ai.enemyUnitPositions[-1]:
+    if len(ai.enemyUnitPositions) >= 2 and target in ai.enemyUnitPositions[-2]:
+      targetPos = 2 * target.x - ai.enemyUnitPositions[-2][target][0] , 2 * target.y - ai.enemyUnitPositions[-2][target][1]
+    else:
+      targetPos = 2 * target.x - ai.enemyUnitPositions[-1][target][0] , 2 * target.y - ai.enemyUnitPositions[-1][target][1]
+  return targetPos
+
+def vectorToGrid(x, y):
+  if (abs(x) > abs(y)):
+    return (cmp(x, 0), 0)
+  else:
+    return (0, cmp(y, 0))
+
 def findNearestTiles(x, y, tiles):
-  return sorted(tile, key = lambda tile: taxiDis(x, y, tile.x, tile.y))
+  return sorted(tiles, key = lambda tile: taxiDis(x, y, tile.x, tile.y))
 
 def findNearestTile(x, y, tiles):
   return min(tiles, key = lambda tile: taxiDis(x, y, tile.x, tile.y))
   
-def getUnitsClosestTo(self, x, y):
-  return sorted(myUnits, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
+def getUnitsClosestTo(ai, x, y):
+  return sorted(ai.myUnits, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
   
-def getUnitClosestTo(self, x, y):
-  return max([()])
-  closestUnits = sorted(
-    [unit for unit in units if unit.owner == self.playerID],
-    key=lambda unit: taxiDis(x, y, unit.x, unit.y))
-  return closestUnits[0]
- 
-  
-  
+def getUnitClosestTo(ai, x, y):
+  return max(ai.myUnits, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
+
+
+
 def getTile(ai, x, y):
   return ai.tiles[x * ai.mapHeight + y]
   
@@ -79,9 +98,9 @@ def taxiDis(x1, y1, x2, y2):
 
 def isOnMap(ai, x, y):
   return x >= 0 and x < ai.getMapWidth() and y >= 0 and y < ai.getMapHeight()
-  
-  
-  
+
+
+
 def validMove(ai, tile, healthLeft):
   if tile.owner != (self.getPlayerID()^1) and ai.getUnitAt(tile.x, tile.y) is None:
     if tile.isTrench:
@@ -107,9 +126,63 @@ def costOfTrenchPath(ai, tile):
   if tile.isTrench:
     return 0.5 / (ai.dfes[tile]**2)
   return 1.0 / (ai.dfes[tile]**2)
+
+
+
+def aStar(ai, startX, startY, goalX, goalY, isValidTile, tileCost):
+  offsets = ((1,0),(0,1),(-1,0),(0,-1))
+
+  start = (startX, startY)
+  goal = (goalX, goalY)
   
+  closed = set()
+  open = [start]
+  cameFrom = dict()
+  
+  g_score = dict()
+  f_score = dict()
+  
+  g_score[start] = 0 # Cost from start along best known path.
+  # Estimated total cost from start to goal through y.
+  f_score[start] = g_score[start] + taxiDis(startX, startY, goalX, goalY)
+     
+  while len(open) > 0:
+    # Black Magic ahead
+    current = max(open, key = lambda obj: f_score[obj]) # the node in openset having the lowest f_score[] value
+    if current == goal:
+      return reconstructPath(cameFrom, goal)
+     
+    open.remove(current) # remove current from openset
+    closed.add(current)
     
+    for offset in offsets:
+      # Calculate neighbor
+      pos = map(operator.add, current, offset)
+      neighbor = tuple(pos)
+      if isOnMap(ai, pos[0], pos[1] and (pos == goal or isValidTile(getTile(ai, pos[0], pos[1])))):
+        tentative_g_score = g_score[current] + tileCost(getTile(ai, pos[0], pos[1]))
+        tentative_f_score = tentative_g_score + taxiDis(neighbor[0], neighbor[1], goal[0], goal[1])
+        if neighbor in closed and tentative_f_score >= f_score[neighbor]:
+          continue
+        if neighbor not in open or tentative_f_score < f_score[neighbor]:
+          cameFrom[neighbor] = current
+          g_score[neighbor] = tentative_g_score
+          f_score[neighbor] = tentative_f_score
+          if neighbor not in open:
+            open.append(neighbor)
+
+  return start
+
+# Returns list of tiles
+def reconstructPath(ai, came_from, current_node):
+  if current_node in came_from:
+    p = [reconstruct_path(came_from, came_from[current_node])]
+    return p.append(current_node)
+  else:
+    return getTile(ai, current_node[0], current_node[1])
+
   
+
 class game_history:
   def __init__(self, ai, use_colors = False):
     self.use_colors = use_colors
