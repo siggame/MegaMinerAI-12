@@ -6,11 +6,15 @@ import time
 from time import sleep
 import random
 import game_utils
+import path_find
 
 class AI(BaseAI):
 
   history = None
+  pf = None
+
   spawnTiles = []
+  myunits = []
 
   """The class implementing gameplay logic."""
   @staticmethod
@@ -30,23 +34,26 @@ class AI(BaseAI):
     for tile in self.spawnTiles:
       tile.spawn(random.choice([game_utils.DIGGER, game_utils.FILLER]))
 
-  def moveUnits(self):
+  def get_myunits(self):
+    self.myunits = []
     for unit in self.units:
       if unit.owner == self.playerID:
-        offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
-        if (0 <= unit.x+offset[0] < self.mapWidth) and (0 <= unit.y+offset[1] < self.mapHeight):
-            unit.move(unit.x+offset[0], unit.y+offset[1])
+        self.myunits.append(unit)
+    return
 
-        offset = random.choice( [(0,1),(0,-1),(1,0),(-1,0)] )
-        tile = game_utils.get_tile(self, unit.x+offset[0], unit.y+offset[1])
-        if tile:
-          unit.dig(tile)
-          unit.fill(tile)
+  def moveUnits(self):
+    for unit in self.myunits:
+      pf_tiles = self.pf.path_find( game_utils.get_tile(self, unit.x,unit.y), game_utils.get_tile(self, 4,5) )
+      for tile in pf_tiles:
+        unit.move(tile)
+
 
   ##This function is called once, before your first turn
   def init(self):
     self.getSpawnTiles()
     self.history = game_utils.game_history(self, True)
+
+    self.pf = path_find.path_finder(self)
     return
 
   ##This function is called once, after your last turn
@@ -61,6 +68,8 @@ class AI(BaseAI):
     print(self.turnNumber)
     #SNAPSHOT AT BEGINNING
     self.history.save_snapshot()
+
+    self.get_myunits()
 
     self.spawnUnits()
     self.moveUnits()
