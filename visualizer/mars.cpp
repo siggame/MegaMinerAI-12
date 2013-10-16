@@ -58,6 +58,9 @@ void Mars::GetSelectedRect(Rect &out) const
 void Mars::ProccessInput()
 {
 	const Input& input = gui->getInput();
+	int unitsSelectable = gui->getDebugOptionState("Units Selectable");
+	int tilesSelectable = gui->getDebugOptionState("Tiles Selectable");
+
 	if( input.leftRelease )
 	{
 		int turn = timeManager->getTurn();
@@ -67,31 +70,36 @@ void Mars::ProccessInput()
 
 		m_selectedUnitIDs.clear();
 
-		/*for(auto& iter : m_Trash[turn])
-		{
-			const auto& trash = iter.second;
+        if(unitsSelectable)
+        {
+            for(auto& iter : m_game->states[ turn ].units)
+            {
+                const auto& unit = iter.second;
 
-			if(trash.amount > 0)
-			{
-				// todo: move this logic into another function
-				if(R.left <= trash.x && R.right >= trash.x && R.top <= trash.y && R.bottom >= trash.y)
-				{
-					m_selectedUnitIDs.push_back(iter.first);
-				}
-			}
-		}*/
+                // todo: move this logic into another function
+                if(R.left <= unit.x && R.right >= unit.x && R.top <= unit.y && R.bottom >= unit.y)
+                {
+                    m_selectedUnitIDs.push_back(unit.id);
+                }
+            }
+        }
 
-		for(auto& iter : m_game->states[ turn ].units)
-		{
-			const auto& unit = iter.second;
+        if(tilesSelectable)
+        {
+            for(auto& iterCol : m_Tiles)
+            {
+                for(auto& tile : iterCol)
+                {
+                    if(R.left <= tile.x && R.right >= tile.x && R.top <= tile.y && R.bottom >= tile.y)
+                    {
+                        m_selectedUnitIDs.push_back(tile.id);
+                    }
+                }
+            }
+        }
 
-			// todo: move this logic into another function
-			if(R.left <= unit.x && R.right >= unit.x && R.top <= unit.y && R.bottom >= unit.y)
-			{
-				m_selectedUnitIDs.push_back(unit.id);
-			}
-		}
-
+        gui->updateDebugWindow();
+        gui->updateDebugUnitFocus();
 		cout<<"Selected Units:" << m_selectedUnitIDs.size() << endl;
 	}
 }
@@ -104,13 +112,43 @@ void Mars::drawObjectSelection() const
 	{
 		drawQuadAroundObj(m_game->states[turn].units,iter);
 	}
-	/*for(auto iter = m_selectedUnitIDs.begin(); iter != m_selectedUnitIDs.end(); ++iter)
+
+	for(auto& unitID : m_selectedUnitIDs)
 	{
-	  if(!DrawQuadAroundObj(m_Trash[turn],*iter))
-	  {
-		DrawQuadAroundObj(m_game->states[turn].fishes,*iter);
-	  }
-	}*/
+        for(auto& iterCol : m_Tiles)
+            for(auto& tile : iterCol)
+                if(tile.id == unitID)
+                    drawQuadAroundObj(tile, glm::vec4(0.3, 0.0, 1.0, 0.6));
+	}
+
+	int focus = gui->getCurrentUnitFocus();
+
+    if(focus >= 0)
+    {
+        auto iter = m_game->states[turn].units.find(focus);
+        if(iter != m_game->states[turn].units.end())
+            drawBoxAroundObj(m_game->states[turn].units.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+        for(auto& iterCol : m_Tiles)
+            for(auto& tile : iterCol)
+                if(focus == tile.id)
+                    drawBoxAroundObj(tile, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+    }
+}
+
+void Mars::drawBoxAroundObj(const parser::Mappable& obj, const glm::vec4& color) const
+{
+    renderer->setColor(Color(color.r, color.g, color.b, color.a));
+    renderer->drawLine(obj.x + 0.1f, obj.y + 0.1f, obj.x + 0.9, obj.y + 0.1);
+    renderer->drawLine(obj.x + 0.1f, obj.y + 0.1f, obj.x + 0.1, obj.y + 0.9);
+    renderer->drawLine(obj.x + 0.9f, obj.y + 0.1f, obj.x + 0.9, obj.y + 0.9);
+    renderer->drawLine(obj.x + 0.1f, obj.y + 0.9f, obj.x + 0.9, obj.y + 0.9);
+}
+
+void Mars::drawQuadAroundObj(const parser::Mappable& obj, const glm::vec4& color) const
+{
+    renderer->setColor( Color( color.r, color.g, color.b, color.a) );
+    renderer->drawQuad(obj.x,obj.y,1,1);
 }
 
 void Mars::preDraw()
@@ -179,6 +217,11 @@ list<int> Mars::getSelectedUnits()
 	return m_selectedUnitIDs;
 }
 
+list<std::string> Mars::getDebugOptions()
+{
+    return std::list<std::string>({"Units Selectable", "Tiles Selectable"});
+}
+
 void Mars::loadGamelog( std::string gamelog )
 {
 	if(isRunning())
@@ -231,7 +274,7 @@ void Mars::BuildWorld()
     // set up the unit map so that the index is it's id, the second is the unit itself
     for(auto& unitIter: m_game->states[0].units)
     {
-        m_Units.insert(std::pair<int, parser::Unit>(unitIter.second.id, unitIter.second));
+        m_Units[unitIter.second.id] = unitIter.second;
     }
 }
 
@@ -244,10 +287,7 @@ void Mars::UpdateWorld(int state)
 
     for(auto& UnitIter: m_game->states[state].units)
     {
-        if(m_Units.count(UnitIter.second.id) == 1)
-            m_Units[UnitIter.second.id] = UnitIter.second;
-        else
-            m_Units.insert(std::pair<int, parser::Unit>(UnitIter.second.id, UnitIter.second));
+        m_Units[UnitIter.second.id] = UnitIter.second;
     }
 
 }
@@ -579,6 +619,15 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
                     turn.addAnimatable(pText);
 				}
             }
+
+            turn[tileIter.id]["owner"] = tileIter.owner;
+            turn[tileIter.id]["type"] = tileIter.type;
+            turn[tileIter.id]["pumpID"] = tileIter.pumpID;
+            turn[tileIter.id]["waterAmount"] = tileIter.waterAmount;
+            turn[tileIter.id]["isTrench"] = tileIter.isTrench;
+            turn[tileIter.id]["x"] = tileIter.x;
+            turn[tileIter.id]["y"] = tileIter.y;
+            turn[tileIter.id]["id"] = tileIter.id;
         }
     }
 
@@ -673,10 +722,8 @@ parser::Tile& Mars::GetTileAt(int x, int y)
 // The "main" function
 void Mars::run()
 {
-	QStringList header;
-	header<<"owner" << "hasAttacked" << "hasDigged" << "hasBuilt" << "healthLeft" << "maxHealth" << "movementLeft" << "maxMovement" <<"X" << "Y" ;
+    gui->setDebugOptions(this);
 
-	gui->setDebugHeader( header );
 	timeManager->setNumTurns( 0 );
 
 	animationEngine->registerGame(0, 0);
