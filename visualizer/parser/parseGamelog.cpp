@@ -566,10 +566,10 @@ static bool parseSexp(Game& game, sexp_t* expression)
           gs.attackDamage = atoi(sub->val);
           sub = sub->next;
           if ( !sub ) return false;
-          gs.offenseCount = atoi(sub->val);
+          gs.offensePower = atoi(sub->val);
           sub = sub->next;
           if ( !sub ) return false;
-          gs.defenseCount = atoi(sub->val);
+          gs.defensePower = atoi(sub->val);
           sub = sub->next;
           if ( !sub ) return false;
           gs.maxUnits = atoi(sub->val);
