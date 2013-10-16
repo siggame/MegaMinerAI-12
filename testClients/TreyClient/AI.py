@@ -44,8 +44,15 @@ class AI(BaseAI):
   def spawnUnitCenter(self, type):
     for tile in self.mySpawnTiles:
       if (tile.x, tile.y) not in self.unitAt and tile not in self.spawnEgg:
+        self.spawnEgg.add(tile)
+        print('Trying to spawn...')
         if tile.spawn(type):
-          self.spawnEgg.add(tile)
+          print('Success')
+        else:
+          print('Failed')
+        return True
+      else:
+        print('Failed in pre-check')
     return False
         
   def spawnUnitClosestTo(self, type, x, y):
@@ -53,7 +60,12 @@ class AI(BaseAI):
     for tile in closestTiles:
       if (tile.x, tile.y) not in self.unitAt and tile not in self.spawnEgg:
         self.spawnEgg.add(tile)
-        return tile.spawn(type)
+        print('Trying to spawn...')
+        if tile.spawn(type):
+          print('Success')
+        else:
+          print('Failed')
+        return True
     return False
     
   def getEnoughToSpawn(self):
@@ -93,7 +105,7 @@ class AI(BaseAI):
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
-    print(self.turnNumber),
+    print(self.turnNumber)
     #SNAPSHOT AT BEGINNING
     self.history.save_snapshot()
 
@@ -127,7 +139,7 @@ class AI(BaseAI):
     self.missions[:] = [mission for mission in self.missions if not mission.done]
     
     # Spawn units if we can
-    if len(self.myUnits) < self.maxUnits - 1:
+    if len(self.myUnits) < 1:#self.maxUnits - 1:
       if self.spawnUnitCenter(DIGGER):
         print('Spawned Digger')
       
