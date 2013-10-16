@@ -49,6 +49,11 @@ namespace visualizer
 
 	}
 
+    void DrawAnimatedSprite::animate(const float &t, AnimData*, IGame* game)
+    {
+        game->renderer->drawAnimQuad( m_Sprite->pos.x, m_Sprite->pos.y, m_Sprite->scale.x, m_Sprite->scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * t));
+    }
+
 	void DrawTextBox::animate(const float &, AnimData*, IGame* game)
 	{
         game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
