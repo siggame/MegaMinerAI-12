@@ -1,6 +1,8 @@
 import copy
 import time
 
+import operator
+
 from AI import *
 
 DIGGER = 0
@@ -86,7 +88,7 @@ def getUnitsClosestTo(ai, x, y):
   return sorted(ai.myUnits, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
   
 def getUnitClosestTo(ai, x, y):
-  return max(ai.myUnits, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
+  return min(ai.myUnits, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
 
 
 
@@ -97,12 +99,12 @@ def taxiDis(x1, y1, x2, y2):
   return (abs(x2 - x1) + abs(y2 - y1))
 
 def isOnMap(ai, x, y):
-  return x >= 0 and x < ai.getMapWidth() and y >= 0 and y < ai.getMapHeight()
+  return x >= 0 and x < ai.mapWidth and y >= 0 and y < ai.mapHeight
 
 
 
 def validMove(ai, tile, healthLeft):
-  if tile.owner != (self.getPlayerID()^1) and ai.getUnitAt(tile.x, tile.y) is None:
+  if tile.pumpID == -1 and tile.owner != (ai.getPlayerID()^1) and (tile.x, tile.y) not in ai.unitAt:
     if tile.isTrench:
       if (tile.waterAmount > 0):
         return healthLeft > ai.getWaterDamage()
@@ -148,18 +150,18 @@ def aStar(ai, startX, startY, goalX, goalY, isValidTile, tileCost):
      
   while len(open) > 0:
     # Black Magic ahead
-    current = max(open, key = lambda obj: f_score[obj]) # the node in openset having the lowest f_score[] value
+    current = min(open, key = lambda obj: f_score[obj]) # the node in open set having the lowest f_score[] value
     if current == goal:
-      return reconstructPath(cameFrom, goal)
+      return reconstructPath(ai, cameFrom, goal)
      
-    open.remove(current) # remove current from openset
+    open.remove(current) # remove current from open set
     closed.add(current)
     
     for offset in offsets:
       # Calculate neighbor
       pos = map(operator.add, current, offset)
       neighbor = tuple(pos)
-      if isOnMap(ai, pos[0], pos[1] and (pos == goal or isValidTile(getTile(ai, pos[0], pos[1])))):
+      if isOnMap(ai, pos[0], pos[1]) and (neighbor == goal or isValidTile(getTile(ai, pos[0], pos[1]))):
         tentative_g_score = g_score[current] + tileCost(getTile(ai, pos[0], pos[1]))
         tentative_f_score = tentative_g_score + taxiDis(neighbor[0], neighbor[1], goal[0], goal[1])
         if neighbor in closed and tentative_f_score >= f_score[neighbor]:
@@ -170,16 +172,17 @@ def aStar(ai, startX, startY, goalX, goalY, isValidTile, tileCost):
           f_score[neighbor] = tentative_f_score
           if neighbor not in open:
             open.append(neighbor)
-
+  print('aStar failed!')
   return start
 
-# Returns list of tiles
+# Returns list of 2-tuples
 def reconstructPath(ai, came_from, current_node):
   if current_node in came_from:
-    p = [reconstruct_path(came_from, came_from[current_node])]
-    return p.append(current_node)
+    p = reconstructPath(ai, came_from, came_from[current_node])
+    p.append(current_node)
+    return p
   else:
-    return getTile(ai, current_node[0], current_node[1])
+    return [current_node]
 
   
 
