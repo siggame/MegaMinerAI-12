@@ -92,6 +92,39 @@ namespace visualizer
 
 			  return false;
 			}
+			
+		private:
+			struct Game
+			{
+				struct State
+				{
+					std::map<int, SmartPointer<parser::Player> > players;
+					std::map<int, SmartPointer<parser::Mappable> > mappables;
+					std::map<int, SmartPointer<parser::PumpStation> > pumpStations;
+					std::map<int, SmartPointer<parser::Unit> > units;
+					std::map<int, SmartPointer<parser::Tile> > tiles;
+					std::vector<std::vector< SmartPointer<parser::Tile> > > tileGrid;
+					std::map< int, std::vector< SmartPointer< Animation > > > animations;
+					int playerID;
+					int turnNumber;
+				};
+			
+				Game(parser::Game* game);
+		
+				int mapWidth;
+			    int mapHeight;
+			    int maxHealth;
+			    int trenchDamage;
+			    int waterDamage;
+			    int attackDamage;
+			    int offensePower;
+			    int defensePower;
+			    int maxUnits;
+			    int unitCost;
+			    int gameNumber;
+			    
+			  	std::vector<State> States;
+			};
     };
 
 } // visualizer

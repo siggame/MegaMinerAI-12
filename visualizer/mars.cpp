@@ -772,6 +772,30 @@ void Mars::run()
 
 } // Mars::run()
 
+Mars::Game::Game(parser::Game* game) :
+	mapWidth(game->states[0].mapWidth),
+	mapHeight(game->states[0].mapHeight),
+	maxHealth(game->states[0].maxHealth),
+	trenchDamage(game->states[0].trenchDamage),
+	waterDamage(game->states[0].waterDamage),
+	attackDamage(game->states[0].attackDamage),
+	offensePower(game->states[0].offensePower),
+	defensePower(game->states[0].defensePower),
+	maxUnits(game->states[0].maxUnits),
+	unitCost(game->states[0].unitCost),
+	gameNumber(game->states[0].gameNumber)
+{
+	for(auto& state : game->states)
+	{
+		States.resize(States.size() + 1);
+		for(auto& player : state.players)
+		{
+			
+		}
+	
+	}
+}
+
 } // visualizer
 
 Q_EXPORT_PLUGIN2( Mars, visualizer::Mars );
