@@ -58,20 +58,29 @@ class AI(BaseAI):
     self.history.print_history()
     return
 
+  def nearest_enemy(self, x, y):
+    for unit
+
+  def attack_enemy(self):
+
 
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
     print(self.turnNumber)
     #SNAPSHOT AT BEGINNING
-    #self.history.save_snapshot()
+    self.history.save_snapshot()
+
+    self.pf.refresh_obstacles()
 
     self.spawn_units()
-    self.move_units()
+    self.attack_enemy()
+
+    self.attack_enemy()
 
 
     #SNAPSHOT AT END
-    #self.history.save_snapshot()
+    self.history.save_snapshot()
     return 1
 
   def __init__(self, conn):
