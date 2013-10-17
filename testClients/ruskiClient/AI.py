@@ -13,8 +13,7 @@ class AI(BaseAI):
   history = None
   pf = None
 
-  spawnTiles = []
-  myunits = []
+  spawn_tiles = []
 
   """The class implementing gameplay logic."""
   @staticmethod
@@ -25,32 +24,30 @@ class AI(BaseAI):
   def password():
     return "password"
 
-  def getSpawnTiles(self):
+  def get_spawn_tiles(self):
     for tile in self.tiles:
       if tile.owner == self.playerID:
-        self.spawnTiles.append(tile)
+        self.spawn_tiles.append(tile)
 
-  def spawnUnits(self):
-    for tile in self.spawnTiles:
+  def spawn_units(self):
+    for tile in self.spawn_tiles:
       tile.spawn(random.choice([game_utils.DIGGER, game_utils.FILLER]))
 
-  def get_myunits(self):
-    self.myunits = []
+  def move_units(self):
     for unit in self.units:
       if unit.owner == self.playerID:
-        self.myunits.append(unit)
-    return
-
-  def moveUnits(self):
-    for unit in self.myunits:
-      pf_tiles = self.pf.path_find( game_utils.get_tile(self, unit.x,unit.y), game_utils.get_tile(self, 4,5) )
-      for tile in pf_tiles:
-        unit.move(tile)
+        pf_tiles = self.pf.path_find( game_utils.get_tile(self, unit.x,unit.y), game_utils.get_tile(self, 4,5) )
+        if pf_tiles is not None:
+          print('CAN MOVE ({},{}) -> ({},{})'.format(unit.x, unit.y, 4, 5))
+          for tile in pf_tiles:
+            unit.move(tile)
+        else:
+          print('CANNOT MOVE ({},{}) -> ({},{})'.format(unit.x, unit.y, 4, 5))
 
 
   ##This function is called once, before your first turn
   def init(self):
-    self.getSpawnTiles()
+    self.get_spawn_tiles()
     self.history = game_utils.game_history(self, True)
 
     self.pf = path_find.path_finder(self)
@@ -67,16 +64,14 @@ class AI(BaseAI):
   def run(self):
     print(self.turnNumber)
     #SNAPSHOT AT BEGINNING
-    self.history.save_snapshot()
+    #self.history.save_snapshot()
 
-    self.get_myunits()
-
-    self.spawnUnits()
-    self.moveUnits()
+    self.spawn_units()
+    self.move_units()
 
 
     #SNAPSHOT AT END
-    self.history.save_snapshot()
+    #self.history.save_snapshot()
     return 1
 
   def __init__(self, conn):
