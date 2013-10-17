@@ -41,10 +41,6 @@ int BaseAI::defensePower()
 {
   return getDefensePower(c);
 }
-int BaseAI::maxSiege()
-{
-  return getMaxSiege(c);
-}
 int BaseAI::maxUnits()
 {
   return getMaxUnits(c);
@@ -60,6 +56,10 @@ int BaseAI::playerID()
 int BaseAI::gameNumber()
 {
   return getGameNumber(c);
+}
+int BaseAI::maxSiege()
+{
+  return getMaxSiege(c);
 }
 
 bool BaseAI::startTurn()

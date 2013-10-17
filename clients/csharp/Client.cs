@@ -57,8 +57,6 @@ public class Client {
   [DllImport("client")]
   public static extern int getDefensePower(IntPtr connection);
   [DllImport("client")]
-  public static extern int getMaxSiege(IntPtr connection);
-  [DllImport("client")]
   public static extern int getMaxUnits(IntPtr connection);
   [DllImport("client")]
   public static extern int getUnitCost(IntPtr connection);
@@ -66,6 +64,8 @@ public class Client {
   public static extern int getPlayerID(IntPtr connection);
   [DllImport("client")]
   public static extern int getGameNumber(IntPtr connection);
+  [DllImport("client")]
+  public static extern int getMaxSiege(IntPtr connection);
 
   [DllImport("client")]
   public static extern IntPtr getMappable(IntPtr connection, int num);

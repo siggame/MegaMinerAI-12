@@ -134,16 +134,10 @@ public abstract class BaseAI
     int value = Client.getOffensePower(connection);
     return value;
   }
-  ///The much a unit will slow a siege.
+  ///How much a unit will slow a siege.
   public int defensePower()
   {
     int value = Client.getDefensePower(connection);
-    return value;
-  }
-  ///The maximum siege value before the PumpStation is sieged.
-  public int maxSiege()
-  {
-    int value = Client.getMaxSiege(connection);
     return value;
   }
   ///The maximum number of units allowed per player.
@@ -168,6 +162,12 @@ public abstract class BaseAI
   public int gameNumber()
   {
     int value = Client.getGameNumber(connection);
+    return value;
+  }
+  ///The maximum siege value before the PumpStation is sieged.
+  public int maxSiege()
+  {
+    int value = Client.getMaxSiege(connection);
     return value;
   }
 }

@@ -45,10 +45,8 @@ public:
   int attackDamage();
   ///How quickly a unit will siege a PumpStation.
   int offensePower();
-  ///The much a unit will slow a siege.
+  ///How much a unit will slow a siege.
   int defensePower();
-  ///The maximum siege value before the PumpStation is sieged.
-  int maxSiege();
   ///The maximum number of units allowed per player.
   int maxUnits();
   ///The cost of spawning in a new unit
@@ -57,6 +55,8 @@ public:
   int playerID();
   ///What number game this is for the server
   int gameNumber();
+  ///The maximum siege value before the PumpStation is sieged.
+  int maxSiege();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

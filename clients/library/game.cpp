@@ -63,11 +63,11 @@ DLLEXPORT Connection* createConnection()
   c->attackDamage = 0;
   c->offensePower = 0;
   c->defensePower = 0;
-  c->maxSiege = 0;
   c->maxUnits = 0;
   c->unitCost = 0;
   c->playerID = 0;
   c->gameNumber = 0;
+  c->maxSiege = 0;
   c->Mappables = NULL;
   c->MappableCount = 0;
   c->Tiles = NULL;
@@ -514,9 +514,6 @@ DLLEXPORT int networkLoop(Connection* c)
           c->defensePower = atoi(sub->val);
           sub = sub->next;
 
-          c->maxSiege = atoi(sub->val);
-          sub = sub->next;
-
           c->maxUnits = atoi(sub->val);
           sub = sub->next;
 
@@ -527,6 +524,9 @@ DLLEXPORT int networkLoop(Connection* c)
           sub = sub->next;
 
           c->gameNumber = atoi(sub->val);
+          sub = sub->next;
+
+          c->maxSiege = atoi(sub->val);
           sub = sub->next;
 
         }
@@ -751,10 +751,6 @@ DLLEXPORT int getDefensePower(Connection* c)
 {
   return c->defensePower;
 }
-DLLEXPORT int getMaxSiege(Connection* c)
-{
-  return c->maxSiege;
-}
 DLLEXPORT int getMaxUnits(Connection* c)
 {
   return c->maxUnits;
@@ -770,4 +766,8 @@ DLLEXPORT int getPlayerID(Connection* c)
 DLLEXPORT int getGameNumber(Connection* c)
 {
   return c->gameNumber;
+}
+DLLEXPORT int getMaxSiege(Connection* c)
+{
+  return c->maxSiege;
 }

@@ -95,11 +95,6 @@ class BaseAI:
   #\endcond
   defensePower = property(getDefensePower)
   #\cond
-  def getMaxSiege(self):
-    return library.getMaxSiege(self.connection)
-  #\endcond
-  maxSiege = property(getMaxSiege)
-  #\cond
   def getMaxUnits(self):
     return library.getMaxUnits(self.connection)
   #\endcond
@@ -119,5 +114,10 @@ class BaseAI:
     return library.getGameNumber(self.connection)
   #\endcond
   gameNumber = property(getGameNumber)
+  #\cond
+  def getMaxSiege(self):
+    return library.getMaxSiege(self.connection)
+  #\endcond
+  maxSiege = property(getMaxSiege)
   def __init__(self, connection):
     self.connection = connection

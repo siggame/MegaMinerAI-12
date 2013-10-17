@@ -40,11 +40,11 @@ struct Connection
   int attackDamage;
   int offensePower;
   int defensePower;
-  int maxSiege;
   int maxUnits;
   int unitCost;
   int playerID;
   int gameNumber;
+  int maxSiege;
 
   _Mappable* Mappables;
   int MappableCount;
@@ -104,11 +104,11 @@ DLLEXPORT int getTurnNumber(Connection* c);
 DLLEXPORT int getAttackDamage(Connection* c);
 DLLEXPORT int getOffensePower(Connection* c);
 DLLEXPORT int getDefensePower(Connection* c);
-DLLEXPORT int getMaxSiege(Connection* c);
 DLLEXPORT int getMaxUnits(Connection* c);
 DLLEXPORT int getUnitCost(Connection* c);
 DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
+DLLEXPORT int getMaxSiege(Connection* c);
 
 DLLEXPORT _Mappable* getMappable(Connection* c, int num);
 DLLEXPORT int getMappableCount(Connection* c);

@@ -17,12 +17,12 @@ globals = [
   Variable('turnNumber', int, 'The current turn number.'),
   Variable('attackDamage', int, 'The amount of damage a unit will deal.'),
   Variable('offensePower', int, 'How quickly a unit will siege a PumpStation.'),
-  Variable('defensePower', int, 'The much a unit will slow a siege.'),
-  Variable('maxSiege', int, 'The maximum siege value before the PumpStation is sieged.'),
+  Variable('defensePower', int, 'How much a unit will slow a siege.'),
   Variable('maxUnits', int, 'The maximum number of units allowed per player.'),
   Variable('unitCost', int, 'The cost of spawning in a new unit'),
   Variable('playerID', int, 'The id of the current player.'),
   Variable('gameNumber', int, 'What number game this is for the server'),
+  Variable('maxSiege', int, 'The maximum siege value before the PumpStation is sieged.'),
 ]
 
 playerData = [

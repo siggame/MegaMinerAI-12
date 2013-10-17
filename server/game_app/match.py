@@ -39,11 +39,11 @@ class Match(DefaultGameWorld):
     self.attackDamage = None
     self.offensePower = None
     self.defensePower = None
-    self.maxSiege = None
     self.maxUnits = None
     self.unitCost = None
     self.playerID = None
     self.gameNumber = id
+    self.maxSiege = None
 
   #this is here to be wrapped
   def __del__(self):
@@ -122,11 +122,11 @@ class Match(DefaultGameWorld):
           attackDamage = self.attackDamage,
           offensePower = self.offensePower,
           defensePower = self.defensePower,
-          maxSiege = self.maxSiege,
           maxUnits = self.maxUnits,
           unitCost = self.unitCost,
           playerID = self.playerID,
           gameNumber = self.gameNumber,
+          maxSiege = self.maxSiege,
           Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
           Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
@@ -225,7 +225,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxSiege, self.maxUnits, self.unitCost, self.playerID, self.gameNumber])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber, self.maxSiege])
 
     typeLists = []
     typeLists.append(["Mappable"] + [i.toList() for i in self.objects.values() if i.__class__ is Mappable])

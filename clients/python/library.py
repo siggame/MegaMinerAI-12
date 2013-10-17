@@ -89,9 +89,6 @@ library.getOffensePower.argtypes = [c_void_p]
 library.getDefensePower.restype = c_int
 library.getDefensePower.argtypes = [c_void_p]
 
-library.getMaxSiege.restype = c_int
-library.getMaxSiege.argtypes = [c_void_p]
-
 library.getMaxUnits.restype = c_int
 library.getMaxUnits.argtypes = [c_void_p]
 
@@ -103,6 +100,9 @@ library.getPlayerID.argtypes = [c_void_p]
 
 library.getGameNumber.restype = c_int
 library.getGameNumber.argtypes = [c_void_p]
+
+library.getMaxSiege.restype = c_int
+library.getMaxSiege.argtypes = [c_void_p]
 
 library.getMappable.restype = c_void_p
 library.getMappable.argtypes = [c_void_p, c_int]

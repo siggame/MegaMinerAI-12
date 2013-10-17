@@ -35,11 +35,11 @@ public interface Client extends Library {
   int getAttackDamage(Pointer connection);
   int getOffensePower(Pointer connection);
   int getDefensePower(Pointer connection);
-  int getMaxSiege(Pointer connection);
   int getMaxUnits(Pointer connection);
   int getUnitCost(Pointer connection);
   int getPlayerID(Pointer connection);
   int getGameNumber(Pointer connection);
+  int getMaxSiege(Pointer connection);
 
   Pointer getMappable(Pointer connection, int num);
   int getMappableCount(Pointer connection);
