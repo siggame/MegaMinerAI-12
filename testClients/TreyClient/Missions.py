@@ -46,6 +46,9 @@ class AttackMission(Mission):
     if len(self.path) > 2:
       goalTile = self.path[1]
       success = self.hero.move(goalTile[0], goalTile[1])
+      if len(self.path) == 3:
+        goalTile = self.path[2]
+        success = self.hero.attack(self.target)
     # Attack
     elif len(self.path) == 2:
       success = self.hero.attack(self.target)

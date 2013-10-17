@@ -23,9 +23,10 @@ class AI(BaseAI):
   unitAt = dict()
   
   missions = []
+  availableUnits = []
   
   threats = []
-  threatThreshold = 0.5
+  threatThreshold = 0.4
   
   enemyHistory = 5
   enemyUnitPositions = []
@@ -41,18 +42,19 @@ class AI(BaseAI):
   def password():
     return "password"
 
+
+  def findAvailableUnits(self):
+    takenUnits = set()
+    for mission in self.missions:
+      if isinstance(mission, AttackMission):
+        takenUnits.add(mission.hero)
+    return [unit for unit in self.myUnits if unit not in takenUnits]
+
   def spawnUnitCenter(self, type):
     for tile in self.mySpawnTiles:
       if (tile.x, tile.y) not in self.unitAt and tile not in self.spawnEgg:
         self.spawnEgg.add(tile)
-        print('Trying to spawn...')
-        if tile.spawn(type):
-          print('Success')
-        else:
-          print('Failed')
-        return True
-      else:
-        print('Failed in pre-check')
+        tile.spawn(type)
     return False
         
   def spawnUnitClosestTo(self, type, x, y):
@@ -60,12 +62,7 @@ class AI(BaseAI):
     for tile in closestTiles:
       if (tile.x, tile.y) not in self.unitAt and tile not in self.spawnEgg:
         self.spawnEgg.add(tile)
-        print('Trying to spawn...')
-        if tile.spawn(type):
-          print('Success')
-        else:
-          print('Failed')
-        return True
+        tile.spawn(type)
     return False
     
   def getEnoughToSpawn(self):
@@ -74,7 +71,9 @@ class AI(BaseAI):
   # Returns of list of tuples (threat, threatLevel), most important first
   def identifyThreats(self):
     threatLevel = dict()
-    for unit in self.enemyUnits:
+    threatsTakenCareOf = set([mission.target for mission in self.missions if isinstance(mission, AttackMission)])
+    possibleThreats = [unit for unit in self.enemyUnits if unit not in threatsTakenCareOf]
+    for unit in possibleThreats:
       nearestPump = findNearestTile(unit.x, unit.y, self.myPumpTiles)
       nearestSpawn = findNearestTile(unit.x, unit.y, self.mySpawnTiles)
       distToPump = taxiDis(unit.x, unit.y, nearestPump.x, nearestPump.y)
@@ -84,7 +83,7 @@ class AI(BaseAI):
       else:
         threatLevel[unit] = 1.0 / distToPump + 1.0 / distToSpawn
     # Smallest threat first
-    return sorted([(unit, threatLevel[unit]) for unit in self.enemyUnits], key=lambda threat: threat[1]).reverse()
+    return sorted([(unit, threatLevel[unit]) for unit in self.enemyUnits], key=lambda threat: -threat[1])
 
 
 
@@ -119,16 +118,19 @@ class AI(BaseAI):
     self.unitAt = cacheUnitPositions(self)
 
     self.spawnEgg = set()
-
+    self.availableUnits = self.findAvailableUnits()
     # Identify threats
     self.threats = self.identifyThreats()
     # Go after threats
     if self.threats is not None:
       for threat in self.threats:
         if threat[1] > self.threatThreshold:
-          print("Assigning attack mission " + str(threat[1]))
-          hero = getUnitClosestTo(self, threat[0].x, threat[0].y)
-          self.missions.append(AttackMission(threat[1] * 5.0, self, hero, threat[0]))
+          heros = getUnitsClosestTo(self, threat[0].x, threat[0].y)
+          for hero in heros:
+            if hero in self.availableUnits:
+              self.missions.append(AttackMission(threat[1] * 5.0, self, hero, threat[0]))
+              self.availableUnits.remove(hero)
+              break
 
     for mission in self.missions:
       mission.step()
@@ -139,7 +141,7 @@ class AI(BaseAI):
     self.missions[:] = [mission for mission in self.missions if not mission.done]
     
     # Spawn units if we can
-    if len(self.myUnits) < 1:#self.maxUnits - 1:
+    if len(self.myUnits) < self.maxUnits - 1:
       if self.spawnUnitCenter(DIGGER):
         print('Spawned Digger')
       
