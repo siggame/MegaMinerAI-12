@@ -343,7 +343,7 @@ class Tile(Mappable):
 
     #TODO: Add spawning animation
 
-    pass
+    return True
 
   def __setattr__(self, name, value):
       if name in self.game_state_attributes:
