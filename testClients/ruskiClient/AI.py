@@ -40,7 +40,7 @@ class AI(BaseAI):
         if pf_tiles is not None:
           print('CAN MOVE ({},{}) -> ({},{})'.format(unit.x, unit.y, 4, 5))
           for tile in pf_tiles:
-            unit.move(tile)
+            print('({},{})'.format(tile.x, tile.y))
         else:
           print('CANNOT MOVE ({},{}) -> ({},{})'.format(unit.x, unit.y, 4, 5))
 
