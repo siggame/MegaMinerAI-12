@@ -230,18 +230,18 @@ DLLEXPORT void getStatus(Connection* c)
 }
 
 
-
-DLLEXPORT int tileSpawn(_Tile* object, int type)
+DLLEXPORT int playerTalk(_Player* object, char* message)
 {
   stringstream expr;
-  expr << "(game-spawn " << object->id
-       << " " << type
+  expr << "(game-talk " << object->id
+      << " \"" << escape_string(message) << "\""
        << ")";
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
   return 1;
 }
+
 
 
 
@@ -295,11 +295,11 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
 }
 
 
-DLLEXPORT int playerTalk(_Player* object, char* message)
+DLLEXPORT int tileSpawn(_Tile* object, int type)
 {
   stringstream expr;
-  expr << "(game-talk " << object->id
-      << " \"" << escape_string(message) << "\""
+  expr << "(game-spawn " << object->id
+       << " " << type
        << ")";
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
