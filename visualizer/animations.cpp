@@ -49,8 +49,9 @@ namespace visualizer
 
 	}
 
-    void DrawAnimatedSprite::animate(const float &t, AnimData*, IGame* game)
+    void DrawAnimatedSprite::animate(const float &t, AnimData*d, IGame* game)
     {
+        ColorSprite::animate(t, d, game);
         game->renderer->drawAnimQuad( m_Sprite->pos.x, m_Sprite->pos.y, m_Sprite->scale.x, m_Sprite->scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * t));
     }
 
