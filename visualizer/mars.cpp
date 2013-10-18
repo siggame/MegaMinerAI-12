@@ -224,7 +224,7 @@ void Mars::BuildWorld()
 
     for(auto& tileIter: m_game->states[0].tiles)
     {
-        std::cout << tileIter.second.x << ", " << tileIter.second.y << std::endl;
+        //std::cout << tileIter.second.x << ", " << tileIter.second.y << std::endl;
         m_Tiles[tileIter.second.x][tileIter.second.y] = tileIter.second;
     }
 
@@ -273,33 +273,18 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
             {
                 texture = "trench";
             }
+            else if(tileIter.pumpID > - 1)
+            {
+                SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "pump", 8);
+                pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(1.0f,1.0f,1.0f, 1.0f)));
+                turn.addAnimatable(pPump);
+            }
 
             if(!texture.empty())
             {
                 SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), texture);
                 pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
                 turn.addAnimatable(pTile);
-
-				// if there is water then render water
-				if(tileIter.owner == 3) // if the tile is a glacier
-				{
-					texture = "glacier";
-				}
-				else if(tileIter.waterAmount != 0)
-				{
-					texture = "water";
-				}
-				else if(tileIter.isTrench == true) // if there is no water, but a trench then render a trench
-				{
-					texture = "trench";
-				}
-
-				if(!texture.empty())
-				{
-					SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), texture);
-					pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
-					turn.addAnimatable(pTile);
-				}
 
                 // Canal Overlays
 				if(tileIter.isTrench == true && tileIter.owner != 3)
@@ -654,7 +639,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		if((state < (int)(m_game->states.size() - 1)) && (m_game->states[state + 1].units.find(unitIter->first) == m_game->states[state + 1].units.end()))
 		//if(unitIter->second.healthLeft <= 0)
 		{
-			cout << "Die at: " << unitIter->second.healthLeft << endl;
+			//cout << "Die at: " << unitIter->second.healthLeft << endl;
 			unitIter = m_Units.erase(unitIter);
 		}
 		else
@@ -686,7 +671,7 @@ void Mars::run()
 															   m_game->states[0].mapWidth,
 															   m_game->states[0].mapHeight
 															   );
-	
+
 	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
 
     BuildWorld();
