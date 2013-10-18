@@ -31,16 +31,19 @@ class AttackMission(Mission):
     
   def step(self):
     success = False
-    # Check if hero is still alive
-    if (self.hero not in self.ai.units):
+    # Find our hero again (if he's not dead that is)
+    if (self.hero.id not in self.ai.unitByID):
       self.done = True
-      print('Hero died?')
       return False
-    # Check if target is still alive
-    if (self.target not in self.ai.units):
+      print('Hero died?')
+    self.hero = self.ai.unitByID[self.hero.id]
+    # Same with target
+    if (self.target.id not in self.ai.unitByID):
       self.done = True
       print('Target died?')
       return True
+    self.target = self.ai.unitByID[self.target.id]
+    # Calculate path again
     self.path = self.getPathToTarget()
     # Move
     if len(self.path) > 2:

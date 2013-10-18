@@ -19,7 +19,8 @@ class AI(BaseAI):
   dfes = dict()
   
   myCollectionTrenches = []
-  
+
+  unitByID = dict()
   unitAt = dict()
   
   missions = []
@@ -32,6 +33,8 @@ class AI(BaseAI):
   enemyUnitPositions = []
 
   spawnEgg = set()
+
+
 
   """The class implementing gameplay logic."""
   @staticmethod
@@ -112,8 +115,9 @@ class AI(BaseAI):
     self.enemyUnits = getEnemyUnits(self)
     self.myPumpTiles = getMyPumpTiles(self)
     self.enemyPumpTiles = getEnemyPumpTiles(self)
-    
-    self.enemyUnitPositions.append(recordEnemyPositions)
+
+    self.unitByID = cacheUnitIDs(self)
+    #self.enemyUnitPositions.append(recordEnemyPositions)
 
     self.unitAt = cacheUnitPositions(self)
 
@@ -125,12 +129,11 @@ class AI(BaseAI):
     if self.threats is not None:
       for threat in self.threats:
         if threat[1] > self.threatThreshold:
-          heros = getUnitsClosestTo(self, threat[0].x, threat[0].y)
+          heros = getUnitsClosestToFromList(self.availableUnits, threat[0].x, threat[0].y)
           for hero in heros:
-            if hero in self.availableUnits:
-              self.missions.append(AttackMission(threat[1] * 5.0, self, hero, threat[0]))
-              self.availableUnits.remove(hero)
-              break
+            self.missions.append(AttackMission(threat[1] * 5.0, self, hero, threat[0]))
+            self.availableUnits.remove(hero)
+            break
 
     for mission in self.missions:
       mission.step()

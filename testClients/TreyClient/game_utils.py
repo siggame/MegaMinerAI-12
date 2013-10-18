@@ -11,6 +11,12 @@ FILLER = 1
 offsets = ((1,0),(0,1),(-1,0),(0,-1))
 
 
+def cacheUnitIDs(ai):
+  d = dict()
+  for unit in ai.units:
+    d[unit.id] = unit
+  return d
+
 def getMyPumpTiles(ai):
   return [tile for tile in ai.tiles if tile.pumpID != -1 and tile.owner == ai.playerID]
 
@@ -86,7 +92,10 @@ def findNearestTile(x, y, tiles):
   
 def getUnitsClosestTo(ai, x, y):
   return sorted(ai.myUnits, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
-  
+
+def getUnitsClosestToFromList(units, x, y):
+  return sorted(units, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
+
 def getUnitClosestTo(ai, x, y):
   return min(ai.myUnits, key=lambda unit: taxiDis(x, y, unit.x, unit.y))
 
