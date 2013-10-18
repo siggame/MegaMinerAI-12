@@ -17,22 +17,22 @@ class BaseAI:
   #\endcond
   mappables = []
   tiles = []
+  pumpStations = []
   units = []
   players = []
-  pumpStations = []
   #\cond
   def startTurn(self):
     from GameObject import Mappable
     from GameObject import Tile
+    from GameObject import PumpStation
     from GameObject import Unit
     from GameObject import Player
-    from GameObject import PumpStation
 
     BaseAI.mappables = [Mappable(library.getMappable(self.connection, i)) for i in xrange(library.getMappableCount(self.connection))]
     BaseAI.tiles = [Tile(library.getTile(self.connection, i)) for i in xrange(library.getTileCount(self.connection))]
+    BaseAI.pumpStations = [PumpStation(library.getPumpStation(self.connection, i)) for i in xrange(library.getPumpStationCount(self.connection))]
     BaseAI.units = [Unit(library.getUnit(self.connection, i)) for i in xrange(library.getUnitCount(self.connection))]
     BaseAI.players = [Player(library.getPlayer(self.connection, i)) for i in xrange(library.getPlayerCount(self.connection))]
-    BaseAI.pumpStations = [PumpStation(library.getPumpStation(self.connection, i)) for i in xrange(library.getPumpStationCount(self.connection))]
 
     if not self.initialized:
       self.initialized = True

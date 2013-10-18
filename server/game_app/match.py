@@ -129,9 +129,9 @@ class Match(DefaultGameWorld):
           maxSiege = self.maxSiege,
           Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
+          PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
           Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
           Players = [i.toJson() for i in self.objects.values() if i.__class__ is Player],
-          PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
           animations = self.jsonAnimations
         )
       )
@@ -232,13 +232,13 @@ class Match(DefaultGameWorld):
     updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["Tile"] + [i.toList() for i in updated])
+    updated = [i for i in self.objects.values() if i.__class__ is PumpStation and i.updatedAt > self.turnNumber-3]
+    if updated:
+      typeLists.append(["PumpStation"] + [i.toList() for i in updated])
     updated = [i for i in self.objects.values() if i.__class__ is Unit and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["Unit"] + [i.toList() for i in updated])
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
-    updated = [i for i in self.objects.values() if i.__class__ is PumpStation and i.updatedAt > self.turnNumber-3]
-    if updated:
-      typeLists.append(["PumpStation"] + [i.toList() for i in updated])
 
     msg.extend(typeLists)
 

@@ -29,6 +29,12 @@ DLLEXPORT int tileGetWaterAmount(_Tile* ptr);
 DLLEXPORT int tileGetIsTrench(_Tile* ptr);
 
 
+DLLEXPORT int pumpStationGetId(_PumpStation* ptr);
+DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr);
+DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr);
+DLLEXPORT int pumpStationGetSiegeAmount(_PumpStation* ptr);
+
+
 DLLEXPORT int unitGetId(_Unit* ptr);
 DLLEXPORT int unitGetX(_Unit* ptr);
 DLLEXPORT int unitGetY(_Unit* ptr);
@@ -48,12 +54,6 @@ DLLEXPORT char* playerGetPlayerName(_Player* ptr);
 DLLEXPORT float playerGetTime(_Player* ptr);
 DLLEXPORT int playerGetWaterStored(_Player* ptr);
 DLLEXPORT int playerGetSpawnResources(_Player* ptr);
-
-
-DLLEXPORT int pumpStationGetId(_PumpStation* ptr);
-DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr);
-DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr);
-DLLEXPORT int pumpStationGetSiegeAmount(_PumpStation* ptr);
 
 
 

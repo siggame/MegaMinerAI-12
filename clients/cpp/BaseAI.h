@@ -10,9 +10,9 @@
 
 #include "Mappable.h"
 #include "Tile.h"
+#include "PumpStation.h"
 #include "Unit.h"
 #include "Player.h"
-#include "PumpStation.h"
 
 /// \brief A basic AI interface.
 
@@ -25,9 +25,9 @@ protected:
   Connection* c;
   std::vector<Mappable> mappables;
   std::vector<Tile> tiles;
+  std::vector<PumpStation> pumpStations;
   std::vector<Unit> units;
   std::vector<Player> players;
-  std::vector<PumpStation> pumpStations;
 public:
   ///The width of the total map.
   int mapWidth();

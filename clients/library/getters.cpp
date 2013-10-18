@@ -40,6 +40,22 @@ DLLEXPORT int tileGetIsTrench(_Tile* ptr)
 {
   return ptr->isTrench;
 }
+DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
+{
+  return ptr->owner;
+}
+DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
+{
+  return ptr->waterAmount;
+}
+DLLEXPORT int pumpStationGetSiegeAmount(_PumpStation* ptr)
+{
+  return ptr->siegeAmount;
+}
 DLLEXPORT int unitGetId(_Unit* ptr)
 {
   return ptr->id;
@@ -107,21 +123,5 @@ DLLEXPORT int playerGetWaterStored(_Player* ptr)
 DLLEXPORT int playerGetSpawnResources(_Player* ptr)
 {
   return ptr->spawnResources;
-}
-DLLEXPORT int pumpStationGetId(_PumpStation* ptr)
-{
-  return ptr->id;
-}
-DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
-{
-  return ptr->owner;
-}
-DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
-{
-  return ptr->waterAmount;
-}
-DLLEXPORT int pumpStationGetSiegeAmount(_PumpStation* ptr)
-{
-  return ptr->siegeAmount;
 }
 

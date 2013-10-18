@@ -76,6 +76,10 @@ public class Client {
   [DllImport("client")]
   public static extern int getTileCount(IntPtr connection);
   [DllImport("client")]
+  public static extern IntPtr getPumpStation(IntPtr connection, int num);
+  [DllImport("client")]
+  public static extern int getPumpStationCount(IntPtr connection);
+  [DllImport("client")]
   public static extern IntPtr getUnit(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getUnitCount(IntPtr connection);
@@ -83,10 +87,6 @@ public class Client {
   public static extern IntPtr getPlayer(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getPlayerCount(IntPtr connection);
-  [DllImport("client")]
-  public static extern IntPtr getPumpStation(IntPtr connection, int num);
-  [DllImport("client")]
-  public static extern int getPumpStationCount(IntPtr connection);
 
 
     //getters
@@ -111,6 +111,15 @@ public class Client {
   public static extern int tileGetWaterAmount(IntPtr ptr);
   [DllImport("client")]
   public static extern int tileGetIsTrench(IntPtr ptr);
+
+  [DllImport("client")]
+  public static extern int pumpStationGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetOwner(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int pumpStationGetSiegeAmount(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int unitGetId(IntPtr ptr);
@@ -147,15 +156,6 @@ public class Client {
   public static extern int playerGetWaterStored(IntPtr ptr);
   [DllImport("client")]
   public static extern int playerGetSpawnResources(IntPtr ptr);
-
-  [DllImport("client")]
-  public static extern int pumpStationGetId(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetOwner(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int pumpStationGetSiegeAmount(IntPtr ptr);
 
 
     //properties

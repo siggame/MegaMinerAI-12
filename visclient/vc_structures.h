@@ -10,9 +10,9 @@ namespace client
 struct Connection;
 struct _Mappable;
 struct _Tile;
+struct _PumpStation;
 struct _Unit;
 struct _Player;
-struct _PumpStation;
 
 
 struct _Mappable
@@ -32,6 +32,14 @@ struct _Tile
   int pumpID;
   int waterAmount;
   int isTrench;
+};
+struct _PumpStation
+{
+  Connection* _c;
+  int id;
+  int owner;
+  int waterAmount;
+  int siegeAmount;
 };
 struct _Unit
 {
@@ -57,14 +65,6 @@ struct _Player
   float time;
   int waterStored;
   int spawnResources;
-};
-struct _PumpStation
-{
-  Connection* _c;
-  int id;
-  int owner;
-  int waterAmount;
-  int siegeAmount;
 };
 
 }

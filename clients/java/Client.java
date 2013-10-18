@@ -45,12 +45,12 @@ public interface Client extends Library {
   int getMappableCount(Pointer connection);
   Pointer getTile(Pointer connection, int num);
   int getTileCount(Pointer connection);
+  Pointer getPumpStation(Pointer connection, int num);
+  int getPumpStationCount(Pointer connection);
   Pointer getUnit(Pointer connection, int num);
   int getUnitCount(Pointer connection);
   Pointer getPlayer(Pointer connection, int num);
   int getPlayerCount(Pointer connection);
-  Pointer getPumpStation(Pointer connection, int num);
-  int getPumpStationCount(Pointer connection);
 
 
     //getters
@@ -65,6 +65,11 @@ public interface Client extends Library {
   int tileGetPumpID(Pointer ptr);
   int tileGetWaterAmount(Pointer ptr);
   int tileGetIsTrench(Pointer ptr);
+
+  int pumpStationGetId(Pointer ptr);
+  int pumpStationGetOwner(Pointer ptr);
+  int pumpStationGetWaterAmount(Pointer ptr);
+  int pumpStationGetSiegeAmount(Pointer ptr);
 
   int unitGetId(Pointer ptr);
   int unitGetX(Pointer ptr);
@@ -84,11 +89,6 @@ public interface Client extends Library {
   float playerGetTime(Pointer ptr);
   int playerGetWaterStored(Pointer ptr);
   int playerGetSpawnResources(Pointer ptr);
-
-  int pumpStationGetId(Pointer ptr);
-  int pumpStationGetOwner(Pointer ptr);
-  int pumpStationGetWaterAmount(Pointer ptr);
-  int pumpStationGetSiegeAmount(Pointer ptr);
 
 
     //properties

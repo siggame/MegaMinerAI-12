@@ -70,12 +70,12 @@ DLLEXPORT Connection* createConnection()
   c->MappableCount = 0;
   c->Tiles = NULL;
   c->TileCount = 0;
+  c->PumpStations = NULL;
+  c->PumpStationCount = 0;
   c->Units = NULL;
   c->UnitCount = 0;
   c->Players = NULL;
   c->PlayerCount = 0;
-  c->PumpStations = NULL;
-  c->PumpStationCount = 0;
   return c;
 }
 
@@ -98,6 +98,13 @@ DLLEXPORT void destroyConnection(Connection* c)
     }
     delete[] c->Tiles;
   }
+  if(c->PumpStations)
+  {
+    for(int i = 0; i < c->PumpStationCount; i++)
+    {
+    }
+    delete[] c->PumpStations;
+  }
   if(c->Units)
   {
     for(int i = 0; i < c->UnitCount; i++)
@@ -112,13 +119,6 @@ DLLEXPORT void destroyConnection(Connection* c)
       delete[] c->Players[i].playerName;
     }
     delete[] c->Players;
-  }
-  if(c->PumpStations)
-  {
-    for(int i = 0; i < c->PumpStationCount; i++)
-    {
-    }
-    delete[] c->PumpStations;
   }
   delete c;
 }
@@ -234,6 +234,7 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
 }
 
 
+
 DLLEXPORT int unitMove(_Unit* object, int x, int y)
 {
   stringstream expr;
@@ -297,7 +298,6 @@ DLLEXPORT int playerTalk(_Player* object, char* message)
 }
 
 
-
 //Utility functions for parsing data
 void parseMappable(Connection* c, _Mappable* object, sexp_t* expression)
 {
@@ -334,6 +334,23 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   object->waterAmount = atoi(sub->val);
   sub = sub->next;
   object->isTrench = atoi(sub->val);
+  sub = sub->next;
+
+}
+void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
+{
+  sexp_t* sub;
+  sub = expression->list;
+
+  object->_c = c;
+
+  object->id = atoi(sub->val);
+  sub = sub->next;
+  object->owner = atoi(sub->val);
+  sub = sub->next;
+  object->waterAmount = atoi(sub->val);
+  sub = sub->next;
+  object->siegeAmount = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -388,23 +405,6 @@ void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
   object->waterStored = atoi(sub->val);
   sub = sub->next;
   object->spawnResources = atoi(sub->val);
-  sub = sub->next;
-
-}
-void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
-{
-  sexp_t* sub;
-  sub = expression->list;
-
-  object->_c = c;
-
-  object->id = atoi(sub->val);
-  sub = sub->next;
-  object->owner = atoi(sub->val);
-  sub = sub->next;
-  object->waterAmount = atoi(sub->val);
-  sub = sub->next;
-  object->siegeAmount = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -554,6 +554,23 @@ DLLEXPORT int networkLoop(Connection* c)
             parseTile(c, c->Tiles+i, sub);
           }
         }
+        else if(string(sub->val) == "PumpStation")
+        {
+          if(c->PumpStations)
+          {
+            for(int i = 0; i < c->PumpStationCount; i++)
+            {
+            }
+            delete[] c->PumpStations;
+          }
+          c->PumpStationCount =  sexp_list_length(expression)-1; //-1 for the header
+          c->PumpStations = new _PumpStation[c->PumpStationCount];
+          for(int i = 0; i < c->PumpStationCount; i++)
+          {
+            sub = sub->next;
+            parsePumpStation(c, c->PumpStations+i, sub);
+          }
+        }
         else if(string(sub->val) == "Unit")
         {
           if(c->Units)
@@ -589,23 +606,6 @@ DLLEXPORT int networkLoop(Connection* c)
             parsePlayer(c, c->Players+i, sub);
           }
         }
-        else if(string(sub->val) == "PumpStation")
-        {
-          if(c->PumpStations)
-          {
-            for(int i = 0; i < c->PumpStationCount; i++)
-            {
-            }
-            delete[] c->PumpStations;
-          }
-          c->PumpStationCount =  sexp_list_length(expression)-1; //-1 for the header
-          c->PumpStations = new _PumpStation[c->PumpStationCount];
-          for(int i = 0; i < c->PumpStationCount; i++)
-          {
-            sub = sub->next;
-            parsePumpStation(c, c->PumpStations+i, sub);
-          }
-        }
       }
       destroy_sexp(base);
       return 1;
@@ -638,6 +638,15 @@ DLLEXPORT int getTileCount(Connection* c)
   return c->TileCount;
 }
 
+DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num)
+{
+  return c->PumpStations + num;
+}
+DLLEXPORT int getPumpStationCount(Connection* c)
+{
+  return c->PumpStationCount;
+}
+
 DLLEXPORT _Unit* getUnit(Connection* c, int num)
 {
   return c->Units + num;
@@ -654,15 +663,6 @@ DLLEXPORT _Player* getPlayer(Connection* c, int num)
 DLLEXPORT int getPlayerCount(Connection* c)
 {
   return c->PlayerCount;
-}
-
-DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num)
-{
-  return c->PumpStations + num;
-}
-DLLEXPORT int getPumpStationCount(Connection* c)
-{
-  return c->PumpStationCount;
 }
 
 

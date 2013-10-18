@@ -82,6 +82,14 @@ bool BaseAI::startTurn()
     tiles[i] = Tile(getTile(c, i));
   }
 
+  count = getPumpStationCount(c);
+  pumpStations.clear();
+  pumpStations.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    pumpStations[i] = PumpStation(getPumpStation(c, i));
+  }
+
   count = getUnitCount(c);
   units.clear();
   units.resize(count);
@@ -96,14 +104,6 @@ bool BaseAI::startTurn()
   for(int i = 0; i < count; i++)
   {
     players[i] = Player(getPlayer(c, i));
-  }
-
-  count = getPumpStationCount(c);
-  pumpStations.clear();
-  pumpStations.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    pumpStations[i] = PumpStation(getPumpStation(c, i));
   }
 
   if(!initialized)

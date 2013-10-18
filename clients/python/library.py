@@ -116,6 +116,12 @@ library.getTile.argtypes = [c_void_p, c_int]
 library.getTileCount.restype = c_int
 library.getTileCount.argtypes = [c_void_p]
 
+library.getPumpStation.restype = c_void_p
+library.getPumpStation.argtypes = [c_void_p, c_int]
+
+library.getPumpStationCount.restype = c_int
+library.getPumpStationCount.argtypes = [c_void_p]
+
 library.getUnit.restype = c_void_p
 library.getUnit.argtypes = [c_void_p, c_int]
 
@@ -127,12 +133,6 @@ library.getPlayer.argtypes = [c_void_p, c_int]
 
 library.getPlayerCount.restype = c_int
 library.getPlayerCount.argtypes = [c_void_p]
-
-library.getPumpStation.restype = c_void_p
-library.getPumpStation.argtypes = [c_void_p, c_int]
-
-library.getPumpStationCount.restype = c_int
-library.getPumpStationCount.argtypes = [c_void_p]
 
 # getters
 
@@ -166,6 +166,18 @@ library.tileGetWaterAmount.argtypes = [c_void_p]
 
 library.tileGetIsTrench.restype = c_int
 library.tileGetIsTrench.argtypes = [c_void_p]
+
+library.pumpStationGetId.restype = c_int
+library.pumpStationGetId.argtypes = [c_void_p]
+
+library.pumpStationGetOwner.restype = c_int
+library.pumpStationGetOwner.argtypes = [c_void_p]
+
+library.pumpStationGetWaterAmount.restype = c_int
+library.pumpStationGetWaterAmount.argtypes = [c_void_p]
+
+library.pumpStationGetSiegeAmount.restype = c_int
+library.pumpStationGetSiegeAmount.argtypes = [c_void_p]
 
 library.unitGetId.restype = c_int
 library.unitGetId.argtypes = [c_void_p]
@@ -217,18 +229,6 @@ library.playerGetWaterStored.argtypes = [c_void_p]
 
 library.playerGetSpawnResources.restype = c_int
 library.playerGetSpawnResources.argtypes = [c_void_p]
-
-library.pumpStationGetId.restype = c_int
-library.pumpStationGetId.argtypes = [c_void_p]
-
-library.pumpStationGetOwner.restype = c_int
-library.pumpStationGetOwner.argtypes = [c_void_p]
-
-library.pumpStationGetWaterAmount.restype = c_int
-library.pumpStationGetWaterAmount.argtypes = [c_void_p]
-
-library.pumpStationGetSiegeAmount.restype = c_int
-library.pumpStationGetSiegeAmount.argtypes = [c_void_p]
 
 
 #Properties

@@ -53,12 +53,12 @@ struct Connection
   int MappableCount;
   _Tile* Tiles;
   int TileCount;
+  _PumpStation* PumpStations;
+  int PumpStationCount;
   _Unit* Units;
   int UnitCount;
   _Player* Players;
   int PlayerCount;
-  _PumpStation* PumpStations;
-  int PumpStationCount;
 };
 
 #ifdef __cplusplus
@@ -119,14 +119,14 @@ DLLEXPORT int getMappableCount(Connection* c);
 DLLEXPORT _Tile* getTile(Connection* c, int num);
 DLLEXPORT int getTileCount(Connection* c);
 
+DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num);
+DLLEXPORT int getPumpStationCount(Connection* c);
+
 DLLEXPORT _Unit* getUnit(Connection* c, int num);
 DLLEXPORT int getUnitCount(Connection* c);
 
 DLLEXPORT _Player* getPlayer(Connection* c, int num);
 DLLEXPORT int getPlayerCount(Connection* c);
-
-DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num);
-DLLEXPORT int getPumpStationCount(Connection* c);
 
 
 

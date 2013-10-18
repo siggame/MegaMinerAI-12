@@ -9,9 +9,9 @@ public abstract class BaseAI
 {
   static Mappable[] mappables;
   static Tile[] tiles;
+  static PumpStation[] pumpStations;
   static Unit[] units;
   static Player[] players;
-  static PumpStation[] pumpStations;
   Pointer connection;
   static int iteration;
   boolean initialized;
@@ -57,6 +57,12 @@ public abstract class BaseAI
     {
       tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
     }
+    count = Client.INSTANCE.getPumpStationCount(connection);
+    pumpStations = new PumpStation[count];
+    for(int i = 0; i < count; i++)
+    {
+      pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
+    }
     count = Client.INSTANCE.getUnitCount(connection);
     units = new Unit[count];
     for(int i = 0; i < count; i++)
@@ -68,12 +74,6 @@ public abstract class BaseAI
     for(int i = 0; i < count; i++)
     {
       players[i] = new Player(Client.INSTANCE.getPlayer(connection, i));
-    }
-    count = Client.INSTANCE.getPumpStationCount(connection);
-    pumpStations = new PumpStation[count];
-    for(int i = 0; i < count; i++)
-    {
-      pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
     }
 
     if(!initialized)
