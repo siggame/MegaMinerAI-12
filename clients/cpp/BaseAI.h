@@ -8,11 +8,11 @@
 #include <ctime>
 #include "game.h"
 
-#include "Player.h"
 #include "Mappable.h"
+#include "Tile.h"
 #include "PumpStation.h"
 #include "Unit.h"
-#include "Tile.h"
+#include "Player.h"
 
 /// \brief A basic AI interface.
 
@@ -23,11 +23,11 @@ class BaseAI
 {
 protected:
   Connection* c;
-  std::vector<Player> players;
   std::vector<Mappable> mappables;
+  std::vector<Tile> tiles;
   std::vector<PumpStation> pumpStations;
   std::vector<Unit> units;
-  std::vector<Tile> tiles;
+  std::vector<Player> players;
 public:
   ///The width of the total map.
   int mapWidth();
@@ -43,9 +43,9 @@ public:
   int turnNumber();
   ///The amount of damage a unit will deal.
   int attackDamage();
-  ///How quickly a unit will siege a base.
+  ///How quickly a unit will siege a PumpStation.
   int offensePower();
-  ///The much a unit will slow a  siege.
+  ///How much a unit will slow a siege.
   int defensePower();
   ///The maximum number of units allowed per player.
   int maxUnits();
@@ -55,6 +55,8 @@ public:
   int playerID();
   ///What number game this is for the server
   int gameNumber();
+  ///The maximum siege value before the PumpStation is sieged.
+  int maxSiege();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

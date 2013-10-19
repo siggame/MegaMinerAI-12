@@ -24,62 +24,6 @@ char *ToLower( char *str )
 }
 
 
-static bool parsePlayer(Player& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  sub = expression->list;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.id = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.playerName = new char[strlen(sub->val)+1];
-  strncpy(object.playerName, sub->val, strlen(sub->val));
-  object.playerName[strlen(sub->val)] = 0;
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.time = atof(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.waterStored = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.spawnResources = atoi(sub->val);
-  sub = sub->next;
-
-  return true;
-
-}
 static bool parseMappable(Mappable& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -111,6 +55,78 @@ static bool parseMappable(Mappable& object, sexp_t* expression)
   }
 
   object.y = atoi(sub->val);
+  sub = sub->next;
+
+  return true;
+
+}
+static bool parseTile(Tile& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  sub = expression->list;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.id = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.x = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.y = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.owner = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.pumpID = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.waterAmount = atoi(sub->val);
+  sub = sub->next;
+
+  if ( !sub ) 
+  {
+    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.isTrench = atoi(sub->val);
   sub = sub->next;
 
   return true;
@@ -155,7 +171,7 @@ static bool parsePumpStation(PumpStation& object, sexp_t* expression)
     return false;
   }
 
-  object.siegeCount = atoi(sub->val);
+  object.siegeAmount = atoi(sub->val);
   sub = sub->next;
 
   return true;
@@ -227,7 +243,7 @@ static bool parseUnit(Unit& object, sexp_t* expression)
     return false;
   }
 
-  object.hasDigged = atoi(sub->val);
+  object.hasDug = atoi(sub->val);
   sub = sub->next;
 
   if ( !sub ) 
@@ -236,7 +252,7 @@ static bool parseUnit(Unit& object, sexp_t* expression)
     return false;
   }
 
-  object.hasBuilt = atoi(sub->val);
+  object.hasFilled = atoi(sub->val);
   sub = sub->next;
 
   if ( !sub ) 
@@ -278,7 +294,7 @@ static bool parseUnit(Unit& object, sexp_t* expression)
   return true;
 
 }
-static bool parseTile(Tile& object, sexp_t* expression)
+static bool parsePlayer(Player& object, sexp_t* expression)
 {
   sexp_t* sub;
   if ( !expression ) return false;
@@ -286,7 +302,7 @@ static bool parseTile(Tile& object, sexp_t* expression)
 
   if ( !sub ) 
   {
-    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
     return false;
   }
 
@@ -295,65 +311,40 @@ static bool parseTile(Tile& object, sexp_t* expression)
 
   if ( !sub ) 
   {
-    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
     return false;
   }
 
-  object.x = atoi(sub->val);
+  object.playerName = new char[strlen(sub->val)+1];
+  strncpy(object.playerName, sub->val, strlen(sub->val));
+  object.playerName[strlen(sub->val)] = 0;
   sub = sub->next;
 
   if ( !sub ) 
   {
-    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
     return false;
   }
 
-  object.y = atoi(sub->val);
+  object.time = atof(sub->val);
   sub = sub->next;
 
   if ( !sub ) 
   {
-    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
     return false;
   }
 
-  object.owner = atoi(sub->val);
+  object.waterStored = atoi(sub->val);
   sub = sub->next;
 
   if ( !sub ) 
   {
-    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    cerr << "Error in parsePlayer.\n Parsing: " << *expression << endl;
     return false;
   }
 
-  object.type = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.pumpID = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.waterAmount = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
-  object.isTrench = atoi(sub->val);
+  object.spawnResources = atoi(sub->val);
   sub = sub->next;
 
   return true;
@@ -383,6 +374,29 @@ static bool parseSpawn(spawn& object, sexp_t* expression)
   return true;
 
 }
+static bool parseFill(fill& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = FILL;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsefill.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.actingID = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsefill.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.tileID = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
 static bool parseAttack(attack& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -402,6 +416,52 @@ static bool parseAttack(attack& object, sexp_t* expression)
     return false;
   }
   object.targetID = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
+static bool parseDeath(death& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = DEATH;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsedeath.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.sourceID = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
+static bool parseFlow(flow& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = FLOW;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.sourceID = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.destID = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.waterAmount = atoi(sub->val);
   sub = sub->next;
   return true;
 
@@ -446,59 +506,6 @@ static bool parseMove(move& object, sexp_t* expression)
     return false;
   }
   object.toY = atoi(sub->val);
-  sub = sub->next;
-  return true;
-
-}
-static bool parseFlow(flow& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  object.type = FLOW;
-  sub = expression->list->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.sourceID = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.destID = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.waterAmount = atoi(sub->val);
-  sub = sub->next;
-  return true;
-
-}
-static bool parseFill(fill& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  object.type = FILL;
-  sub = expression->list->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parsefill.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.actingID = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parsefill.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.tileID = atoi(sub->val);
   sub = sub->next;
   return true;
 
@@ -583,19 +590,9 @@ static bool parseSexp(Game& game, sexp_t* expression)
           if ( !sub ) return false;
           gs.gameNumber = atoi(sub->val);
           sub = sub->next;
-      }
-      else if(string(sub->val) == "Player")
-      {
-        sub = sub->next;
-        bool flag = true;
-        while(sub && flag)
-        {
-          Player object;
-          flag = parsePlayer(object, sub);
-          gs.players[object.id] = object;
+          if ( !sub ) return false;
+          gs.maxSiege = atoi(sub->val);
           sub = sub->next;
-        }
-        if ( !flag ) return false;
       }
       else if(string(sub->val) == "Mappable")
       {
@@ -606,6 +603,19 @@ static bool parseSexp(Game& game, sexp_t* expression)
           Mappable object;
           flag = parseMappable(object, sub);
           gs.mappables[object.id] = object;
+          sub = sub->next;
+        }
+        if ( !flag ) return false;
+      }
+      else if(string(sub->val) == "Tile")
+      {
+        sub = sub->next;
+        bool flag = true;
+        while(sub && flag)
+        {
+          Tile object;
+          flag = parseTile(object, sub);
+          gs.tiles[object.id] = object;
           sub = sub->next;
         }
         if ( !flag ) return false;
@@ -636,15 +646,15 @@ static bool parseSexp(Game& game, sexp_t* expression)
         }
         if ( !flag ) return false;
       }
-      else if(string(sub->val) == "Tile")
+      else if(string(sub->val) == "Player")
       {
         sub = sub->next;
         bool flag = true;
         while(sub && flag)
         {
-          Tile object;
-          flag = parseTile(object, sub);
-          gs.tiles[object.id] = object;
+          Player object;
+          flag = parsePlayer(object, sub);
+          gs.players[object.id] = object;
           sub = sub->next;
         }
         if ( !flag ) return false;
@@ -668,6 +678,14 @@ static bool parseSexp(Game& game, sexp_t* expression)
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
       }
+      if(string(ToLower( sub->val ) ) == "fill")
+      {
+        SmartPointer<fill> animation = new fill;
+        if ( !parseFill(*animation, expression) )
+          return false;
+
+        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
+      }
       if(string(ToLower( sub->val ) ) == "attack")
       {
         SmartPointer<attack> animation = new attack;
@@ -676,10 +694,10 @@ static bool parseSexp(Game& game, sexp_t* expression)
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
       }
-      if(string(ToLower( sub->val ) ) == "move")
+      if(string(ToLower( sub->val ) ) == "death")
       {
-        SmartPointer<move> animation = new move;
-        if ( !parseMove(*animation, expression) )
+        SmartPointer<death> animation = new death;
+        if ( !parseDeath(*animation, expression) )
           return false;
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
@@ -692,10 +710,10 @@ static bool parseSexp(Game& game, sexp_t* expression)
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
       }
-      if(string(ToLower( sub->val ) ) == "fill")
+      if(string(ToLower( sub->val ) ) == "move")
       {
-        SmartPointer<fill> animation = new fill;
-        if ( !parseFill(*animation, expression) )
+        SmartPointer<move> animation = new move;
+        if ( !parseMove(*animation, expression) )
           return false;
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );

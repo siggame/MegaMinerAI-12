@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 
 
-///Represents a base to which you want to lead water, and a spawn location for new units.
+///Represents a base to which you want to lead water.
 public class PumpStation
 {
   public IntPtr ptr;
@@ -74,13 +74,13 @@ public class PumpStation
     }
   }
 
-  ///The length of time it takes to capture the PumpStation.
-  public int SiegeCount
+  ///The amount the PumpStation has been sieged.
+  public int SiegeAmount
   {
     get
     {
       validify();
-      int value = Client.pumpStationGetSiegeCount(ptr);
+      int value = Client.pumpStationGetSiegeAmount(ptr);
       return value;
     }
   }

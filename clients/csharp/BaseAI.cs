@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
-  public static Player[] players;
   public static Mappable[] mappables;
+  public static Tile[] tiles;
   public static PumpStation[] pumpStations;
   public static Unit[] units;
-  public static Tile[] tiles;
+  public static Player[] players;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -46,17 +46,17 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
-    count = Client.getPlayerCount(connection);
-    players = new Player[count];
-    for(int i = 0; i < count; i++)
-    {
-      players[i] = new Player(Client.getPlayer(connection, i));
-    }
     count = Client.getMappableCount(connection);
     mappables = new Mappable[count];
     for(int i = 0; i < count; i++)
     {
       mappables[i] = new Mappable(Client.getMappable(connection, i));
+    }
+    count = Client.getTileCount(connection);
+    tiles = new Tile[count];
+    for(int i = 0; i < count; i++)
+    {
+      tiles[i] = new Tile(Client.getTile(connection, i));
     }
     count = Client.getPumpStationCount(connection);
     pumpStations = new PumpStation[count];
@@ -70,11 +70,11 @@ public abstract class BaseAI
     {
       units[i] = new Unit(Client.getUnit(connection, i));
     }
-    count = Client.getTileCount(connection);
-    tiles = new Tile[count];
+    count = Client.getPlayerCount(connection);
+    players = new Player[count];
     for(int i = 0; i < count; i++)
     {
-      tiles[i] = new Tile(Client.getTile(connection, i));
+      players[i] = new Player(Client.getPlayer(connection, i));
     }
 
     if(!initialized)
@@ -128,16 +128,16 @@ public abstract class BaseAI
     int value = Client.getAttackDamage(connection);
     return value;
   }
-  ///How quickly a unit will siege a base.
+  ///How quickly a unit will siege a PumpStation.
   public int offensePower()
   {
-    int value = Client.getOffenseCount(connection);
+    int value = Client.getOffensePower(connection);
     return value;
   }
-  ///The much a unit will slow a  siege.
+  ///How much a unit will slow a siege.
   public int defensePower()
   {
-    int value = Client.getDefenseCount(connection);
+    int value = Client.getDefensePower(connection);
     return value;
   }
   ///The maximum number of units allowed per player.
@@ -162,6 +162,12 @@ public abstract class BaseAI
   public int gameNumber()
   {
     int value = Client.getGameNumber(connection);
+    return value;
+  }
+  ///The maximum siege value before the PumpStation is sieged.
+  public int maxSiege()
+  {
+    int value = Client.getMaxSiege(connection);
     return value;
   }
 }

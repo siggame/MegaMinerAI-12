@@ -11,84 +11,6 @@ class GameObject(object):
     self._iteration = BaseAI.iteration
 
 
-##
-class Player(GameObject):
-  def __init__(self, ptr):
-    from BaseAI import BaseAI
-    self._ptr = ptr
-    self._iteration = BaseAI.iteration
-    self._id = library.playerGetId(ptr)
-
-  #\cond
-  def validify(self):
-    from BaseAI import BaseAI
-    #if this class is pointing to an object from before the current turn it's probably
-    #somewhere else in memory now
-    if self._iteration == BaseAI.iteration:
-      return True
-    for i in BaseAI.players:
-      if i._id == self._id:
-        self._ptr = i._ptr
-        self._iteration = BaseAI.iteration
-        return True
-    raise ExistentialError()
-  #\endcond
-  ##Allows a player to display messages on the screen
-  def talk(self, message):
-    self.validify()
-    return library.playerTalk(self._ptr, message)
-
-  #\cond
-  def getId(self):
-    self.validify()
-    return library.playerGetId(self._ptr)
-  #\endcond
-  ##Unique Identifier
-  id = property(getId)
-
-  #\cond
-  def getPlayerName(self):
-    self.validify()
-    return library.playerGetPlayerName(self._ptr)
-  #\endcond
-  ##Player's Name
-  playerName = property(getPlayerName)
-
-  #\cond
-  def getTime(self):
-    self.validify()
-    return library.playerGetTime(self._ptr)
-  #\endcond
-  ##Time remaining, updated at start of turn
-  time = property(getTime)
-
-  #\cond
-  def getWaterStored(self):
-    self.validify()
-    return library.playerGetWaterStored(self._ptr)
-  #\endcond
-  ##The amount of water a player has.
-  waterStored = property(getWaterStored)
-
-  #\cond
-  def getSpawnResources(self):
-    self.validify()
-    return library.playerGetSpawnResources(self._ptr)
-  #\endcond
-  ##Resource used to spawn in units
-  spawnResources = property(getSpawnResources)
-
-
-  def __str__(self):
-    self.validify()
-    ret = ""
-    ret += "id: %s\n" % self.getId()
-    ret += "playerName: %s\n" % self.getPlayerName()
-    ret += "time: %s\n" % self.getTime()
-    ret += "waterStored: %s\n" % self.getWaterStored()
-    ret += "spawnResources: %s\n" % self.getSpawnResources()
-    return ret
-
 ##A mappable object!
 class Mappable(GameObject):
   def __init__(self, ptr):
@@ -144,7 +66,103 @@ class Mappable(GameObject):
     ret += "y: %s\n" % self.getY()
     return ret
 
-##Represents a base to which you want to lead water, and a spawn location for new units.
+##Represents a single tile on the map, can contain some amount of water.
+class Tile(Mappable):
+  def __init__(self, ptr):
+    from BaseAI import BaseAI
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.tileGetId(ptr)
+
+  #\cond
+  def validify(self):
+    from BaseAI import BaseAI
+    #if this class is pointing to an object from before the current turn it's probably
+    #somewhere else in memory now
+    if self._iteration == BaseAI.iteration:
+      return True
+    for i in BaseAI.tiles:
+      if i._id == self._id:
+        self._ptr = i._ptr
+        self._iteration = BaseAI.iteration
+        return True
+    raise ExistentialError()
+  #\endcond
+  ##Attempt to spawn a unit of a type on this tile.
+  def spawn(self, type):
+    self.validify()
+    return library.tileSpawn(self._ptr, type)
+
+  #\cond
+  def getId(self):
+    self.validify()
+    return library.tileGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
+
+  #\cond
+  def getX(self):
+    self.validify()
+    return library.tileGetX(self._ptr)
+  #\endcond
+  ##X position of the object
+  x = property(getX)
+
+  #\cond
+  def getY(self):
+    self.validify()
+    return library.tileGetY(self._ptr)
+  #\endcond
+  ##Y position of the object
+  y = property(getY)
+
+  #\cond
+  def getOwner(self):
+    self.validify()
+    return library.tileGetOwner(self._ptr)
+  #\endcond
+  ##The owner of the tile.
+  owner = property(getOwner)
+
+  #\cond
+  def getPumpID(self):
+    self.validify()
+    return library.tileGetPumpID(self._ptr)
+  #\endcond
+  ##Determines if this tile is a part of a Pump Station.
+  pumpID = property(getPumpID)
+
+  #\cond
+  def getWaterAmount(self):
+    self.validify()
+    return library.tileGetWaterAmount(self._ptr)
+  #\endcond
+  ##The amount of water contained on the tile.
+  waterAmount = property(getWaterAmount)
+
+  #\cond
+  def getIsTrench(self):
+    self.validify()
+    return library.tileGetIsTrench(self._ptr)
+  #\endcond
+  ##Whether the tile is a trench or not.
+  isTrench = property(getIsTrench)
+
+
+  def __str__(self):
+    self.validify()
+    ret = ""
+    ret += "id: %s\n" % self.getId()
+    ret += "x: %s\n" % self.getX()
+    ret += "y: %s\n" % self.getY()
+    ret += "owner: %s\n" % self.getOwner()
+    ret += "pumpID: %s\n" % self.getPumpID()
+    ret += "waterAmount: %s\n" % self.getWaterAmount()
+    ret += "isTrench: %s\n" % self.getIsTrench()
+    return ret
+
+##Represents a base to which you want to lead water.
 class PumpStation(GameObject):
   def __init__(self, ptr):
     from BaseAI import BaseAI
@@ -191,12 +209,12 @@ class PumpStation(GameObject):
   waterAmount = property(getWaterAmount)
 
   #\cond
-  def getSiegeCount(self):
+  def getSiegeAmount(self):
     self.validify()
-    return library.pumpStationGetSiegeCount(self._ptr)
+    return library.pumpStationGetSiegeAmount(self._ptr)
   #\endcond
-  ##The length of time it takes to capture the PumpStation.
-  siegeCount = property(getSiegeCount)
+  ##The amount the PumpStation has been sieged.
+  siegeAmount = property(getSiegeAmount)
 
 
   def __str__(self):
@@ -205,7 +223,7 @@ class PumpStation(GameObject):
     ret += "id: %s\n" % self.getId()
     ret += "owner: %s\n" % self.getOwner()
     ret += "waterAmount: %s\n" % self.getWaterAmount()
-    ret += "siegeCount: %s\n" % self.getSiegeCount()
+    ret += "siegeAmount: %s\n" % self.getSiegeAmount()
     return ret
 
 ##Represents a single unit on the map.
@@ -308,20 +326,20 @@ class Unit(Mappable):
   hasAttacked = property(getHasAttacked)
 
   #\cond
-  def getHasDigged(self):
+  def getHasDug(self):
     self.validify()
-    return library.unitGetHasDigged(self._ptr)
+    return library.unitGetHasDug(self._ptr)
   #\endcond
-  ##Whether the current unit has digged or not.
-  hasDigged = property(getHasDigged)
+  ##Whether the current unit has dug or not.
+  hasDug = property(getHasDug)
 
   #\cond
-  def getHasBuilt(self):
+  def getHasFilled(self):
     self.validify()
-    return library.unitGetHasBuilt(self._ptr)
+    return library.unitGetHasFilled(self._ptr)
   #\endcond
-  ##Whether the current unit has built or not.
-  hasBuilt = property(getHasBuilt)
+  ##Whether the current unit has filled or not.
+  hasFilled = property(getHasFilled)
 
   #\cond
   def getHealthLeft(self):
@@ -365,21 +383,21 @@ class Unit(Mappable):
     ret += "owner: %s\n" % self.getOwner()
     ret += "type: %s\n" % self.getType()
     ret += "hasAttacked: %s\n" % self.getHasAttacked()
-    ret += "hasDigged: %s\n" % self.getHasDigged()
-    ret += "hasBuilt: %s\n" % self.getHasBuilt()
+    ret += "hasDug: %s\n" % self.getHasDug()
+    ret += "hasFilled: %s\n" % self.getHasFilled()
     ret += "healthLeft: %s\n" % self.getHealthLeft()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
     ret += "movementLeft: %s\n" % self.getMovementLeft()
     ret += "maxMovement: %s\n" % self.getMaxMovement()
     return ret
 
-##Represents a single tile on the map, can contain some amount of water.
-class Tile(Mappable):
+##
+class Player(GameObject):
   def __init__(self, ptr):
     from BaseAI import BaseAI
     self._ptr = ptr
     self._iteration = BaseAI.iteration
-    self._id = library.tileGetId(ptr)
+    self._id = library.playerGetId(ptr)
 
   #\cond
   def validify(self):
@@ -388,92 +406,65 @@ class Tile(Mappable):
     #somewhere else in memory now
     if self._iteration == BaseAI.iteration:
       return True
-    for i in BaseAI.tiles:
+    for i in BaseAI.players:
       if i._id == self._id:
         self._ptr = i._ptr
         self._iteration = BaseAI.iteration
         return True
     raise ExistentialError()
   #\endcond
-  ##Attempt to spawn a unit of a type on this tile.
-  def spawn(self, type):
+  ##Allows a player to display messages on the screen
+  def talk(self, message):
     self.validify()
-    return library.tileSpawn(self._ptr, type)
+    return library.playerTalk(self._ptr, message)
 
   #\cond
   def getId(self):
     self.validify()
-    return library.tileGetId(self._ptr)
+    return library.playerGetId(self._ptr)
   #\endcond
   ##Unique Identifier
   id = property(getId)
 
   #\cond
-  def getX(self):
+  def getPlayerName(self):
     self.validify()
-    return library.tileGetX(self._ptr)
+    return library.playerGetPlayerName(self._ptr)
   #\endcond
-  ##X position of the object
-  x = property(getX)
+  ##Player's Name
+  playerName = property(getPlayerName)
 
   #\cond
-  def getY(self):
+  def getTime(self):
     self.validify()
-    return library.tileGetY(self._ptr)
+    return library.playerGetTime(self._ptr)
   #\endcond
-  ##Y position of the object
-  y = property(getY)
+  ##Time remaining, updated at start of turn
+  time = property(getTime)
 
   #\cond
-  def getOwner(self):
+  def getWaterStored(self):
     self.validify()
-    return library.tileGetOwner(self._ptr)
+    return library.playerGetWaterStored(self._ptr)
   #\endcond
-  ##The owner of the tile.
-  owner = property(getOwner)
+  ##The amount of water a player has.
+  waterStored = property(getWaterStored)
 
   #\cond
-  def getType(self):
+  def getSpawnResources(self):
     self.validify()
-    return library.tileGetType(self._ptr)
+    return library.playerGetSpawnResources(self._ptr)
   #\endcond
-  ##The type of tile this tile represents.
-  type = property(getType)
-
-  #\cond
-  def getPumpID(self):
-    self.validify()
-    return library.tileGetPumpID(self._ptr)
-  #\endcond
-  ##Determines if this tile is a part of a Pump Station.
-  pumpID = property(getPumpID)
-
-  #\cond
-  def getWaterAmount(self):
-    self.validify()
-    return library.tileGetWaterAmount(self._ptr)
-  #\endcond
-  ##The amount of water contained on the tile.
-  waterAmount = property(getWaterAmount)
-
-  #\cond
-  def getIsTrench(self):
-    self.validify()
-    return library.tileGetIsTrench(self._ptr)
-  #\endcond
-  ##Whether the tile is a trench or not.
-  isTrench = property(getIsTrench)
+  ##Resource used to spawn in units
+  spawnResources = property(getSpawnResources)
 
 
   def __str__(self):
     self.validify()
     ret = ""
     ret += "id: %s\n" % self.getId()
-    ret += "x: %s\n" % self.getX()
-    ret += "y: %s\n" % self.getY()
-    ret += "owner: %s\n" % self.getOwner()
-    ret += "type: %s\n" % self.getType()
-    ret += "pumpID: %s\n" % self.getPumpID()
-    ret += "waterAmount: %s\n" % self.getWaterAmount()
-    ret += "isTrench: %s\n" % self.getIsTrench()
+    ret += "playerName: %s\n" % self.getPlayerName()
+    ret += "time: %s\n" % self.getTime()
+    ret += "waterStored: %s\n" % self.getWaterStored()
+    ret += "spawnResources: %s\n" % self.getSpawnResources()
     return ret

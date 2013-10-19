@@ -90,17 +90,17 @@ class Unit extends Mappable
     validify();
     return Client.INSTANCE.unitGetHasAttacked(ptr);
   }
-  ///Whether the current unit has digged or not.
-  public int getHasDigged()
+  ///Whether the current unit has dug or not.
+  public int getHasDug()
   {
     validify();
-    return Client.INSTANCE.unitGetHasDigged(ptr);
+    return Client.INSTANCE.unitGetHasDug(ptr);
   }
-  ///Whether the current unit has built or not.
-  public int getHasBuilt()
+  ///Whether the current unit has filled or not.
+  public int getHasFilled()
   {
     validify();
-    return Client.INSTANCE.unitGetHasBuilt(ptr);
+    return Client.INSTANCE.unitGetHasFilled(ptr);
   }
   ///The current amount health this unit has remaining.
   public int getHealthLeft()

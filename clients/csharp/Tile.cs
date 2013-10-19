@@ -88,17 +88,6 @@ public class Tile: Mappable
     }
   }
 
-  ///The type of tile this tile represents.
-  public int Type
-  {
-    get
-    {
-      validify();
-      int value = Client.tileGetType(ptr);
-      return value;
-    }
-  }
-
   ///Determines if this tile is a part of a Pump Station.
   public int PumpID
   {

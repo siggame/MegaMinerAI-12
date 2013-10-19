@@ -15,24 +15,24 @@ class BaseAI:
   runGenerator = None
   connection = None
   #\endcond
-  players = []
   mappables = []
+  tiles = []
   pumpStations = []
   units = []
-  tiles = []
+  players = []
   #\cond
   def startTurn(self):
-    from GameObject import Player
     from GameObject import Mappable
+    from GameObject import Tile
     from GameObject import PumpStation
     from GameObject import Unit
-    from GameObject import Tile
+    from GameObject import Player
 
-    BaseAI.players = [Player(library.getPlayer(self.connection, i)) for i in xrange(library.getPlayerCount(self.connection))]
     BaseAI.mappables = [Mappable(library.getMappable(self.connection, i)) for i in xrange(library.getMappableCount(self.connection))]
+    BaseAI.tiles = [Tile(library.getTile(self.connection, i)) for i in xrange(library.getTileCount(self.connection))]
     BaseAI.pumpStations = [PumpStation(library.getPumpStation(self.connection, i)) for i in xrange(library.getPumpStationCount(self.connection))]
     BaseAI.units = [Unit(library.getUnit(self.connection, i)) for i in xrange(library.getUnitCount(self.connection))]
-    BaseAI.tiles = [Tile(library.getTile(self.connection, i)) for i in xrange(library.getTileCount(self.connection))]
+    BaseAI.players = [Player(library.getPlayer(self.connection, i)) for i in xrange(library.getPlayerCount(self.connection))]
 
     if not self.initialized:
       self.initialized = True
@@ -85,15 +85,15 @@ class BaseAI:
   #\endcond
   attackDamage = property(getAttackDamage)
   #\cond
-  def getOffenseCount(self):
-    return library.getOffenseCount(self.connection)
+  def getOffensePower(self):
+    return library.getOffensePower(self.connection)
   #\endcond
-  offensePower = property(getOffenseCount)
+  offensePower = property(getOffensePower)
   #\cond
-  def getDefenseCount(self):
-    return library.getDefenseCount(self.connection)
+  def getDefensePower(self):
+    return library.getDefensePower(self.connection)
   #\endcond
-  defensePower = property(getDefenseCount)
+  defensePower = property(getDefensePower)
   #\cond
   def getMaxUnits(self):
     return library.getMaxUnits(self.connection)
@@ -114,5 +114,10 @@ class BaseAI:
     return library.getGameNumber(self.connection)
   #\endcond
   gameNumber = property(getGameNumber)
+  #\cond
+  def getMaxSiege(self):
+    return library.getMaxSiege(self.connection)
+  #\endcond
+  maxSiege = property(getMaxSiege)
   def __init__(self, connection):
     self.connection = connection
