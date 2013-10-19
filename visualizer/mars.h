@@ -96,15 +96,40 @@ namespace visualizer
 		private:
 			struct Game
 			{
+                struct Animatable
+                {
+                    Animatable(const parser::GameState& state, const int& id)
+                    {
+                        if(state.animations.find(id) != state.animations.end())
+                            m_Animations = state.animations.at(id);
+                    }
+
+                    std::vector<SmartPointer<parser::Animation> > m_Animations;
+                };
+
+                struct Unit : public parser::Unit, public Animatable
+                {
+                    Unit(const parser::GameState& state, const parser::Unit& unit) :
+                        parser::Unit(unit),
+                        Animatable(state, unit.id)
+                        {}
+                };
+
+                struct Tile : public parser::Tile, public Animatable
+                {
+                    Tile(const parser::GameState& state, const parser::Tile& tile) :
+                        parser::Tile(tile),
+                        Animatable(state, tile.id)
+                        {}
+                };
+
 				struct State
 				{
-					std::map<int, SmartPointer<parser::Player> > players;
-					std::map<int, SmartPointer<parser::Mappable> > mappables;
+                    std::map<int, SmartPointer<parser::Player> > players;
 					std::map<int, SmartPointer<parser::PumpStation> > pumpStations;
-					std::map<int, SmartPointer<parser::Unit> > units;
-					std::map<int, SmartPointer<parser::Tile> > tiles;
-					std::vector<std::vector< SmartPointer<parser::Tile> > > tileGrid;
-					std::map< int, std::vector< SmartPointer< Animation > > > animations;
+                    std::map<int, SmartPointer<Unit> > units;
+                    std::map<int, SmartPointer<Tile> > tiles;
+                    std::vector<std::vector< SmartPointer<Tile> > > tileGrid;
 					int playerID;
 					int turnNumber;
 				};

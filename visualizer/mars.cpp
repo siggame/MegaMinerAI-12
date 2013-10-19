@@ -785,14 +785,64 @@ Mars::Game::Game(parser::Game* game) :
 	unitCost(game->states[0].unitCost),
 	gameNumber(game->states[0].gameNumber)
 {
-	for(auto& state : game->states)
-	{
-		States.resize(States.size() + 1);
-		for(auto& player : state.players)
-		{
-			
-		}
+
+    States.resize(game->states.size());
+
+    for(auto& unit : game->states[0].units)
+    {
+        States[0].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[0], unit.second));
+    }
+
+    for(auto& tile : game->states[0].tiles)
+    {
+        States[0].tiles[tile.second.id] = SmartPointer<Tile>(new Tile(game->states[0], tile.second));
+    }
+
+    States[0].tileGrid.resize(mapWidth);
+    for(auto& col : States[0].tileGrid)
+        col.resize(mapHeight);
+
+    for(auto& tile : States[0].tiles)
+        States[0].tileGrid[tile.second->x][tile.second->y] = tile.second;
+
+
+    for(int i = 1; i < (int) game->states.size(); i++)
+    {
+        for(auto& unitBefore : States[i-1].units)
+            States[i].units[unitBefore.second->id] = unitBefore.second;
+
+        for(auto& unit : game->states[i].units)
+        {
+            bool death = false;
+            auto anims = game->states[i].animations.find(unit.second.id);
+
+            if(anims != game->states[i].animations.end())
+            {
+                for(auto& anim : (*anims).second)
+                    if(anim->type == parser::DEATH)
+                        death = true;
+
+                if(death == true)
+                    States[i].units.erase(unit.second.id);
+                else
+                    States[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
+            }\
+            else
+                States[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
+        }
+
+        for(auto& tileBefore : States[i-1].tiles)
+            States[i].tiles[tileBefore.second->id] = tileBefore.second;
+
+        for(auto& tile : game->states[i].tiles)
+            States[i].tiles[tile.second.id] = SmartPointer<Tile>(new Tile(game->states[i], tile.second));
+
+        States[i].tileGrid.resize(mapWidth);
+        for(auto& col : States[i].tileGrid)
+            col.resize(mapHeight);
 	
+        for(auto& tile : States[i].tiles)
+            States[i].tileGrid[tile.second->x][tile.second->y] = tile.second;
 	}
 }
 
