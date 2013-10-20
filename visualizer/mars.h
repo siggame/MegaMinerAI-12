@@ -19,16 +19,17 @@ using namespace std;
 
 namespace visualizer
 {
-	struct Rect
-	{
-		int left;
-		int top;
-		int right;
-		int bottom;
-	};
 
     class Mars: public QThread, public AnimSequence, public IGame
     {
+        struct Rect
+        {
+            int left;
+            int top;
+            int right;
+            int bottom;
+        };
+
         Q_OBJECT;
         Q_INTERFACES( visualizer::IGame );
         public:

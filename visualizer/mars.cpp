@@ -661,7 +661,6 @@ void Mars::run()
 	QStringList header;
 	header<<"owner" << "hasAttacked" << "hasDug" << "hasFilled" << "healthLeft" << "maxHealth" << "movementLeft" << "maxMovement" <<"X" << "Y" ;
 
-	gui->setDebugHeader( header );
 	timeManager->setNumTurns( 0 );
 
 	animationEngine->registerGame(0, 0);
@@ -733,4 +732,4 @@ void Mars::run()
 
 } // visualizer
 
-Q_EXPORT_PLUGIN2( Mars, visualizer::Mars );
+Q_EXPORT_PLUGIN2( mars, visualizer::Mars );
