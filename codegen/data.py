@@ -8,6 +8,8 @@ gameName = "Mars"
 constants = [
   ]
 
+modelOrder = ['Player', 'Mappable', 'PumpStation', 'Unit', 'Tile']
+
 globals = [
   Variable('mapWidth', int, 'The width of the total map.'),
   Variable('mapHeight', int, 'The height of the total map.'),
