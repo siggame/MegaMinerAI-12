@@ -93,8 +93,8 @@ class Match(DefaultGameWorld):
     self.turn = self.players[-1]
     self.turnNumber = -1
 
-    # ['id', 'x', 'y', 'owner', 'type', 'pumpID', 'waterAmount', 'isTrench']
-    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, -1, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+    # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'isTrench']
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
 
     self.create_ice()
     self.create_spawns()

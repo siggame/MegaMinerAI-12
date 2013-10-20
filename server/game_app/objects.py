@@ -90,16 +90,16 @@ class PumpStation(object):
 
       #Defending
       if unit.owner == self.owner:
-        self.siegeCount -= self.game.defensePower
+        self.siegeAmount -= self.game.defensePower
       elif unit.owner == self.owner^1:
-        self.siegeCount += self.game.offensePower
+        self.siegeAmount += self.game.offensePower
       else:
         print('Unit owner not 0 or 1: {}'.format(self.owner))
 
-    if self.siegeCount < 0:
-      self.siegeCount = 0
-    elif self.siegeCount >= self.maxSiege:
-      self.siegeCount = 0
+    if self.siegeAmount < 0:
+      self.siegeAmount = 0
+    elif self.siegeAmount >= self.maxSiege:
+      self.siegeAmount = 0
       self.owner ^= 1
 
       for siegeTile in self.siegeTiles:
