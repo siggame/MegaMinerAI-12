@@ -235,9 +235,7 @@ class Match(DefaultGameWorld):
     updated = [i for i in self.objects.values() if i.__class__ is PumpStation and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["PumpStation"] + [i.toList() for i in updated])
-    updated = [i for i in self.objects.values() if i.__class__ is Unit and i.updatedAt > self.turnNumber-3]
-    if updated:
-      typeLists.append(["Unit"] + [i.toList() for i in updated])
+    typeLists.append(["Unit"] + [i.toList() for i in self.objects.values() if i.__class__ is Unit])
     updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["Tile"] + [i.toList() for i in updated])
