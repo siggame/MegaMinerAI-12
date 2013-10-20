@@ -328,7 +328,7 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   if (object->type != 1)
     return 0;
   // Can only fill once per turn
-  if (object->hasBuilt == 1)
+  if (object->hasFilled == 1)
     return 0;
   // Can only fill adjacent tiles
   if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
@@ -352,7 +352,7 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  object->hasBuilt = 1;
+  object->hasFilled = 1;
   
   return 1;
 }
@@ -378,7 +378,7 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   if (object->type != 0)
     return 0;
   // Can only dig once per turn
-  if (object->hasDigged == 1)
+  if (object->hasDug == 1)
     return 0;
   // Can only dig adjacent tiles
   if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
@@ -408,7 +408,7 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  object->hasDigged = 1;
+  object->hasDug = 1;
   
   return 1;
 }

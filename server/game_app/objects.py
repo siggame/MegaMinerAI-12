@@ -143,8 +143,8 @@ class Unit(Mappable):
     if self.owner == self.game.playerID:
       self.movementLeft = self.maxMovement
       self.hasAttacked = 0
-      self.hasBuilt = 0
-      self.hasDigged = 0
+      self.hasFilled = 0
+      self.hasDug = 0
           # Check if the unit died
       if self.healthLeft <= 0:
         self.game.objects.players[self.owner].totalUnits -= 1
@@ -200,7 +200,7 @@ class Unit(Mappable):
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.type != 1:
       return 'Turn {}: Your digger unit {} cannot fill.'.format(self.game.turnNumber, self.id)
-    elif self.hasBuilt == 1:
+    elif self.hasFilled == 1:
       return 'Turn {}: Your unit {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your unit {} can only fill adjacent Tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
@@ -216,7 +216,7 @@ class Unit(Mappable):
     # Unit can no longer move
     self.movementLeft = 0
     
-    self.hasBuilt = 1
+    self.hasFilled = 1
     
     self.game.addAnimation(FillAnimation(self.id, tile.id))
     
@@ -232,7 +232,7 @@ class Unit(Mappable):
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.type != 0:
       return 'Turn {}: Your filler {} cannot dig.'.format(self.game.turnNumber, self.id)
-    elif self.hasDigged == 1:
+    elif self.hasDug == 1:
       return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
@@ -252,7 +252,7 @@ class Unit(Mappable):
     # Unit can no longer move
     self.movementLeft = 0
     
-    self.hasDigged = 1
+    self.hasDug = 1
     
     self.game.addAnimation(DigAnimation(self.id, tile.id))
     
@@ -335,7 +335,7 @@ class Tile(Mappable):
 
     player.oxygen -= self.game.unitCost
 
-    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDigged', 'hasBuilt', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
+    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
     newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, 1, 1 ]
     player.spawnQueue.append(newUnitStats)
     player.totalUnits += 1

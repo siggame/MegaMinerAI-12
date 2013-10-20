@@ -188,11 +188,11 @@ library.unitGetType.argtypes = [c_void_p]
 library.unitGetHasAttacked.restype = c_int
 library.unitGetHasAttacked.argtypes = [c_void_p]
 
-library.unitGetHasDigged.restype = c_int
-library.unitGetHasDigged.argtypes = [c_void_p]
+library.unitGetHasDug.restype = c_int
+library.unitGetHasDug.argtypes = [c_void_p]
 
-library.unitGetHasBuilt.restype = c_int
-library.unitGetHasBuilt.argtypes = [c_void_p]
+library.unitGetHasFilled.restype = c_int
+library.unitGetHasFilled.argtypes = [c_void_p]
 
 library.unitGetHealthLeft.restype = c_int
 library.unitGetHealthLeft.argtypes = [c_void_p]

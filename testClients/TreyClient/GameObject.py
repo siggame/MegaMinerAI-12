@@ -308,20 +308,20 @@ class Unit(Mappable):
   hasAttacked = property(getHasAttacked)
 
   #\cond
-  def getHasDigged(self):
+  def getHasDug(self):
     self.validify()
-    return library.unitGetHasDigged(self._ptr)
+    return library.unitGetHasDug(self._ptr)
   #\endcond
   ##Whether the current unit has digged or not.
-  hasDigged = property(getHasDigged)
+  hasDug = property(getHasDug)
 
   #\cond
-  def getHasBuilt(self):
+  def getHasFilled(self):
     self.validify()
-    return library.unitGetHasBuilt(self._ptr)
+    return library.unitGetHasFilled(self._ptr)
   #\endcond
   ##Whether the current unit has built or not.
-  hasBuilt = property(getHasBuilt)
+  hasFilled = property(getHasFilled)
 
   #\cond
   def getHealthLeft(self):
@@ -365,8 +365,8 @@ class Unit(Mappable):
     ret += "owner: %s\n" % self.getOwner()
     ret += "type: %s\n" % self.getType()
     ret += "hasAttacked: %s\n" % self.getHasAttacked()
-    ret += "hasDigged: %s\n" % self.getHasDigged()
-    ret += "hasBuilt: %s\n" % self.getHasBuilt()
+    ret += "hasDug: %s\n" % self.getHasDug()
+    ret += "hasFilled: %s\n" % self.getHasFilled()
     ret += "healthLeft: %s\n" % self.getHealthLeft()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
     ret += "movementLeft: %s\n" % self.getMovementLeft()

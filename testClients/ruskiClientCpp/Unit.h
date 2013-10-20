@@ -29,9 +29,9 @@ class Unit : public Mappable {
   ///Whether current unit has attacked or not.
   int hasAttacked();
   ///Whether the current unit has digged or not.
-  int hasDigged();
+  int hasDug();
   ///Whether the current unit has built or not.
-  int hasBuilt();
+  int hasFilled();
   ///The current amount health this unit has remaining.
   int healthLeft();
   ///The maximum amount of this health this unit can have

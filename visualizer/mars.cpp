@@ -626,8 +626,8 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 
 		turn[unitIter->second.id]["owner"] = unitIter->second.owner;
 		turn[unitIter->second.id]["hasAttacked"] = unitIter->second.hasAttacked;
-		turn[unitIter->second.id]["hasDigged"] = unitIter->second.hasDigged;
-		turn[unitIter->second.id]["hasBuilt"] = unitIter->second.hasBuilt;
+		turn[unitIter->second.id]["hasDug"] = unitIter->second.hasDug;
+		turn[unitIter->second.id]["hasFilled"] = unitIter->second.hasFilled;
 		turn[unitIter->second.id]["healthLeft"] = unitIter->second.healthLeft;
 		turn[unitIter->second.id]["maxHealth"] = unitIter->second.maxHealth;
 		turn[unitIter->second.id]["movementLeft"] = unitIter->second.movementLeft;
@@ -659,7 +659,7 @@ parser::Tile& Mars::GetTileAt(int x, int y)
 void Mars::run()
 {
 	QStringList header;
-	header<<"owner" << "hasAttacked" << "hasDigged" << "hasBuilt" << "healthLeft" << "maxHealth" << "movementLeft" << "maxMovement" <<"X" << "Y" ;
+	header<<"owner" << "hasAttacked" << "hasDug" << "hasFilled" << "healthLeft" << "maxHealth" << "movementLeft" << "maxMovement" <<"X" << "Y" ;
 
 	gui->setDebugHeader( header );
 	timeManager->setNumTurns( 0 );
