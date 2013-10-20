@@ -22,7 +22,8 @@ struct _Player
   char* playerName;
   float time;
   int waterStored;
-  int spawnResources;
+  int oxygen;
+  int maxOxygen;
 };
 struct _Mappable
 {
@@ -37,7 +38,7 @@ struct _PumpStation
   int id;
   int owner;
   int waterAmount;
-  int siegeCount;
+  int siegeAmount;
 };
 struct _Unit
 {
@@ -48,8 +49,8 @@ struct _Unit
   int owner;
   int type;
   int hasAttacked;
-  int hasDigged;
-  int hasBuilt;
+  int hasDug;
+  int hasFilled;
   int healthLeft;
   int maxHealth;
   int movementLeft;
@@ -62,7 +63,6 @@ struct _Tile
   int x;
   int y;
   int owner;
-  int type;
   int pumpID;
   int waterAmount;
   int isTrench;

@@ -699,8 +699,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 			   m_game->states[state - 1].units.find(unitIter->id) != m_game->states[state - 1].units.end() &&
 			   m_game->states[state - 1].units.at(unitIter->id)->m_Flipped)
 			   unitIter->m_Flipped = true;
-
-
 		}
 		else
 		{

@@ -47,6 +47,8 @@ class Match(DefaultGameWorld):
     self.playerID = -1
     self.gameNumber = id
     self.turnLimit = self.turnLimit
+    self.maxSiege = self.maxSiege
+    self.oxygenRate = self.oxygenRate
 
     self.ice = []
 
@@ -61,9 +63,9 @@ class Match(DefaultGameWorld):
     if type == "player":
       self.players.append(connection)
       try:
-        #['id', 'playerName', 'time', 'waterStored', 'spawnResources']
+        #['id', 'playerName', 'time', 'waterStored', 'oxygen']
         startingResources = 1000
-        self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources])
+        self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources, self.maxOxygen])
       except TypeError:
         raise TypeError("Someone forgot to add the extra attributes to the Player object initialization")
     elif type == "spectator":
@@ -91,8 +93,8 @@ class Match(DefaultGameWorld):
     self.turn = self.players[-1]
     self.turnNumber = -1
 
-    # ['id', 'x', 'y', 'owner', 'type', 'pumpID', 'waterAmount', 'isTrench']
-    self.grid = [[[ self.addObject(Tile,[x, y, 2, 0, -1, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+    # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'isTrench']
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
 
     self.create_ice()
     self.create_spawns()
@@ -278,6 +280,8 @@ class Match(DefaultGameWorld):
           unitCost = self.unitCost,
           playerID = self.playerID,
           gameNumber = self.gameNumber,
+          maxSiege = self.maxSiege,
+          oxygenRate = self.oxygenRate,
           Players = [i.toJson() for i in self.objects.values() if i.__class__ is Player],
           Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
@@ -450,7 +454,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])

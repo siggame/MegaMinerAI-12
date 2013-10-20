@@ -44,6 +44,8 @@ struct Connection
   int unitCost;
   int playerID;
   int gameNumber;
+  int maxSiege;
+  float oxygenRate;
 
   _Player* Players;
   int PlayerCount;
@@ -101,12 +103,14 @@ DLLEXPORT int getTrenchDamage(Connection* c);
 DLLEXPORT int getWaterDamage(Connection* c);
 DLLEXPORT int getTurnNumber(Connection* c);
 DLLEXPORT int getAttackDamage(Connection* c);
-DLLEXPORT int getOffenseCount(Connection* c);
-DLLEXPORT int getDefenseCount(Connection* c);
+DLLEXPORT int getOffensePower(Connection* c);
+DLLEXPORT int getDefensePower(Connection* c);
 DLLEXPORT int getMaxUnits(Connection* c);
 DLLEXPORT int getUnitCost(Connection* c);
 DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
+DLLEXPORT int getMaxSiege(Connection* c);
+DLLEXPORT float getOxygenRate(Connection* c);
 
 DLLEXPORT _Player* getPlayer(Connection* c, int num);
 DLLEXPORT int getPlayerCount(Connection* c);

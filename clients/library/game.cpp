@@ -68,6 +68,8 @@ DLLEXPORT Connection* createConnection()
   c->unitCost = 0;
   c->playerID = 0;
   c->gameNumber = 0;
+  c->maxSiege = 0;
+  c->oxygenRate = 0;
   c->Players = NULL;
   c->PlayerCount = 0;
   c->Mappables = NULL;
@@ -326,7 +328,7 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   if (object->type != 1)
     return 0;
   // Can only fill once per turn
-  if (object->hasBuilt == 1)
+  if (object->hasFilled == 1)
     return 0;
   // Can only fill adjacent tiles
   if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
@@ -350,7 +352,7 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  object->hasBuilt = 1;
+  object->hasFilled = 1;
   
   return 1;
 }
@@ -376,7 +378,7 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   if (object->type != 0)
     return 0;
   // Can only dig once per turn
-  if (object->hasDigged == 1)
+  if (object->hasDug == 1)
     return 0;
   // Can only dig adjacent tiles
   if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
@@ -406,7 +408,7 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  object->hasDigged = 1;
+  object->hasDug = 1;
   
   return 1;
 }
@@ -465,7 +467,7 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   if (object->owner != getPlayerID(c))
     return 0;
   // Only spawn if player has enough resources
-  if (getPlayer(c, object->owner)->spawnResources < getUnitCost(c))
+  if (getPlayer(c, object->owner)->oxygen < getUnitCost(c))
     return 0;
   // Can only spawn Fillers and Diggers
   if (type != 0 && type != 1)
@@ -486,7 +488,7 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   if (count >= getMaxUnits(c))
     return 0;
   
-  getPlayer(c, getPlayerID(c))->spawnResources -= getUnitCost(c);
+  getPlayer(c, getPlayerID(c))->oxygen -= getUnitCost(c);
   
   return 1;
 }
@@ -510,7 +512,9 @@ void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
   sub = sub->next;
   object->waterStored = atoi(sub->val);
   sub = sub->next;
-  object->spawnResources = atoi(sub->val);
+  object->oxygen = atoi(sub->val);
+  sub = sub->next;
+  object->maxOxygen = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -542,7 +546,7 @@ void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
   sub = sub->next;
   object->waterAmount = atoi(sub->val);
   sub = sub->next;
-  object->siegeCount = atoi(sub->val);
+  object->siegeAmount = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -565,9 +569,9 @@ void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
   sub = sub->next;
   object->hasAttacked = atoi(sub->val);
   sub = sub->next;
-  object->hasDigged = atoi(sub->val);
+  object->hasDug = atoi(sub->val);
   sub = sub->next;
-  object->hasBuilt = atoi(sub->val);
+  object->hasFilled = atoi(sub->val);
   sub = sub->next;
   object->healthLeft = atoi(sub->val);
   sub = sub->next;
@@ -593,8 +597,6 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   object->y = atoi(sub->val);
   sub = sub->next;
   object->owner = atoi(sub->val);
-  sub = sub->next;
-  object->type = atoi(sub->val);
   sub = sub->next;
   object->pumpID = atoi(sub->val);
   sub = sub->next;
@@ -710,6 +712,12 @@ DLLEXPORT int networkLoop(Connection* c)
           sub = sub->next;
 
           c->gameNumber = atoi(sub->val);
+          sub = sub->next;
+
+          c->maxSiege = atoi(sub->val);
+          sub = sub->next;
+
+          c->oxygenRate = atof(sub->val);
           sub = sub->next;
 
         }
@@ -913,11 +921,11 @@ DLLEXPORT int getAttackDamage(Connection* c)
 {
   return c->attackDamage;
 }
-DLLEXPORT int getOffenseCount(Connection* c)
+DLLEXPORT int getOffensePower(Connection* c)
 {
   return c->offensePower;
 }
-DLLEXPORT int getDefenseCount(Connection* c)
+DLLEXPORT int getDefensePower(Connection* c)
 {
   return c->defensePower;
 }
@@ -936,4 +944,12 @@ DLLEXPORT int getPlayerID(Connection* c)
 DLLEXPORT int getGameNumber(Connection* c)
 {
   return c->gameNumber;
+}
+DLLEXPORT int getMaxSiege(Connection* c)
+{
+  return c->maxSiege;
+}
+DLLEXPORT float getOxygenRate(Connection* c)
+{
+  return c->oxygenRate;
 }

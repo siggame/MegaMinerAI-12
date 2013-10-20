@@ -14,7 +14,8 @@ std::ostream& operator<<(std::ostream& stream, Player ob)
   stream << "playerName: " << ob.playerName  <<'\n';
   stream << "time: " << ob.time  <<'\n';
   stream << "waterStored: " << ob.waterStored  <<'\n';
-  stream << "spawnResources: " << ob.spawnResources  <<'\n';
+  stream << "oxygen: " << ob.oxygen  <<'\n';
+  stream << "maxOxygen: " << ob.maxOxygen  <<'\n';
   return stream;
 }
 
@@ -33,7 +34,7 @@ std::ostream& operator<<(std::ostream& stream, PumpStation ob)
   stream << "id: " << ob.id  <<'\n';
   stream << "owner: " << ob.owner  <<'\n';
   stream << "waterAmount: " << ob.waterAmount  <<'\n';
-  stream << "siegeCount: " << ob.siegeCount  <<'\n';
+  stream << "siegeAmount: " << ob.siegeAmount  <<'\n';
   return stream;
 }
 
@@ -46,8 +47,8 @@ std::ostream& operator<<(std::ostream& stream, Unit ob)
   stream << "owner: " << ob.owner  <<'\n';
   stream << "type: " << ob.type  <<'\n';
   stream << "hasAttacked: " << ob.hasAttacked  <<'\n';
-  stream << "hasDigged: " << ob.hasDigged  <<'\n';
-  stream << "hasBuilt: " << ob.hasBuilt  <<'\n';
+  stream << "hasDug: " << ob.hasDug  <<'\n';
+  stream << "hasFilled: " << ob.hasFilled  <<'\n';
   stream << "healthLeft: " << ob.healthLeft  <<'\n';
   stream << "maxHealth: " << ob.maxHealth  <<'\n';
   stream << "movementLeft: " << ob.movementLeft  <<'\n';
@@ -62,7 +63,6 @@ std::ostream& operator<<(std::ostream& stream, Tile ob)
   stream << "x: " << ob.x  <<'\n';
   stream << "y: " << ob.y  <<'\n';
   stream << "owner: " << ob.owner  <<'\n';
-  stream << "type: " << ob.type  <<'\n';
   stream << "pumpID: " << ob.pumpID  <<'\n';
   stream << "waterAmount: " << ob.waterAmount  <<'\n';
   stream << "isTrench: " << ob.isTrench  <<'\n';
@@ -80,15 +80,6 @@ std::ostream& operator<<(std::ostream& stream, spawn ob)
 }
 
 
-std::ostream& operator<<(std::ostream& stream, attack ob)
-{
-  stream << "attack" << "\n";
-  stream << "actingID: " << ob.actingID  <<'\n';
-  stream << "targetID: " << ob.targetID  <<'\n';
-  return stream;
-}
-
-
 std::ostream& operator<<(std::ostream& stream, move ob)
 {
   stream << "move" << "\n";
@@ -97,6 +88,32 @@ std::ostream& operator<<(std::ostream& stream, move ob)
   stream << "fromY: " << ob.fromY  <<'\n';
   stream << "toX: " << ob.toX  <<'\n';
   stream << "toY: " << ob.toY  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, fill ob)
+{
+  stream << "fill" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "tileID: " << ob.tileID  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, death ob)
+{
+  stream << "death" << "\n";
+  stream << "sourceID: " << ob.sourceID  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, dig ob)
+{
+  stream << "dig" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "tileID: " << ob.tileID  <<'\n';
   return stream;
 }
 
@@ -111,20 +128,11 @@ std::ostream& operator<<(std::ostream& stream, flow ob)
 }
 
 
-std::ostream& operator<<(std::ostream& stream, fill ob)
+std::ostream& operator<<(std::ostream& stream, attack ob)
 {
-  stream << "fill" << "\n";
+  stream << "attack" << "\n";
   stream << "actingID: " << ob.actingID  <<'\n';
-  stream << "tileID: " << ob.tileID  <<'\n';
-  return stream;
-}
-
-
-std::ostream& operator<<(std::ostream& stream, dig ob)
-{
-  stream << "dig" << "\n";
-  stream << "actingID: " << ob.actingID  <<'\n';
-  stream << "tileID: " << ob.tileID  <<'\n';
+  stream << "targetID: " << ob.targetID  <<'\n';
   return stream;
 }
 
@@ -144,6 +152,8 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   stream << "unitCost: " << ob.unitCost  <<'\n';
   stream << "playerID: " << ob.playerID  <<'\n';
   stream << "gameNumber: " << ob.gameNumber  <<'\n';
+  stream << "maxSiege: " << ob.maxSiege  <<'\n';
+  stream << "oxygenRate: " << ob.oxygenRate  <<'\n';
 
   stream << "\n\nPlayers:\n";
   for(std::map<int,Player>::iterator i = ob.players.begin(); i != ob.players.end(); i++)
@@ -172,16 +182,18 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   {
 //    if((*(*i)).type == SPAWN)
 //      stream << *((spawn*)*i) << "\n";
-//    if((*(*i)).type == ATTACK)
-//      stream << *((attack*)*i) << "\n";
 //    if((*(*i)).type == MOVE)
 //      stream << *((move*)*i) << "\n";
-//    if((*(*i)).type == FLOW)
-//      stream << *((flow*)*i) << "\n";
 //    if((*(*i)).type == FILL)
 //      stream << *((fill*)*i) << "\n";
+//    if((*(*i)).type == DEATH)
+//      stream << *((death*)*i) << "\n";
 //    if((*(*i)).type == DIG)
 //      stream << *((dig*)*i) << "\n";
+//    if((*(*i)).type == FLOW)
+//      stream << *((flow*)*i) << "\n";
+//    if((*(*i)).type == ATTACK)
+//      stream << *((attack*)*i) << "\n";
   }
   
 

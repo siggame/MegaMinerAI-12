@@ -43,9 +43,9 @@ public:
   int turnNumber();
   ///The amount of damage a unit will deal.
   int attackDamage();
-  ///How quickly a unit will siege a base.
+  ///How quickly a unit will siege a PumpStation.
   int offensePower();
-  ///The much a unit will slow a  siege.
+  ///How much a unit will slow a siege.
   int defensePower();
   ///The maximum number of units allowed per player.
   int maxUnits();
@@ -55,6 +55,10 @@ public:
   int playerID();
   ///What number game this is for the server
   int gameNumber();
+  ///The maximum siege value before the PumpStation is sieged.
+  int maxSiege();
+  ///The rate at which missing oxygen is regained.
+  float oxygenRate();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();
