@@ -6,7 +6,9 @@ import time
 from time import sleep
 import random
 import game_utils
+from game_utils import get_tile
 import path_find
+
 
 class AI(BaseAI):
 
@@ -25,31 +27,40 @@ class AI(BaseAI):
     return "password"
 
   def get_spawn_tiles(self):
-    for tile in self.tiles:
-      if tile.owner == self.playerID:
-        self.spawn_tiles.append(tile)
+    self.spawn_tiles = [tile for tile in self.tiles if tile.owner == self.playerID]
 
   def spawn_units(self):
     for tile in self.spawn_tiles:
       tile.spawn(random.choice([game_utils.DIGGER, game_utils.FILLER]))
 
-  def move_units(self):
-    for unit in self.units:
-      if unit.owner == self.playerID:
-        pf_tiles = self.pf.path_find( game_utils.get_tile(self, unit.x,unit.y), game_utils.get_tile(self, 4,5) )
-        if pf_tiles is not None:
-          print('CAN MOVE ({},{}) -> ({},{})'.format(unit.x, unit.y, 4, 5))
-          for tile in pf_tiles:
-            print('({},{})'.format(tile.x, tile.y))
-        else:
-          print('CANNOT MOVE ({},{}) -> ({},{})'.format(unit.x, unit.y, 4, 5))
+  def move_unit_to(self, unit, x, y):
+    unit_tile = get_tile(self, unit.x, unit.y)
+    if unit_tile is None:
+      print('Unit {} ({},{}) does not have a corresponding tile.'.format(unit.id, unit.x, unit.y))
+      return False
 
+    goal_tile = get_tile(self, x, y)
+    if goal_tile is None:
+      print('Goal Tile ({},{}) does not have a corresponding tile.'.format(x, y))
+      return False
+
+    pf_tiles = self.pf.path_find(unit_tile, goal_tile)
+    if pf_tiles is None or len(pf_tiles) <= 1:
+      print('Cannot travel from ({},{}) to ({},{}).'.format(unit.x, unit.y, x, y))
+      return False
+
+    #Remove very beginning tile
+    pf_tiles = pf_tiles[1:]
+
+    for tile in pf_tiles[:unit.maxMovement]:
+      unit.move(tile.x, tile.y)
+
+    return True
 
   ##This function is called once, before your first turn
   def init(self):
     self.get_spawn_tiles()
     self.history = game_utils.game_history(self, True)
-
     self.pf = path_find.path_finder(self)
     return
 
@@ -58,10 +69,24 @@ class AI(BaseAI):
     self.history.print_history()
     return
 
-  def nearest_enemy(self, x, y):
-    for unit
+  @staticmethod
+  def man_dist(x1, y1 ,x2, y2):
+    return abs(x2-x1) + abs(y2-y1)
 
-  def attack_enemy(self):
+  def nearest_enemy(self, x, y):
+    enemy, dist = None, 100000
+    for unit in self.units:
+      if unit.owner != self.playerID:
+        cur_dist = self.man_dist(x, y, unit.x, unit.y)
+        if cur_dist < dist:
+          enemy, dist = unit, cur_dist
+    return enemy
+
+  def greedy_enemy(self):
+    for unit in self.units:
+      if unit.owner != self.playerID:
+        return unit
+    return None
 
 
   ##This function is called each time it is your turn
@@ -69,18 +94,22 @@ class AI(BaseAI):
   def run(self):
     print(self.turnNumber)
     #SNAPSHOT AT BEGINNING
-    self.history.save_snapshot()
-
-    self.pf.refresh_obstacles()
+    #self.history.save_snapshot()
 
     self.spawn_units()
-    self.attack_enemy()
 
-    self.attack_enemy()
+    for unit in self.units:
+      if unit.owner == self.playerID:
+        enemy_unit = self.nearest_enemy(unit.x, unit.y)
+        if enemy_unit is not None:
+          self.move_unit_to(unit, enemy_unit.x, enemy_unit.y)
+
+          if self.man_dist(unit.x, unit.y, enemy_unit.x, enemy_unit.y) == 1:
+            unit.attack(enemy_unit)
 
 
     #SNAPSHOT AT END
-    self.history.save_snapshot()
+    #self.history.save_snapshot()
     return 1
 
   def __init__(self, conn):

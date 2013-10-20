@@ -5,18 +5,8 @@ class path_finder:
   def __init__(self, ai):
     self.__ai = ai
 
-    self.__obstacles = dict()
-
-  def refresh_obstacles(self):
-    self.__obstacles = dict()
-
-    #ICE
     for unit in self.__ai.units:
       self.__obstacles[(unit.x, unit.y)] = unit
-
-    for tile in self.__ai.tiles:
-      if tile.owner == 3 and tile.waterAmount > 0:
-        self.__obstacles[(tile.x, tile.y)] = tile
 
 
 
@@ -31,8 +21,9 @@ class path_finder:
     offsets = [(0,1),(1,0),(0,-1),(-1,0)]
     for offset in offsets:
       neighbor = self.__get_tile(tile.x+offset[0], tile.y+offset[1])
-      if neighbor is not None and (neighbor.x, neighbor.y) not in self.__obstacles.keys():
-        neighbors.append(neighbor)
+      if neighbor is None:
+        continue
+      neighbors.append(neighbor)
 
     return neighbors
 
@@ -55,7 +46,7 @@ class path_finder:
 
     closed_set = []
     open_set = []
-    #came_from := the empty map    // The map of navigated nodes.
+
     g_scores = dict()
     f_scores = dict()
     parents = dict()
