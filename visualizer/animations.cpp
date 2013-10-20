@@ -42,10 +42,9 @@ namespace visualizer
 		glm::vec2 diff = thisMove.to - thisMove.from;
 		glm::vec2 pos = thisMove.from + diff * subT;
 
-		// TODO: give it the option of being flipped
         ColorSprite::animate(t, d, game);
 		game->renderer->drawTexturedQuad(pos.x, pos.y, 1.0f, 1.0f,
-										 m_Sprite->m_SpriteName, true);
+										 m_Sprite->m_SpriteName, m_Flipped);
 
 	}
 

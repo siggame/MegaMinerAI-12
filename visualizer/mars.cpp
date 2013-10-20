@@ -597,9 +597,15 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 	auto unitIter = m_Units.begin();
 	while(unitIter != m_Units.end())
 	{
-        SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
-		pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter->second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f) ));
-        turn.addAnimatable(pUnit);
+        std::string texture;
+        bool flipped = false;
+
+        if(unitIter->second.type == 0)
+            texture = "digger";
+        else
+            texture = "filler";
+
+        SmartPointer<MoveableSprite> pUnit = new MoveableSprite(texture);
 
 		for(auto& animationIter : m_game->states[state].animations[unitIter->second.id])
         {
@@ -623,6 +629,15 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 			pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter->second.x, unitIter->second.y), glm::vec2(unitIter->second.x, unitIter->second.y)));
 			trailMap[unitIter->second.y][unitIter->second.x] = 5;
 		}
+		else
+		{
+            if(pUnit->m_Moves.back().to.x >= pUnit->m_Moves.front().from.x)
+                flipped = true;
+		}
+
+
+		pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter->second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f), flipped));
+        turn.addAnimatable(pUnit);
 
 		turn[unitIter->second.id]["owner"] = unitIter->second.owner;
 		turn[unitIter->second.id]["hasAttacked"] = unitIter->second.hasAttacked;
