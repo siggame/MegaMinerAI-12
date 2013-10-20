@@ -790,30 +790,17 @@ DLLEXPORT int networkLoop(Connection* c)
         {
           if(c->Units)
           {
-            sub = sub->next;
             for(int i = 0; i < c->UnitCount; i++)
             {
-              if(!sub)
-              {
-                break;
-              }
-              int id = atoi(sub->list->val);
-              if(id == c->Units[i].id)
-              {
-                parseUnit(c, c->Units+i, sub);
-                sub = sub->next;
-              }
             }
+            delete[] c->Units;
           }
-          else
+          c->UnitCount =  sexp_list_length(expression)-1; //-1 for the header
+          c->Units = new _Unit[c->UnitCount];
+          for(int i = 0; i < c->UnitCount; i++)
           {
-            c->UnitCount =  sexp_list_length(expression)-1; //-1 for the header
-            c->Units = new _Unit[c->UnitCount];
-            for(int i = 0; i < c->UnitCount; i++)
-            {
-              sub = sub->next;
-              parseUnit(c, c->Units+i, sub);
-            }
+            sub = sub->next;
+            parseUnit(c, c->Units+i, sub);
           }
         }
         else if(string(sub->val) == "Tile")

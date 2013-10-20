@@ -87,7 +87,6 @@ Unit = Model('Unit',
     Function('dig',[Variable('tile', Tile)],
     doc='Dig out a tile'),
     ],
-  permanent = True,
   )
 
 Unit.addFunctions([Function("attack", [ Variable("target", Unit)],
