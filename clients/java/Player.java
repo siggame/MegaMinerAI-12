@@ -62,11 +62,17 @@ class Player
     validify();
     return Client.INSTANCE.playerGetWaterStored(ptr);
   }
-  ///Resource used to spawn in units
-  public int getSpawnResources()
+  ///Resource used to spawn in units.
+  public int getOxygen()
   {
     validify();
-    return Client.INSTANCE.playerGetSpawnResources(ptr);
+    return Client.INSTANCE.playerGetOxygen(ptr);
+  }
+  ///The player's oxygen cap.
+  public int getMaxOxygen()
+  {
+    validify();
+    return Client.INSTANCE.playerGetMaxOxygen(ptr);
   }
 
 }

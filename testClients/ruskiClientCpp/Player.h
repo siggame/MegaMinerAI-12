@@ -21,8 +21,10 @@ class Player {
   float time();
   ///The amount of water a player has.
   int waterStored();
-  ///Resource used to spawn in units
-  int spawnResources();
+  ///Resource used to spawn in units.
+  int oxygen();
+  ///The player's oxygen cap.
+  int maxOxygen();
 
   // Actions
   ///Allows a player to display messages on the screen

@@ -71,12 +71,12 @@ class Player(GameObject):
   waterStored = property(getWaterStored)
 
   #\cond
-  def getSpawnResources(self):
+  def getOxygen(self):
     self.validify()
-    return library.playerGetSpawnResources(self._ptr)
+    return library.playerGetOxygen(self._ptr)
   #\endcond
   ##Resource used to spawn in units
-  spawnResources = property(getSpawnResources)
+  oxygen = property(getOxygen)
 
 
   def __str__(self):
@@ -86,7 +86,7 @@ class Player(GameObject):
     ret += "playerName: %s\n" % self.getPlayerName()
     ret += "time: %s\n" % self.getTime()
     ret += "waterStored: %s\n" % self.getWaterStored()
-    ret += "spawnResources: %s\n" % self.getSpawnResources()
+    ret += "oxygen: %s\n" % self.getOxygen()
     return ret
 
 ##A mappable object!
@@ -196,7 +196,7 @@ class PumpStation(GameObject):
     return library.pumpStationGetSiegeCount(self._ptr)
   #\endcond
   ##The length of time it takes to capture the PumpStation.
-  siegeCount = property(getSiegeCount)
+  siegeAmount = property(getSiegeCount)
 
 
   def __str__(self):
@@ -205,7 +205,7 @@ class PumpStation(GameObject):
     ret += "id: %s\n" % self.getId()
     ret += "owner: %s\n" % self.getOwner()
     ret += "waterAmount: %s\n" % self.getWaterAmount()
-    ret += "siegeCount: %s\n" % self.getSiegeCount()
+    ret += "siegeAmount: %s\n" % self.getSiegeCount()
     return ret
 
 ##Represents a single unit on the map.
@@ -308,20 +308,20 @@ class Unit(Mappable):
   hasAttacked = property(getHasAttacked)
 
   #\cond
-  def getHasDigged(self):
+  def getHasDug(self):
     self.validify()
-    return library.unitGetHasDigged(self._ptr)
+    return library.unitGetHasDug(self._ptr)
   #\endcond
   ##Whether the current unit has digged or not.
-  hasDigged = property(getHasDigged)
+  hasDug = property(getHasDug)
 
   #\cond
-  def getHasBuilt(self):
+  def getHasFilled(self):
     self.validify()
-    return library.unitGetHasBuilt(self._ptr)
+    return library.unitGetHasFilled(self._ptr)
   #\endcond
   ##Whether the current unit has built or not.
-  hasBuilt = property(getHasBuilt)
+  hasFilled = property(getHasFilled)
 
   #\cond
   def getHealthLeft(self):
@@ -365,8 +365,8 @@ class Unit(Mappable):
     ret += "owner: %s\n" % self.getOwner()
     ret += "type: %s\n" % self.getType()
     ret += "hasAttacked: %s\n" % self.getHasAttacked()
-    ret += "hasDigged: %s\n" % self.getHasDigged()
-    ret += "hasBuilt: %s\n" % self.getHasBuilt()
+    ret += "hasDug: %s\n" % self.getHasDug()
+    ret += "hasFilled: %s\n" % self.getHasFilled()
     ret += "healthLeft: %s\n" % self.getHealthLeft()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
     ret += "movementLeft: %s\n" % self.getMovementLeft()

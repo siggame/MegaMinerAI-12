@@ -26,8 +26,6 @@ class Tile : public Mappable {
   int y();
   ///The owner of the tile.
   int owner();
-  ///The type of tile this tile represents.
-  int type();
   ///Determines if this tile is a part of a Pump Station.
   int pumpID();
   ///The amount of water contained on the tile.

@@ -53,9 +53,9 @@ public class Client {
   [DllImport("client")]
   public static extern int getAttackDamage(IntPtr connection);
   [DllImport("client")]
-  public static extern int getOffenseCount(IntPtr connection);
+  public static extern int getOffensePower(IntPtr connection);
   [DllImport("client")]
-  public static extern int getDefenseCount(IntPtr connection);
+  public static extern int getDefensePower(IntPtr connection);
   [DllImport("client")]
   public static extern int getMaxUnits(IntPtr connection);
   [DllImport("client")]
@@ -64,6 +64,10 @@ public class Client {
   public static extern int getPlayerID(IntPtr connection);
   [DllImport("client")]
   public static extern int getGameNumber(IntPtr connection);
+  [DllImport("client")]
+  public static extern int getMaxSiege(IntPtr connection);
+  [DllImport("client")]
+  public static extern float getOxygenRate(IntPtr connection);
 
   [DllImport("client")]
   public static extern IntPtr getPlayer(IntPtr connection, int num);
@@ -97,7 +101,9 @@ public class Client {
   [DllImport("client")]
   public static extern int playerGetWaterStored(IntPtr ptr);
   [DllImport("client")]
-  public static extern int playerGetSpawnResources(IntPtr ptr);
+  public static extern int playerGetOxygen(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int playerGetMaxOxygen(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int mappableGetId(IntPtr ptr);
@@ -113,7 +119,7 @@ public class Client {
   [DllImport("client")]
   public static extern int pumpStationGetWaterAmount(IntPtr ptr);
   [DllImport("client")]
-  public static extern int pumpStationGetSiegeCount(IntPtr ptr);
+  public static extern int pumpStationGetSiegeAmount(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int unitGetId(IntPtr ptr);
@@ -128,9 +134,9 @@ public class Client {
   [DllImport("client")]
   public static extern int unitGetHasAttacked(IntPtr ptr);
   [DllImport("client")]
-  public static extern int unitGetHasDigged(IntPtr ptr);
+  public static extern int unitGetHasDug(IntPtr ptr);
   [DllImport("client")]
-  public static extern int unitGetHasBuilt(IntPtr ptr);
+  public static extern int unitGetHasFilled(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetHealthLeft(IntPtr ptr);
   [DllImport("client")]
@@ -148,8 +154,6 @@ public class Client {
   public static extern int tileGetY(IntPtr ptr);
   [DllImport("client")]
   public static extern int tileGetOwner(IntPtr ptr);
-  [DllImport("client")]
-  public static extern int tileGetType(IntPtr ptr);
   [DllImport("client")]
   public static extern int tileGetPumpID(IntPtr ptr);
   [DllImport("client")]
