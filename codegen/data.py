@@ -23,11 +23,13 @@ globals = [
   Variable('playerID', int, 'The id of the current player.'),
   Variable('gameNumber', int, 'What number game this is for the server'),
   Variable('maxSiege', int, 'The maximum siege value before the PumpStation is sieged.'),
+  Variable('oxygenRate', float, 'The rate at which missing oxygen is regained.'),
 ]
 
 playerData = [
   Variable('waterStored', int, 'The amount of water a player has.'),
-  Variable('spawnResources', int, 'Resource used to spawn in units'),
+  Variable('oxygen', int, 'Resource used to spawn in units.'),
+  Variable('maxOxygen', int, "The player's oxygen cap."),
   ]
 
 playerFunctions = [
