@@ -8,7 +8,7 @@ SOURCES = *.cpp           ./parser/*.cpp           ./parser/sexp/*.cpp          
 
 HEADERS +=  *.h             ./parser/*.h             ./parser/sexp/*.h
 
-CONFIG += config plugin dll 
+CONFIG += plugin
 debug:DEFINES += __DEBUG__
 #QMAKE_CFLAGS_DEBUG += -pg
 #QMAKE_CXXFLAGS_DEBUG += -pg
@@ -21,3 +21,13 @@ QMAKE_CXXFLAGS += -std=c++0x
 QMAKE_CXXFLAGS_DEBUG += -std=c++0x
 
 QT += opengl
+
+win32: {
+CONFIG += static
+} else {
+QMAKE_CFLAGS_DEBUG += -rdynamic
+QMAKE_CXXFLAGS_DEBUG += -rdynamic
+QMAKE_LFLAGS_DEBUG += -rdynamic
+LIBS += -lGLU
+CONFIG += dll
+}
