@@ -91,7 +91,7 @@ void Mars::ProccessInput()
                 const auto& tile = iter.second;
 
                 if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y &&
-                  (tile->isTrench == true || tile->owner == 3))
+                  (tile->isTrench == true || tile->owner == 3 || tile->pumpID != -1))
                 {
                     m_selectedUnitIDs.push_back(tile->id);
                 }
@@ -213,9 +213,59 @@ list<int> Mars::getSelectedUnits()
 	return m_selectedUnitIDs;
 }
 
-list<std::string> Mars::getDebugOptions()
+list<IGUI::DebugOption> Mars::getDebugOptions()
 {
-    return std::list<std::string>({"Units Selectable", "Tiles Selectable"});
+    return std::list<IGUI::DebugOption>({{"Units Selectable", true},
+                                         {"Tiles Selectable", true},
+                                         {"Render Footprints", true}});
+}
+
+std::map<std::string, bool> Mars::getRenderTagState()
+{
+    return m_renderTagState;
+}
+
+void Mars::pruneSelection()
+{
+    int turn = timeManager->getTurn();
+    bool changed = false;
+    int focus = gui->getCurrentUnitFocus();
+
+    auto iter = m_selectedUnitIDs.begin();
+    while(iter != m_selectedUnitIDs.end())
+    {
+        // if it doesn't exist anymore, remove it from the selection.
+        if(m_game->states[turn].units.find(*iter) == m_game->states[turn].units.end() &&
+          (m_game->states[turn].tiles.find(*iter) == m_game->states[turn].tiles.end() ||
+          (m_game->states[turn].tiles.at(*iter)->isTrench == false &&
+           m_game->states[turn].tiles.at(*iter)->owner != 3 &&
+           m_game->states[turn].tiles.at(*iter)->pumpID == -1)))
+        {
+            iter = m_selectedUnitIDs.erase(iter);
+            changed = true;
+        }
+        else
+            iter++;
+    }
+
+    if(changed == true)
+    {
+        gui->updateDebugWindow();
+    }
+
+    // if previous focus is dead/gone then reset it to the top of the table
+    if(std::find(m_selectedUnitIDs.begin(), m_selectedUnitIDs.end(), focus) == m_selectedUnitIDs.end())
+        gui->updateDebugUnitFocus();
+}
+
+void Mars::optionStateChanged()
+{
+    int footprints = gui->getDebugOptionState("Render Footprints");
+
+    std::cout << "options state changed\n";
+
+    if(footprints > -1)
+        m_renderTagState["footprints"] = footprints;
 }
 
 void Mars::loadGamelog( std::string gamelog )
@@ -590,7 +640,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		}
 
 		// First Draw trail at iter->second
-		SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->x, iter->y), glm::vec2(1.0f, 1.0f), "trail");
+		SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->x, iter->y), glm::vec2(1.0f, 1.0f), "trail", "footprints");
 		pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.3f),fade));
 		turn.addAnimatable(pTile);
 
@@ -613,7 +663,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 	{
         auto& unitIter = unit.second;
         std::string texture;
-        bool flipped = false;
 
         if(unitIter->type == 0)
             texture = "digger";
