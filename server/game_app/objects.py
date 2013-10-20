@@ -324,8 +324,8 @@ class Tile(Mappable):
 
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
-    if player.spawnResources < self.game.unitCost:
-      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.spawnResources, self.game.unitCost, tile.x, tile.y)
+    if player.oxygen < self.game.unitCost:
+      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, tile.x, tile.y)
     if type not in [0,1]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
     if len(self.game.grid[self.x][self.y]) > 1:
@@ -333,7 +333,7 @@ class Tile(Mappable):
     if player.totalUnits >= self.game.maxUnits:
       return 'Turn {} You cannot spawn a unit because you already have the maximum amount of units ({})'.format(self.game.turnNumber, self.game.maxUnits)
 
-    player.spawnResources -= self.game.unitCost
+    player.oxygen -= self.game.unitCost
 
     #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDigged', 'hasBuilt', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
     newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, 1, 1 ]

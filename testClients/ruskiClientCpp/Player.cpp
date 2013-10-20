@@ -29,9 +29,9 @@ int Player::waterStored()
   return ((_Player*)ptr)->waterStored;
 }
 
-int Player::spawnResources()
+int Player::oxygen()
 {
-  return ((_Player*)ptr)->spawnResources;
+  return ((_Player*)ptr)->oxygen;
 }
 
 
@@ -48,6 +48,6 @@ std::ostream& operator<<(std::ostream& stream,Player ob)
   stream << "playerName: " << ((_Player*)ob.ptr)->playerName  <<'\n';
   stream << "time: " << ((_Player*)ob.ptr)->time  <<'\n';
   stream << "waterStored: " << ((_Player*)ob.ptr)->waterStored  <<'\n';
-  stream << "spawnResources: " << ((_Player*)ob.ptr)->spawnResources  <<'\n';
+  stream << "oxygen: " << ((_Player*)ob.ptr)->oxygen  <<'\n';
   return stream;
 }

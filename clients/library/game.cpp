@@ -467,7 +467,7 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   if (object->owner != getPlayerID(c))
     return 0;
   // Only spawn if player has enough resources
-  if (getPlayer(c, object->owner)->spawnResources < getUnitCost(c))
+  if (getPlayer(c, object->owner)->oxygen < getUnitCost(c))
     return 0;
   // Can only spawn Fillers and Diggers
   if (type != 0 && type != 1)
@@ -488,7 +488,7 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   if (count >= getMaxUnits(c))
     return 0;
   
-  getPlayer(c, getPlayerID(c))->spawnResources -= getUnitCost(c);
+  getPlayer(c, getPlayerID(c))->oxygen -= getUnitCost(c);
   
   return 1;
 }

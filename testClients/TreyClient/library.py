@@ -146,8 +146,8 @@ library.playerGetTime.argtypes = [c_void_p]
 library.playerGetWaterStored.restype = c_int
 library.playerGetWaterStored.argtypes = [c_void_p]
 
-library.playerGetSpawnResources.restype = c_int
-library.playerGetSpawnResources.argtypes = [c_void_p]
+library.playerGetOxygen.restype = c_int
+library.playerGetOxygen.argtypes = [c_void_p]
 
 library.mappableGetId.restype = c_int
 library.mappableGetId.argtypes = [c_void_p]

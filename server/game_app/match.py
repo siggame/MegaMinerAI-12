@@ -63,7 +63,7 @@ class Match(DefaultGameWorld):
     if type == "player":
       self.players.append(connection)
       try:
-        #['id', 'playerName', 'time', 'waterStored', 'spawnResources']
+        #['id', 'playerName', 'time', 'waterStored', 'oxygen']
         startingResources = 1000
         self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources])
       except TypeError:

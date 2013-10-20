@@ -71,12 +71,12 @@ class Player(GameObject):
   waterStored = property(getWaterStored)
 
   #\cond
-  def getSpawnResources(self):
+  def getOxygen(self):
     self.validify()
-    return library.playerGetSpawnResources(self._ptr)
+    return library.playerGetOxygen(self._ptr)
   #\endcond
   ##Resource used to spawn in units
-  spawnResources = property(getSpawnResources)
+  oxygen = property(getOxygen)
 
 
   def __str__(self):
@@ -86,7 +86,7 @@ class Player(GameObject):
     ret += "playerName: %s\n" % self.getPlayerName()
     ret += "time: %s\n" % self.getTime()
     ret += "waterStored: %s\n" % self.getWaterStored()
-    ret += "spawnResources: %s\n" % self.getSpawnResources()
+    ret += "oxygen: %s\n" % self.getOxygen()
     return ret
 
 ##A mappable object!
