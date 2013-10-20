@@ -49,8 +49,11 @@ namespace visualizer
                 {
                     Unit(const parser::GameState& state, const parser::Unit& unit) :
                         parser::Unit(unit),
-                        Animatable(state, unit.id)
+                        Animatable(state, unit.id),
+                        m_Flipped(false)
                         {}
+
+                    bool m_Flipped;
                 };
 
                 struct Tile : public parser::Tile, public Animatable

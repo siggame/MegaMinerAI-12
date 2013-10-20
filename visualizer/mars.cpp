@@ -614,6 +614,8 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
         else
             texture = "filler";
 
+        glm::vec4 unitColor = unitIter->owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f);
+
         SmartPointer<MoveableSprite> pUnit = new MoveableSprite(texture);
 
 		for(auto& animationIter : unitIter->m_Animations)
@@ -637,15 +639,26 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		{
 			pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter->x, unitIter->y), glm::vec2(unitIter->x, unitIter->y)));
 			trailMap[unitIter->y][unitIter->x] = 5;
+
+			if(state > 0 &&
+			   m_game->states[state - 1].units.find(unitIter->id) != m_game->states[state - 1].units.end() &&
+			   m_game->states[state - 1].units.at(unitIter->id)->m_Flipped)
+			   unitIter->m_Flipped = true;
+
+
 		}
 		else
 		{
-            if(pUnit->m_Moves.back().to.x >= pUnit->m_Moves.front().from.x)
-                flipped = true;
+            if(pUnit->m_Moves.back().to.x > pUnit->m_Moves.front().from.x)
+                unitIter->m_Flipped = true;
+            else if(pUnit->m_Moves.back().to.x == pUnit->m_Moves.front().from.x &&
+                    state > 0 &&
+                    m_game->states[state - 1].units.find(unitIter->id) != m_game->states[state - 1].units.end())
+                unitIter->m_Flipped = m_game->states[state - 1].units.at(unitIter->id)->m_Flipped;
+
 		}
 
-
-		pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter->owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f), flipped));
+        pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitColor, unitIter->m_Flipped));
         turn.addAnimatable(pUnit);
 
 		turn[unitIter->id]["owner"] = unitIter->owner;
