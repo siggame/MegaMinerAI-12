@@ -65,7 +65,7 @@ class Match(DefaultGameWorld):
       try:
         #['id', 'playerName', 'time', 'waterStored', 'oxygen']
         startingResources = 1000
-        self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources])
+        self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources, self.maxOxygen])
       except TypeError:
         raise TypeError("Someone forgot to add the extra attributes to the Player object initialization")
     elif type == "spectator":
