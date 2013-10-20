@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
-  public static Mappable[] mappables;
-  public static Tile[] tiles;
-  public static Unit[] units;
   public static Player[] players;
+  public static Mappable[] mappables;
   public static PumpStation[] pumpStations;
+  public static Unit[] units;
+  public static Tile[] tiles;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -46,17 +46,23 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.getPlayerCount(connection);
+    players = new Player[count];
+    for(int i = 0; i < count; i++)
+    {
+      players[i] = new Player(Client.getPlayer(connection, i));
+    }
     count = Client.getMappableCount(connection);
     mappables = new Mappable[count];
     for(int i = 0; i < count; i++)
     {
       mappables[i] = new Mappable(Client.getMappable(connection, i));
     }
-    count = Client.getTileCount(connection);
-    tiles = new Tile[count];
+    count = Client.getPumpStationCount(connection);
+    pumpStations = new PumpStation[count];
     for(int i = 0; i < count; i++)
     {
-      tiles[i] = new Tile(Client.getTile(connection, i));
+      pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
     }
     count = Client.getUnitCount(connection);
     units = new Unit[count];
@@ -64,17 +70,11 @@ public abstract class BaseAI
     {
       units[i] = new Unit(Client.getUnit(connection, i));
     }
-    count = Client.getPlayerCount(connection);
-    players = new Player[count];
+    count = Client.getTileCount(connection);
+    tiles = new Tile[count];
     for(int i = 0; i < count; i++)
     {
-      players[i] = new Player(Client.getPlayer(connection, i));
-    }
-    count = Client.getPumpStationCount(connection);
-    pumpStations = new PumpStation[count];
-    for(int i = 0; i < count; i++)
-    {
-      pumpStations[i] = new PumpStation(Client.getPumpStation(connection, i));
+      tiles[i] = new Tile(Client.getTile(connection, i));
     }
 
     if(!initialized)
@@ -168,6 +168,12 @@ public abstract class BaseAI
   public int maxSiege()
   {
     int value = Client.getMaxSiege(connection);
+    return value;
+  }
+  ///The rate at which missing oxygen is regained.
+  public float oxygenRate()
+  {
+    float value = Client.getOxygenRate(connection);
     return value;
   }
 }

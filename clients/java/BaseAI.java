@@ -7,11 +7,11 @@ import com.sun.jna.Pointer;
 ///The provided AI class does just that.
 public abstract class BaseAI
 {
-  static Mappable[] mappables;
-  static Tile[] tiles;
-  static Unit[] units;
   static Player[] players;
+  static Mappable[] mappables;
   static PumpStation[] pumpStations;
+  static Unit[] units;
+  static Tile[] tiles;
   Pointer connection;
   static int iteration;
   boolean initialized;
@@ -45,17 +45,23 @@ public abstract class BaseAI
   {
     iteration++;
     int count = 0;
+    count = Client.INSTANCE.getPlayerCount(connection);
+    players = new Player[count];
+    for(int i = 0; i < count; i++)
+    {
+      players[i] = new Player(Client.INSTANCE.getPlayer(connection, i));
+    }
     count = Client.INSTANCE.getMappableCount(connection);
     mappables = new Mappable[count];
     for(int i = 0; i < count; i++)
     {
       mappables[i] = new Mappable(Client.INSTANCE.getMappable(connection, i));
     }
-    count = Client.INSTANCE.getTileCount(connection);
-    tiles = new Tile[count];
+    count = Client.INSTANCE.getPumpStationCount(connection);
+    pumpStations = new PumpStation[count];
     for(int i = 0; i < count; i++)
     {
-      tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
+      pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
     }
     count = Client.INSTANCE.getUnitCount(connection);
     units = new Unit[count];
@@ -63,17 +69,11 @@ public abstract class BaseAI
     {
       units[i] = new Unit(Client.INSTANCE.getUnit(connection, i));
     }
-    count = Client.INSTANCE.getPlayerCount(connection);
-    players = new Player[count];
+    count = Client.INSTANCE.getTileCount(connection);
+    tiles = new Tile[count];
     for(int i = 0; i < count; i++)
     {
-      players[i] = new Player(Client.INSTANCE.getPlayer(connection, i));
-    }
-    count = Client.INSTANCE.getPumpStationCount(connection);
-    pumpStations = new PumpStation[count];
-    for(int i = 0; i < count; i++)
-    {
-      pumpStations[i] = new PumpStation(Client.INSTANCE.getPumpStation(connection, i));
+      tiles[i] = new Tile(Client.INSTANCE.getTile(connection, i));
     }
 
     if(!initialized)
@@ -154,5 +154,10 @@ public abstract class BaseAI
   int maxSiege()
   {
     return Client.INSTANCE.getMaxSiege(connection);
+  }
+  ///The rate at which missing oxygen is regained.
+  float oxygenRate()
+  {
+    return Client.INSTANCE.getOxygenRate(connection);
   }
 }

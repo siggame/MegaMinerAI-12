@@ -8,11 +8,11 @@
 #include <ctime>
 #include "game.h"
 
-#include "Mappable.h"
-#include "Tile.h"
-#include "Unit.h"
 #include "Player.h"
+#include "Mappable.h"
 #include "PumpStation.h"
+#include "Unit.h"
+#include "Tile.h"
 
 /// \brief A basic AI interface.
 
@@ -23,11 +23,11 @@ class BaseAI
 {
 protected:
   Connection* c;
-  std::vector<Mappable> mappables;
-  std::vector<Tile> tiles;
-  std::vector<Unit> units;
   std::vector<Player> players;
+  std::vector<Mappable> mappables;
   std::vector<PumpStation> pumpStations;
+  std::vector<Unit> units;
+  std::vector<Tile> tiles;
 public:
   ///The width of the total map.
   int mapWidth();
@@ -57,6 +57,8 @@ public:
   int gameNumber();
   ///The maximum siege value before the PumpStation is sieged.
   int maxSiege();
+  ///The rate at which missing oxygen is regained.
+  float oxygenRate();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

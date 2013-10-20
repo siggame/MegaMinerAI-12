@@ -48,17 +48,18 @@ struct Connection
   int playerID;
   int gameNumber;
   int maxSiege;
+  float oxygenRate;
 
-  _Mappable* Mappables;
-  int MappableCount;
-  _Tile* Tiles;
-  int TileCount;
-  _Unit* Units;
-  int UnitCount;
   _Player* Players;
   int PlayerCount;
+  _Mappable* Mappables;
+  int MappableCount;
   _PumpStation* PumpStations;
   int PumpStationCount;
+  _Unit* Units;
+  int UnitCount;
+  _Tile* Tiles;
+  int TileCount;
 };
 
 #ifdef __cplusplus
@@ -79,8 +80,8 @@ extern "C"
 
 //commands
 
-  ///Attempt to spawn a unit of a type on this tile.
-  DLLEXPORT int tileSpawn(_Tile* object, int type);
+  ///Allows a player to display messages on the screen
+  DLLEXPORT int playerTalk(_Player* object, char* message);
   ///Make the unit move to the respective x and y location.
   DLLEXPORT int unitMove(_Unit* object, int x, int y);
   ///Put dirt in a hole!
@@ -89,8 +90,8 @@ extern "C"
   DLLEXPORT int unitDig(_Unit* object, _Tile* tile);
   ///Command to attack another Unit.
   DLLEXPORT int unitAttack(_Unit* object, _Unit* target);
-  ///Allows a player to display messages on the screen
-  DLLEXPORT int playerTalk(_Player* object, char* message);
+  ///Attempt to spawn a unit of a type on this tile.
+  DLLEXPORT int tileSpawn(_Tile* object, int type);
 
 //derived properties
 
@@ -112,21 +113,22 @@ DLLEXPORT int getUnitCost(Connection* c);
 DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
 DLLEXPORT int getMaxSiege(Connection* c);
-
-DLLEXPORT _Mappable* getMappable(Connection* c, int num);
-DLLEXPORT int getMappableCount(Connection* c);
-
-DLLEXPORT _Tile* getTile(Connection* c, int num);
-DLLEXPORT int getTileCount(Connection* c);
-
-DLLEXPORT _Unit* getUnit(Connection* c, int num);
-DLLEXPORT int getUnitCount(Connection* c);
+DLLEXPORT float getOxygenRate(Connection* c);
 
 DLLEXPORT _Player* getPlayer(Connection* c, int num);
 DLLEXPORT int getPlayerCount(Connection* c);
 
+DLLEXPORT _Mappable* getMappable(Connection* c, int num);
+DLLEXPORT int getMappableCount(Connection* c);
+
 DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num);
 DLLEXPORT int getPumpStationCount(Connection* c);
+
+DLLEXPORT _Unit* getUnit(Connection* c, int num);
+DLLEXPORT int getUnitCount(Connection* c);
+
+DLLEXPORT _Tile* getTile(Connection* c, int num);
+DLLEXPORT int getTileCount(Connection* c);
 
 
 

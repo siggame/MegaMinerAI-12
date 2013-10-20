@@ -44,6 +44,7 @@ class Match(DefaultGameWorld):
     self.playerID = None
     self.gameNumber = id
     self.maxSiege = None
+    self.oxygenRate = None
 
   #this is here to be wrapped
   def __del__(self):
@@ -127,11 +128,12 @@ class Match(DefaultGameWorld):
           playerID = self.playerID,
           gameNumber = self.gameNumber,
           maxSiege = self.maxSiege,
-          Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
-          Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
-          Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
+          oxygenRate = self.oxygenRate,
           Players = [i.toJson() for i in self.objects.values() if i.__class__ is Player],
+          Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
+          Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
+          Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
           animations = self.jsonAnimations
         )
       )
@@ -174,9 +176,9 @@ class Match(DefaultGameWorld):
   def logPath(self):
     return "logs/" + str(self.id)
 
-  @derefArgs(Tile, None)
-  def spawn(self, object, type):
-    return object.spawn(type, )
+  @derefArgs(Player, None)
+  def talk(self, object, message):
+    return object.talk(message, )
 
   @derefArgs(Unit, None, None)
   def move(self, object, x, y):
@@ -194,9 +196,9 @@ class Match(DefaultGameWorld):
   def attack(self, object, target):
     return object.attack(target, )
 
-  @derefArgs(Player, None)
-  def talk(self, object, message):
-    return object.talk(message, )
+  @derefArgs(Tile, None)
+  def spawn(self, object, type):
+    return object.spawn(type, )
 
 
   def sendIdent(self, players):
@@ -225,20 +227,20 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber, self.maxSiege])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
 
     typeLists = []
-    typeLists.append(["Mappable"] + [i.toList() for i in self.objects.values() if i.__class__ is Mappable])
-    updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
-    if updated:
-      typeLists.append(["Tile"] + [i.toList() for i in updated])
-    updated = [i for i in self.objects.values() if i.__class__ is Unit and i.updatedAt > self.turnNumber-3]
-    if updated:
-      typeLists.append(["Unit"] + [i.toList() for i in updated])
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
+    typeLists.append(["Mappable"] + [i.toList() for i in self.objects.values() if i.__class__ is Mappable])
     updated = [i for i in self.objects.values() if i.__class__ is PumpStation and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["PumpStation"] + [i.toList() for i in updated])
+    updated = [i for i in self.objects.values() if i.__class__ is Unit and i.updatedAt > self.turnNumber-3]
+    if updated:
+      typeLists.append(["Unit"] + [i.toList() for i in updated])
+    updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
+    if updated:
+      typeLists.append(["Tile"] + [i.toList() for i in updated])
 
     msg.extend(typeLists)
 

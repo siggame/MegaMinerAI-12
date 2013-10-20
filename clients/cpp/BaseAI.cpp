@@ -61,11 +61,23 @@ int BaseAI::maxSiege()
 {
   return getMaxSiege(c);
 }
+float BaseAI::oxygenRate()
+{
+  return getOxygenRate(c);
+}
 
 bool BaseAI::startTurn()
 {
   static bool initialized = false;
   int count = 0;
+  count = getPlayerCount(c);
+  players.clear();
+  players.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    players[i] = Player(getPlayer(c, i));
+  }
+
   count = getMappableCount(c);
   mappables.clear();
   mappables.resize(count);
@@ -74,12 +86,12 @@ bool BaseAI::startTurn()
     mappables[i] = Mappable(getMappable(c, i));
   }
 
-  count = getTileCount(c);
-  tiles.clear();
-  tiles.resize(count);
+  count = getPumpStationCount(c);
+  pumpStations.clear();
+  pumpStations.resize(count);
   for(int i = 0; i < count; i++)
   {
-    tiles[i] = Tile(getTile(c, i));
+    pumpStations[i] = PumpStation(getPumpStation(c, i));
   }
 
   count = getUnitCount(c);
@@ -90,20 +102,12 @@ bool BaseAI::startTurn()
     units[i] = Unit(getUnit(c, i));
   }
 
-  count = getPlayerCount(c);
-  players.clear();
-  players.resize(count);
+  count = getTileCount(c);
+  tiles.clear();
+  tiles.resize(count);
   for(int i = 0; i < count; i++)
   {
-    players[i] = Player(getPlayer(c, i));
-  }
-
-  count = getPumpStationCount(c);
-  pumpStations.clear();
-  pumpStations.resize(count);
-  for(int i = 0; i < count; i++)
-  {
-    pumpStations[i] = PumpStation(getPumpStation(c, i));
+    tiles[i] = Tile(getTile(c, i));
   }
 
   if(!initialized)
