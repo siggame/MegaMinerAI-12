@@ -47,6 +47,8 @@ class Match(DefaultGameWorld):
     self.playerID = -1
     self.gameNumber = id
     self.turnLimit = self.turnLimit
+    self.maxSiege = self.maxSiege
+    self.oxygenRate = self.oxygenRate
 
     self.ice = []
 
@@ -278,6 +280,8 @@ class Match(DefaultGameWorld):
           unitCost = self.unitCost,
           playerID = self.playerID,
           gameNumber = self.gameNumber,
+          maxSiege = self.maxSiege,
+          oxygenRate = self.oxygenRate,
           Players = [i.toJson() for i in self.objects.values() if i.__class__ is Player],
           Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
@@ -450,7 +454,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
@@ -458,7 +462,9 @@ class Match(DefaultGameWorld):
     updated = [i for i in self.objects.values() if i.__class__ is PumpStation and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["PumpStation"] + [i.toList() for i in updated])
-    typeLists.append(["Unit"] + [i.toList() for i in self.objects.values() if i.__class__ is Unit])
+    updated = [i for i in self.objects.values() if i.__class__ is Unit and i.updatedAt > self.turnNumber-3]
+    if updated:
+      typeLists.append(["Unit"] + [i.toList() for i in updated])
     updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["Tile"] + [i.toList() for i in updated])

@@ -1,6 +1,6 @@
 import com.sun.jna.Pointer;
 
-///Represents a base to which you want to lead water, and a spawn location for new units.
+///Represents a base to which you want to lead water.
 class PumpStation
 {
   Pointer ptr;
@@ -50,11 +50,11 @@ class PumpStation
     validify();
     return Client.INSTANCE.pumpStationGetWaterAmount(ptr);
   }
-  ///The length of time it takes to capture the PumpStation.
-  public int getSiegeCount()
+  ///The amount the PumpStation has been sieged.
+  public int getSiegeAmount()
   {
     validify();
-    return Client.INSTANCE.pumpStationGetSiegeCount(ptr);
+    return Client.INSTANCE.pumpStationGetSiegeAmount(ptr);
   }
 
 }

@@ -68,6 +68,8 @@ DLLEXPORT Connection* createConnection()
   c->unitCost = 0;
   c->playerID = 0;
   c->gameNumber = 0;
+  c->maxSiege = 0;
+  c->oxygenRate = 0;
   c->Players = NULL;
   c->PlayerCount = 0;
   c->Mappables = NULL;
@@ -510,7 +512,9 @@ void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
   sub = sub->next;
   object->waterStored = atoi(sub->val);
   sub = sub->next;
-  object->spawnResources = atoi(sub->val);
+  object->oxygen = atoi(sub->val);
+  sub = sub->next;
+  object->maxOxygen = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -542,7 +546,7 @@ void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
   sub = sub->next;
   object->waterAmount = atoi(sub->val);
   sub = sub->next;
-  object->siegeCount = atoi(sub->val);
+  object->siegeAmount = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -565,9 +569,9 @@ void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
   sub = sub->next;
   object->hasAttacked = atoi(sub->val);
   sub = sub->next;
-  object->hasDigged = atoi(sub->val);
+  object->hasDug = atoi(sub->val);
   sub = sub->next;
-  object->hasBuilt = atoi(sub->val);
+  object->hasFilled = atoi(sub->val);
   sub = sub->next;
   object->healthLeft = atoi(sub->val);
   sub = sub->next;
@@ -593,8 +597,6 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   object->y = atoi(sub->val);
   sub = sub->next;
   object->owner = atoi(sub->val);
-  sub = sub->next;
-  object->type = atoi(sub->val);
   sub = sub->next;
   object->pumpID = atoi(sub->val);
   sub = sub->next;
@@ -712,6 +714,12 @@ DLLEXPORT int networkLoop(Connection* c)
           c->gameNumber = atoi(sub->val);
           sub = sub->next;
 
+          c->maxSiege = atoi(sub->val);
+          sub = sub->next;
+
+          c->oxygenRate = atof(sub->val);
+          sub = sub->next;
+
         }
         else if(string(sub->val) == "Player")
         {
@@ -782,17 +790,30 @@ DLLEXPORT int networkLoop(Connection* c)
         {
           if(c->Units)
           {
+            sub = sub->next;
             for(int i = 0; i < c->UnitCount; i++)
             {
+              if(!sub)
+              {
+                break;
+              }
+              int id = atoi(sub->list->val);
+              if(id == c->Units[i].id)
+              {
+                parseUnit(c, c->Units+i, sub);
+                sub = sub->next;
+              }
             }
-            delete[] c->Units;
           }
-          c->UnitCount =  sexp_list_length(expression)-1; //-1 for the header
-          c->Units = new _Unit[c->UnitCount];
-          for(int i = 0; i < c->UnitCount; i++)
+          else
           {
-            sub = sub->next;
-            parseUnit(c, c->Units+i, sub);
+            c->UnitCount =  sexp_list_length(expression)-1; //-1 for the header
+            c->Units = new _Unit[c->UnitCount];
+            for(int i = 0; i < c->UnitCount; i++)
+            {
+              sub = sub->next;
+              parseUnit(c, c->Units+i, sub);
+            }
           }
         }
         else if(string(sub->val) == "Tile")
@@ -913,11 +934,11 @@ DLLEXPORT int getAttackDamage(Connection* c)
 {
   return c->attackDamage;
 }
-DLLEXPORT int getOffenseCount(Connection* c)
+DLLEXPORT int getOffensePower(Connection* c)
 {
   return c->offensePower;
 }
-DLLEXPORT int getDefenseCount(Connection* c)
+DLLEXPORT int getDefensePower(Connection* c)
 {
   return c->defensePower;
 }
@@ -936,4 +957,12 @@ DLLEXPORT int getPlayerID(Connection* c)
 DLLEXPORT int getGameNumber(Connection* c)
 {
   return c->gameNumber;
+}
+DLLEXPORT int getMaxSiege(Connection* c)
+{
+  return c->maxSiege;
+}
+DLLEXPORT float getOxygenRate(Connection* c)
+{
+  return c->oxygenRate;
 }

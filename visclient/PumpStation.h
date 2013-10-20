@@ -11,7 +11,7 @@ namespace client
 {
 
 
-///Represents a base to which you want to lead water, and a spawn location for new units.
+///Represents a base to which you want to lead water.
 class PumpStation {
   public:
   void* ptr;
@@ -24,8 +24,8 @@ class PumpStation {
   int owner();
   ///The amount of water the PumpStation pumps.
   int waterAmount();
-  ///The length of time it takes to capture the PumpStation.
-  int siegeCount();
+  ///The amount the PumpStation has been sieged.
+  int siegeAmount();
 
   // Actions
 
