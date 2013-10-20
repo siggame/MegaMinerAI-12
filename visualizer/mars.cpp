@@ -278,6 +278,12 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
         {
             texture = "trench";
         }
+        else if(tileIter->pumpID > - 1)
+        {
+            SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), "pump", 8);
+            pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(1.0f,1.0f,1.0f, 1.0f)));
+            turn.addAnimatable(pPump);
+        }
 
         if(!texture.empty())
         {
