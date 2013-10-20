@@ -83,11 +83,11 @@ library.getTurnNumber.argtypes = [c_void_p]
 library.getAttackDamage.restype = c_int
 library.getAttackDamage.argtypes = [c_void_p]
 
-library.getOffenseCount.restype = c_int
-library.getOffenseCount.argtypes = [c_void_p]
+library.getOffensePower.restype = c_int
+library.getOffensePower.argtypes = [c_void_p]
 
-library.getDefenseCount.restype = c_int
-library.getDefenseCount.argtypes = [c_void_p]
+library.getDefensePower.restype = c_int
+library.getDefensePower.argtypes = [c_void_p]
 
 library.getMaxUnits.restype = c_int
 library.getMaxUnits.argtypes = [c_void_p]
@@ -100,6 +100,12 @@ library.getPlayerID.argtypes = [c_void_p]
 
 library.getGameNumber.restype = c_int
 library.getGameNumber.argtypes = [c_void_p]
+
+library.getMaxSiege.restype = c_int
+library.getMaxSiege.argtypes = [c_void_p]
+
+library.getOxygenRate.restype = c_float
+library.getOxygenRate.argtypes = [c_void_p]
 
 library.getPlayer.restype = c_void_p
 library.getPlayer.argtypes = [c_void_p, c_int]
@@ -149,6 +155,9 @@ library.playerGetWaterStored.argtypes = [c_void_p]
 library.playerGetOxygen.restype = c_int
 library.playerGetOxygen.argtypes = [c_void_p]
 
+library.playerGetMaxOxygen.restype = c_int
+library.playerGetMaxOxygen.argtypes = [c_void_p]
+
 library.mappableGetId.restype = c_int
 library.mappableGetId.argtypes = [c_void_p]
 
@@ -167,8 +176,8 @@ library.pumpStationGetOwner.argtypes = [c_void_p]
 library.pumpStationGetWaterAmount.restype = c_int
 library.pumpStationGetWaterAmount.argtypes = [c_void_p]
 
-library.pumpStationGetSiegeCount.restype = c_int
-library.pumpStationGetSiegeCount.argtypes = [c_void_p]
+library.pumpStationGetSiegeAmount.restype = c_int
+library.pumpStationGetSiegeAmount.argtypes = [c_void_p]
 
 library.unitGetId.restype = c_int
 library.unitGetId.argtypes = [c_void_p]
@@ -217,9 +226,6 @@ library.tileGetY.argtypes = [c_void_p]
 
 library.tileGetOwner.restype = c_int
 library.tileGetOwner.argtypes = [c_void_p]
-
-library.tileGetType.restype = c_int
-library.tileGetType.argtypes = [c_void_p]
 
 library.tileGetPumpID.restype = c_int
 library.tileGetPumpID.argtypes = [c_void_p]

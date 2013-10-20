@@ -28,9 +28,9 @@ class Unit : public Mappable {
   int type();
   ///Whether current unit has attacked or not.
   int hasAttacked();
-  ///Whether the current unit has digged or not.
+  ///Whether the current unit has dug or not.
   int hasDug();
-  ///Whether the current unit has built or not.
+  ///Whether the current unit has filled or not.
   int hasFilled();
   ///The current amount health this unit has remaining.
   int healthLeft();

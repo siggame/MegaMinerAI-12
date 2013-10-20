@@ -196,7 +196,7 @@ class PumpStation(GameObject):
     return library.pumpStationGetSiegeCount(self._ptr)
   #\endcond
   ##The length of time it takes to capture the PumpStation.
-  siegeCount = property(getSiegeCount)
+  siegeAmount = property(getSiegeCount)
 
 
   def __str__(self):
@@ -205,7 +205,7 @@ class PumpStation(GameObject):
     ret += "id: %s\n" % self.getId()
     ret += "owner: %s\n" % self.getOwner()
     ret += "waterAmount: %s\n" % self.getWaterAmount()
-    ret += "siegeCount: %s\n" % self.getSiegeCount()
+    ret += "siegeAmount: %s\n" % self.getSiegeCount()
     return ret
 
 ##Represents a single unit on the map.

@@ -34,6 +34,11 @@ int Player::oxygen()
   return ((_Player*)ptr)->oxygen;
 }
 
+int Player::maxOxygen()
+{
+  return ((_Player*)ptr)->maxOxygen;
+}
+
 
 bool Player::talk(char* message)
 {
@@ -49,5 +54,6 @@ std::ostream& operator<<(std::ostream& stream,Player ob)
   stream << "time: " << ((_Player*)ob.ptr)->time  <<'\n';
   stream << "waterStored: " << ((_Player*)ob.ptr)->waterStored  <<'\n';
   stream << "oxygen: " << ((_Player*)ob.ptr)->oxygen  <<'\n';
+  stream << "maxOxygen: " << ((_Player*)ob.ptr)->maxOxygen  <<'\n';
   return stream;
 }
