@@ -82,14 +82,16 @@ namespace visualizer
         public ColorSprite
 	{
 	public:
-		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, Fade f = None) : ColorSprite(c,f),
-			m_Sprite(sprite)
+		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, bool flipped = false, Fade f = None) : ColorSprite(c,f),
+			m_Sprite(sprite),
+			m_Flipped(flipped)
 			{}
 
 		void animate( const float& t, AnimData* d, IGame* game );
 
 	private:
 		MoveableSprite * m_Sprite;
+		bool m_Flipped;
 	};
 
 	/** @name DrawAnimatedSprite
@@ -121,12 +123,12 @@ namespace visualizer
     {
     public:
         DrawTextBox(const std::string& text, const glm::vec2& pos, const glm::vec4& color,
-                const float& size, const std::string& font) :
+                const float& size, IRenderer::Alignment align = IRenderer::Alignment::Center) :
             m_Text(text),
             m_Pos(pos),
             m_Color(color),
             m_Size(size),
-            m_Font(font)
+            m_Alignment(align)
             {}
 
         void animate(const float &t, AnimData *d, IGame *game);
@@ -136,7 +138,7 @@ namespace visualizer
         glm::vec2 m_Pos;
         glm::vec4 m_Color;
         float m_Size;
-        std::string m_Font;
+        IRenderer::Alignment m_Alignment;
     };
 
 	class DrawSplashScreen : public Anim

@@ -308,7 +308,7 @@ class Unit(Mappable):
     
     # Deal damage
     target.healthLeft -= self.game.attackDamage
-    
+
     self.handleDeath(target)
     
     return True
