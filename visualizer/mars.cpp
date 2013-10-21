@@ -751,4 +751,4 @@ void Mars::run()
 
 } // visualizer
 
-Q_EXPORT_PLUGIN2( Mars, visualizer::Mars );
+Q_EXPORT_PLUGIN2( mars, visualizer::Mars );
