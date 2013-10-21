@@ -59,8 +59,13 @@ namespace visualizer
 			std::vector< std::vector<parser::Tile> > m_Tiles;
 			std::map<int, parser::Unit> m_Units;
 
+            static const unsigned int GRID_OFFSET = 2;
+
+            glm::vec3 GetTeamColor(int) const;
+
             void BuildWorld();
             void UpdateWorld(int state);
+            void RenderHUD(int state, Frame& turn);
 			void RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& turnMap, Frame& turn);
             parser::Tile& GetTileAt(int x, int y);
 

@@ -42,12 +42,12 @@ void Mars::GetSelectedRect(Rect &out) const
 	const Input& input = gui->getInput();
 
 	int x = input.x;
-	int y = input.y /*- SEA_OFFSET*/;
+    int y = input.y - GRID_OFFSET;
 	int width = input.sx - x;
 	int height = input.sy - y;
 
 	int right = x + width;
-	int bottom = y + height /*- SEA_OFFSET*/;
+    int bottom = y + height - GRID_OFFSET;
 
 	out.left = min(x,right);
 	out.top = min(y,bottom);
@@ -94,6 +94,11 @@ void Mars::ProccessInput()
 
 		cout<<"Selected Units:" << m_selectedUnitIDs.size() << endl;
 	}
+}
+
+glm::vec3 Mars::GetTeamColor(int owner) const
+{
+    return owner == 1 ? glm::vec3(1.0f,0.6f,0.6f) : glm::vec3(0.6f,0.6f,1.0f);
 }
 
 void Mars::drawObjectSelection() const
@@ -205,8 +210,8 @@ void Mars::loadGamelog( std::string gamelog )
 
 	// Setup the renderer as a 4 x 4 map by default
 	// TODO: Change board size to something useful
-    renderer->setCamera( 0, 2, m_game->states[0].mapWidth, m_game->states[0].mapHeight + 2);
-    renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight + 2);
+    renderer->setCamera( 0, GRID_OFFSET, m_game->states[0].mapWidth, m_game->states[0].mapHeight + GRID_OFFSET);
+    renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight + GRID_OFFSET);
 
 	m_selectedUnitIDs.clear();
 
@@ -252,6 +257,33 @@ void Mars::UpdateWorld(int state)
 
 }
 
+void Mars::RenderHUD(int state, Frame &turn)
+{
+    // Render player #0
+    SmartPointer<Animatable> pText = new Animatable;
+    DrawTextBox * textBox = new DrawTextBox(m_game->states[0].players[0].playerName,
+                                            glm::vec2(5.0f,-1.0f),
+                                            glm::vec4(1.0f,1.0f,1.0f,1.0f),
+                                            2.0f,
+                                            IRenderer::Left
+                                            );
+
+    pText->addKeyFrame(textBox);
+    turn.addAnimatable(pText);
+
+    // Render player #1
+    pText = new Animatable;
+    textBox = new DrawTextBox(m_game->states[0].players[1].playerName,
+                                            glm::vec2(35.0f,-1.0f),
+                                            glm::vec4(1.0f,1.0f,1.0f,1.0f),
+                                            2.0f,
+                                            IRenderer::Right
+                                            );
+
+    pText->addKeyFrame(textBox);
+    turn.addAnimatable(pText);
+}
+
 void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& trailMap, Frame& turn)
 {    
     // todo: this could be moved elsewhere,
@@ -276,10 +308,10 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
             {
                 texture = "trench";
             }
-            else if(tileIter.pumpID > - 1)
+            else if(tileIter.pumpID > -1)
             {
                 SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "pump", counter[tileIter.id]);
-                pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(1.0f,1.0f,1.0f, 1.0f)));
+                pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(GetTeamColor(tileIter.owner),1.0f)));
                 turn.addAnimatable(pPump);
 
                 int& counterValue = counter[tileIter.id];
@@ -565,8 +597,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
                     DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
                                                             glm::vec2(tileIter.x + 0.5, tileIter.y + 0.25),
                                                             glm::vec4(0.0f,0.0f,0.0f,1.0f),
-                                                            2.0f,
-                                                            "Roboto");
+                                                            2.0f);
 
                     pText->addKeyFrame(textBox);
                     turn.addAnimatable(pText);
@@ -606,7 +637,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 	while(unitIter != m_Units.end())
 	{
         SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
-		pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter->second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f) ));
+        pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, glm::vec4(GetTeamColor(unitIter->second.owner),1.0f)));
         turn.addAnimatable(pUnit);
 
 		for(auto& animationIter : m_game->states[state].animations[unitIter->second.id])
@@ -699,6 +730,7 @@ void Mars::run()
 
         UpdateWorld(state);
 		RenderWorld(state, trail, trailMap, turn);
+        RenderHUD(state,turn);
 
 		if(state >= (int)(m_game->states.size() - 10))
 		{
@@ -740,4 +772,4 @@ void Mars::run()
 
 } // visualizer
 
-Q_EXPORT_PLUGIN2( Mars, visualizer::Mars );
+Q_EXPORT_PLUGIN2( mars, visualizer::Mars );

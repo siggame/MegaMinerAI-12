@@ -61,7 +61,7 @@ namespace visualizer
 	{
         game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
 
-        game->renderer->drawText(m_Pos.x, m_Pos.y, m_Font, m_Text, m_Size, IRenderer::Center);
+        game->renderer->drawText(m_Pos.x, m_Pos.y, "Roboto", m_Text, m_Size, m_Alignment);
 
 	};
 
