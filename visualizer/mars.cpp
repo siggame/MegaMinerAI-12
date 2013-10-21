@@ -282,8 +282,10 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
                 pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(1.0f,1.0f,1.0f, 1.0f)));
                 turn.addAnimatable(pPump);
 
+                int& counterValue = counter[tileIter.id];
+
                 // todo: only play animation if there is water nearby
-                counter[tileIter.id] = ((counter[tileIter.id]) + 1) % 8;
+                counterValue = (counterValue + 1) % 8;
             }
 
             if(!texture.empty())
