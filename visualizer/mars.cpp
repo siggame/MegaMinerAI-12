@@ -96,6 +96,11 @@ void Mars::ProccessInput()
 	}
 }
 
+glm::vec3 Mars::GetTeamColor(int owner) const
+{
+    return owner == 1 ? glm::vec3(1.0f,0.6f,0.6f) : glm::vec3(0.6f,0.6f,1.0f);
+}
+
 void Mars::drawObjectSelection() const
 {
 	int turn = timeManager->getTurn();
@@ -252,6 +257,11 @@ void Mars::UpdateWorld(int state)
 
 }
 
+void Mars::RenderHUD(int state, Frame &turn)
+{
+
+}
+
 void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& trailMap, Frame& turn)
 {    
     // todo: this could be moved elsewhere,
@@ -276,10 +286,10 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
             {
                 texture = "trench";
             }
-            else if(tileIter.pumpID > - 1)
+            else if(tileIter.pumpID > -1)
             {
                 SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "pump", counter[tileIter.id]);
-                pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(1.0f,1.0f,1.0f, 1.0f)));
+                pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(GetTeamColor(tileIter.owner),1.0f)));
                 turn.addAnimatable(pPump);
 
                 int& counterValue = counter[tileIter.id];
@@ -606,7 +616,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 	while(unitIter != m_Units.end())
 	{
         SmartPointer<MoveableSprite> pUnit = new MoveableSprite("digger");
-		pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitIter->second.owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f) ));
+        pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, glm::vec4(GetTeamColor(unitIter->second.owner),1.0f)));
         turn.addAnimatable(pUnit);
 
 		for(auto& animationIter : m_game->states[state].animations[unitIter->second.id])
@@ -699,6 +709,7 @@ void Mars::run()
 
         UpdateWorld(state);
 		RenderWorld(state, trail, trailMap, turn);
+        RenderHUD(state,turn);
 
 		if(state >= (int)(m_game->states.size() - 10))
 		{
