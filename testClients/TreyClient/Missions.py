@@ -49,7 +49,9 @@ class AttackMission(Mission):
     # Calculate path again
     self.path = self.getPathToTarget()
     # Move
-    if len(self.path) > 2:
+    if self.path is None:
+      success = False
+    elif len(self.path) > 2:
       goalTile = self.path[1]
       success = self.hero.move(goalTile[0], goalTile[1])
       if len(self.path) == 3:
@@ -159,7 +161,9 @@ class DigMission(Mission):
     # Calculate path again
     self.path = self.getPathToTarget()
     # Move
-    if len(self.path) > 2:
+    if self.path is None:
+      success = False
+    elif len(self.path) > 2:
       goal = self.path[1]
       success = self.hero.move(goal[0], goal[1])
       if len(self.path) == 3:

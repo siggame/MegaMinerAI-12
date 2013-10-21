@@ -201,7 +201,7 @@ def reconstructPath(came_from, current_node):
   else:
     return [current_node]
 
-def uniformCostSearch(ai, startX, startY, goalCondition, isValidTile, tileCost):
+def uniformCostSearch(ai, startX, startY, maxCost, goalCondition, isValidTile, tileCost):
   node = (0, (startX, startY))
   frontier = [] #:= priority queue containing node only
   heappush(frontier, node)
@@ -209,21 +209,30 @@ def uniformCostSearch(ai, startX, startY, goalCondition, isValidTile, tileCost):
   cameFrom = dict()
   while len(frontier) > 0:
     node = heappop(frontier)   #node := frontier.pop()
+    if node[0] == -1:  # If the node was deleted
+      continue
+    if node[0] > maxCost: #
+      return None
     if goalCondition(getTile(ai, node[1][0], node[1][1])):
       return uniformCostSearchSolution(cameFrom, node)
     explored.add(node)
     for offset in offsets: #for each of node's neighbors n
       pos = (node[1][0] + offset[0], node[1][1] + offset[1])
-      if isOnMap(ai, pos[0], pos[1]) and isValidTile(getTile(ai, pos[0], pos[1])):
-        neighbor = (node[0] + tileCost(pos), pos)
-        if neighbor not in explored:  #if n is not in explored
-          if neighbor not in frontier:  #if n is not in frontier
-            heappush(frontier, neighbor)#frontier.add(n)
-          else:   #else if n is in frontier with higher cost
-            for index, frontierNode in enumerate(frontier):
-              if frontierNode[0] > neighbor[0]:
-                frontier[index] = neighbor  #replace existing node with n
-                break
+      if isOnMap(ai, pos[0], pos[1]):
+        tile = getTile(ai, pos[0], pos[1])
+        if isValidTile(tile):
+          neighbor = (node[0] + tileCost(tile), pos)
+          if neighbor not in explored:  #if n is not in explored
+            if neighbor not in frontier:  #if n is not in frontier
+              heappush(frontier, neighbor)#frontier.add(n)
+              cameFrom[neighbor] = node
+            else:   #else if n is in frontier with higher cost
+              for index, frontierNode in enumerate(frontier):
+                if frontierNode[0] > neighbor[0]:
+                  frontier[index] = (-1,)
+                  heappush(frontier, neighbor)  #replace existing node with n
+                  cameFrom[neighbor] = node
+                  break
   return None
 
 # Returns list of 2-tuples
@@ -231,6 +240,7 @@ def uniformCostSearchSolution(cameFrom, current):
   if current in cameFrom:
     p = uniformCostSearchSolution(cameFrom, cameFrom[current])
     p.append(current[1])
+    return p
   else:
     return [current[1]]
 

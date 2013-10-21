@@ -54,10 +54,13 @@ class AI(BaseAI):
     
     # Find all the distance from every ice tile to the nearest pump
     for iceTile in [tile for tile in self.tiles if tile.owner == 3]:
-      iceToPump[iceTile] = uniformCostSearch(self, iceTile.x, iceTile.y,
+      shortestPath = uniformCostSearch(self, iceTile.x, iceTile.y, 6,
         lambda tile: tile in self.myPumpTilesSet, # GOAL - find any of my pumps
         lambda tile: tile.owner == 2 or tile.owner == 3 or tile in self.myPumpTilesSet, # VALID - dirt or trench or ice
         lambda tile: not (tile.isTrench or tile.owner == 3))  # COST - 0 = trench or ice
+      if shortestPath is not None:
+        iceToPump[iceTile] = shortestPath
+        print("Length of iceToPump: {}".format(len(shortestPath)))
     # Go through the path
     for iceTile, path in iceToPump.iteritems():
       # Check every tile in the path and see if it needs to be dug
@@ -69,14 +72,19 @@ class AI(BaseAI):
         # Need to dig here?
         if not tile.isTrench and tile.owner == 2:
           self.neededTrenches.append(tile)
-    
+
+  def findWaterwayTrenchesNeeded(self):
+    pass
+
   def findAvailableUnits(self):
     takenUnits = set()
     for mission in self.missions:
       if isinstance(mission, AttackMission):
-        takenUnits.add(self.unitByID(mission.heroID))
+        if mission.heroID in self.unitByID:
+          takenUnits.add(self.unitByID[mission.heroID])
       elif isinstance(mission, DigMission):
-        takenUnits.add(self.unitByID(mission.heroID))
+        if mission.heroID in self.unitByID:
+          takenUnits.add(self.unitByID[mission.heroID])
     return [unit for unit in self.myUnits if unit not in takenUnits]
 
   def spawnUnitCenter(self, type):
@@ -187,6 +195,8 @@ class AI(BaseAI):
     if len(self.myUnits) < self.maxUnits - 1:
       if self.spawnUnitCenter(DIGGER):
         print('Spawned Digger')
+      else:
+        print('Maxunits at : {}'.format(self.maxUnits))
       
     #SNAPSHOT AT END
     self.history.save_snapshot()
