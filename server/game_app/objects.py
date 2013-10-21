@@ -1,3 +1,5 @@
+import math
+
 class Player(object):
   game_state_attributes = ['id', 'playerName', 'time', 'waterStored', 'oxygen', 'maxOxygen']
   def __init__(self, game, id, playerName, time, waterStored, oxygen, maxOxygen):
@@ -22,11 +24,26 @@ class Player(object):
   
   def nextTurn(self):
     if self.id == self.game.playerID:
+      #GET OXYGEN
+      unitWorth = [0, 0]
+      for unit in self.game.objects.units:
+        unitWorth[unit.owner] += self.game.unitCost
+
+      # Get value of fish in spawnQueue
+      inSpawnQueue = len(self.spawnQueue) * self.game.unitCost
+      #self.spawnQueue = []
+      netWorth = unitWorth[self.id] + self.oxygen + inSpawnQueue
+      oxyYouShouldHave = self.maxOxygen
+      oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.oxygenRate)
+      self.oxygen += oxyYouGet
+
+      #SPAWN UNITS
       for newUnitStats in self.spawnQueue:
         newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
       self.spawnQueue = []
 
+      #FLOW WATER
       self.game.waterFlow()
 
     return True
@@ -73,8 +90,11 @@ class PumpStation(object):
     self.siegeAmount = siegeAmount
     self.updatedAt = game.turnNumber
 
-    self.maxSiege = 100
+    self.maxSiege = game.maxSiege
 
+    self.siegeTiles = None
+
+  def create_siegeTiles(self):
     self.siegeTiles = [tile for tile in self.game.objects.tiles if tile.pumpID == self.id]
 
   def toList(self):
@@ -86,7 +106,12 @@ class PumpStation(object):
   
   def nextTurn(self):
     for siegeTile in self.siegeTiles:
-      unit = [unit for unit in self.game.grid[siegeTile.x][siegeTile.y] if isinstance(unit, Unit)][0]
+      unit = [unit for unit in self.game.grid[siegeTile.x][siegeTile.y] if isinstance(unit, Unit)]
+
+      if len(unit) <= 0:
+        continue
+
+      unit = unit[0]
 
       #Defending
       if unit.owner == self.owner:
@@ -136,21 +161,26 @@ class Unit(Mappable):
   # This will not work if the object has variables other than primitives
   def toJson(self):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDug = self.hasDug, hasFilled = self.hasFilled, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, )
-  
+
+  @staticmethod
+  def handleDeath(unit):
+    if unit.healthLeft <= 0:
+      unit.game.objects.players[unit.owner].totalUnits -= 1
+      unit.game.grid[unit.x][unit.y].remove(unit)
+      unit.game.removeObject(unit)
+
+      unit.game.addAnimation(DeathAnimation(unit.id))
+
+
   def nextTurn(self):
-  
     # Reset flags if it is unit owner's turn
     if self.owner == self.game.playerID:
       self.movementLeft = self.maxMovement
       self.hasAttacked = 0
       self.hasFilled = 0
       self.hasDug = 0
-          # Check if the unit died
-      if self.healthLeft <= 0:
-        self.game.objects.players[self.owner].totalUnits -= 1
-        self.game.grid[self.x][self.y].remove(self)
-        self.game.removeObject(self)
-      
+
+      self.handleDeath(self)
     return True
 
   def move(self, x, y):
@@ -162,7 +192,7 @@ class Unit(Mappable):
       return 'Turn {}: Your unit {} cannot move off the map. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif len(self.game.grid[x][y]) > 1:
       return 'Turn {}: Your unit {} is trying to run into something. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif self.game.grid[x][y][0].pumpID == -1 and self.game.grid[x][y][0].owner == self.game.playerID^1:
+    elif self.game.getTile(x, y).pumpID == -1 and self.game.getTile(x, y).owner == self.game.playerID^1:
       return 'Turn {}: Your unit {} is trying to move onto the enemy\'s spawn base. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your unit {} can only move one unit away. ({}.{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
@@ -182,11 +212,7 @@ class Unit(Mappable):
         self.healthLeft -= self.game.waterDamage + self.game.trenchDamage
       else:
         self.healthLeft -= self.game.trenchDamage
-      # Check if the unit died
-      if self.healthLeft <= 0:
-        self.game.objects.players[self.owner].totalUnits -= 1
-        self.game.grid[self.x][self.y].remove(self)
-        self.game.removeObject(self)
+      self.handleDeath(self)
 
     return True
 
@@ -282,12 +308,8 @@ class Unit(Mappable):
     
     # Deal damage
     target.healthLeft -= self.game.attackDamage
-    
-    # Check if target is dead
-    if target.healthLeft <= 0:
-      self.game.objects.players[target.owner].totalUnits -= 1
-      self.game.grid[x][y].remove(target)
-      self.game.removeObject(target)
+
+    self.handleDeath(target)
     
     return True
 
@@ -325,7 +347,7 @@ class Tile(Mappable):
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.oxygen < self.game.unitCost:
-      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, tile.x, tile.y)
+      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, self.x, self.y)
     if type not in [0,1]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
     if len(self.game.grid[self.x][self.y]) > 1:

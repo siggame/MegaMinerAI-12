@@ -4,11 +4,11 @@ import GameObject
 class path_finder:
   def __init__(self, ai):
     self.__ai = ai
+    self.__obst = dict()
 
+  def update_obstacles(self):
     for unit in self.__ai.units:
-      self.__obstacles[(unit.x, unit.y)] = unit
-
-
+      self.__obst[(unit.x, unit.y)] = unit
 
   def __get_tile(self, x, y):
     if (0 <= x < self.__ai.mapWidth) and (0 <= y < self.__ai.mapHeight):
@@ -22,6 +22,8 @@ class path_finder:
     for offset in offsets:
       neighbor = self.__get_tile(tile.x+offset[0], tile.y+offset[1])
       if neighbor is None:
+        continue
+      if (neighbor.x, neighbor.y) in self.__obst:
         continue
       neighbors.append(neighbor)
 
@@ -55,7 +57,6 @@ class path_finder:
     f_scores[start] = g_scores[start] + self.__heuristic(start, goal)
 
     heapq.heappush(open_set, (f_scores[start], start))
-
     while len(open_set) > 0:
       f_score, current = heapq.heappop(open_set)
 
@@ -66,6 +67,10 @@ class path_finder:
       closed_set.append(current)
 
       for neighbor in self.__get_neighbors(current):
+        if f_scores[current] > 100:
+          print('PARTIAL PATH')
+          return self.__reconstruct_path(parents, current)
+
         ten_g_score = g_scores[current] + 1
         ten_f_score = ten_g_score + self.__heuristic(neighbor, goal)
         if neighbor in closed_set and ten_f_score >= f_scores[neighbor]:
