@@ -36,13 +36,11 @@ class AttackMission(Mission):
     # Find our hero again (if he's not dead that is)
     if (self.heroID not in self.ai.unitByID):
       self.done = True
-      print('Hero died?')
       return False
     self.hero = self.ai.unitByID[self.heroID]
     # Same with target
     if (self.targetID not in self.ai.unitByID):
       self.done = True
-      print('Target died?')
       return True
     self.target = self.ai.unitByID[self.targetID]
 
@@ -157,7 +155,11 @@ class DigMission(Mission):
       print('Hero died?')
       return False
     self.hero = self.ai.unitByID[self.heroID]
-    
+    # Check if the target is a trench yet
+    if self.trenchTile.isTrench:
+      self.done = True
+      self.success = True
+
     # Calculate path again
     self.path = self.getPathToTarget()
     # Move

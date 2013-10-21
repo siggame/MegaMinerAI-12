@@ -16,6 +16,8 @@ class AI(BaseAI):
   enemyPumpTiles = []
   myUnits = []
   enemyUnits = []
+
+  spawnableTiles = []
   # Distance from enemy spawn point
   dfes = dict()
   
@@ -37,7 +39,9 @@ class AI(BaseAI):
 
   spawnEgg = set()
 
-
+  unitsToThreats = 2
+  unitsToDig = 1
+  unitsToAttack = 3
 
   """The class implementing gameplay logic."""
   @staticmethod
@@ -48,7 +52,25 @@ class AI(BaseAI):
   def password():
     return "password"
 
+  def getSpawnableTiles(self):
+    spawnableTiles = []
+    for tile in self.mySpawnTiles + self.myPumpTiles:
+      spawnable = True
+      # check to make sure the enemy is not camping this spawn point
+      for offset in offsets:
+        if isOnMap(self, tile.x + offset[0], tile.y + offset[1]):
+          neighbor = getTile(self, tile.x + offset[0], tile.y + offset[1])
+          if (neighbor.x, neighbor.y) in self.unitAt:
+            if self.unitAt[(neighbor.x, neighbor.y)].owner != self.playerID:
+              spawnable = False
+      if spawnable:
+        spawnableTiles.append(tile)
+    return spawnableTiles
+
   def findWaterwaysNeeded(self):
+    self.neededTrenches = []
+    self.myCollectionTrenches = []
+
     # Tuples iceTile: (pumpTile, aStarPath)
     iceToPump = dict()
     
@@ -60,7 +82,6 @@ class AI(BaseAI):
         lambda tile: not (tile.isTrench or tile.owner == 3))  # COST - 0 = trench or ice
       if shortestPath is not None:
         iceToPump[iceTile] = shortestPath
-        print("Length of iceToPump: {}".format(len(shortestPath)))
     # Go through the path
     for iceTile, path in iceToPump.iteritems():
       # Check every tile in the path and see if it needs to be dug
@@ -88,14 +109,14 @@ class AI(BaseAI):
     return [unit for unit in self.myUnits if unit not in takenUnits]
 
   def spawnUnitCenter(self, type):
-    for tile in self.mySpawnTiles:
+    for tile in self.spawnableTiles:
       if (tile.x, tile.y) not in self.unitAt and tile not in self.spawnEgg:
         self.spawnEgg.add(tile)
         tile.spawn(type)
     return False
         
   def spawnUnitClosestTo(self, type, x, y):
-    closestTiles = findNearestTiles(x, y, self.mySpawnTiles)
+    closestTiles = findNearestTiles(x, y, self.spawnableTiles)
     for tile in closestTiles:
       if (tile.x, tile.y) not in self.unitAt and tile not in self.spawnEgg:
         self.spawnEgg.add(tile)
@@ -120,7 +141,8 @@ class AI(BaseAI):
       else:
         threatLevel[unit] = 1.0 / distToPump + 1.0 / distToSpawn
     # Smallest threat first
-    return sorted([(unit, threatLevel[unit]) for unit in possibleThreats], key=lambda threat: -threat[1])
+    return sorted([unit for unit in possibleThreats if threatLevel[unit] <= self.threatThreshold],
+      key=lambda unit: -threatLevel[unit])
 
 
 
@@ -157,30 +179,46 @@ class AI(BaseAI):
     self.unitAt = cacheUnitPositions(self)
 
     self.findWaterwaysNeeded()
-    
+
+    self.spawnableTiles = self.getSpawnableTiles()
+
     self.spawnEgg = set()
     self.availableUnits = self.findAvailableUnits()
     # Identify threats
     self.threats = self.identifyThreats()
     # Go after threats
     if self.threats is not None:
+      heroDistances = []
       for threat in self.threats:
-        if threat[1] > self.threatThreshold:
-          heros = getUnitsClosestToFromList(self.availableUnits, threat[0].x, threat[0].y)
-          for hero in heros:
-            print('Assigned mission {} -> {}'.format(hero.id, threat[0].id))
-            self.missions.append(AttackMission(threat[1] * 5.0, self, hero.id, threat[0].id))
-            self.availableUnits.remove(hero)
-            break
+        for hero in self.availableUnits:
+          heroDistances.append((taxiDis(hero.x, hero.y, threat.x, threat.y), threat, hero))
+      heroDistances.sort()
+      while len(heroDistances) > 0:
+        top = heroDistances.pop()
+        hero = top[2]
+        threat = top[1]
+        print('Assigned mission {} -> {}'.format(hero.id, threat.id))
+        self.missions.append(AttackMission(5.0, self, hero.id, threat.id))
+        self.availableUnits.remove(hero)
+        heroDistances[:] = [x for x in heroDistances if x[1] != threat and x[2] != hero]
 
     # Dig trenches
-    for trench in self.neededTrenches:
-      heros = getUnitsClosestToFromList(self.availableUnits, trench.x, trench.y)
-      for hero in heros:
-        print('Assigned dig mission {} -> ({},{})'.format(hero.id, trench.x, trench.y))
-        self.missions.append(DigMission(1.0, self, hero.id, trench))
-        self.availableUnits.remove(hero)
-        break
+    if self.neededTrenches is not None and len(self.neededTrenches) > 0:
+      unitsToDig = 0
+      for trench in self.neededTrenches:
+        if unitsToDig >= self.unitsToDig:
+          break
+        heros = getUnitsClosestToFromList(self.availableUnits, trench.x, trench.y)
+        for hero in heros:
+          print('Assigned dig mission {} -> ({},{})'.format(hero.id, trench.x, trench.y))
+          self.missions.append(DigMission(1.0, self, hero.id, trench))
+          self.availableUnits.remove(hero)
+          unitsToDig += 1
+          break
+      # Spawn units close to needed trenches
+      tile = self.neededTrenches[0]
+      if len(self.myUnits) < self.maxUnits - 1:
+        self.spawnUnitClosestTo(DIGGER, tile.x, tile.y)
             
     # Perform missions
     for mission in self.missions:
@@ -190,7 +228,7 @@ class AI(BaseAI):
 
     # Remove missions that are done
     self.missions[:] = [mission for mission in self.missions if not mission.done]
-    
+
     # Spawn units if we can
     if len(self.myUnits) < self.maxUnits - 1:
       if self.spawnUnitCenter(DIGGER):
