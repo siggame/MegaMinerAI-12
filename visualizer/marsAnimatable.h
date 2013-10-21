@@ -18,8 +18,8 @@ namespace visualizer
       */
 	struct BaseSprite : public Animatable
 	{
-		BaseSprite(const glm::vec2& pos, const glm::vec2& scale, const string& sprite) :
-			pos(pos), scale(scale), m_sprite(sprite)  {}
+		BaseSprite(const glm::vec2& pos, const glm::vec2& scale, const string& sprite, const string& tag = "") :
+			pos(pos), scale(scale), m_sprite(sprite), Animatable(tag)  {}
 
 		glm::vec2 pos;
 		glm::vec2 scale;

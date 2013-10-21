@@ -82,14 +82,16 @@ namespace visualizer
         public ColorSprite
 	{
 	public:
-		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, Fade f = None) : ColorSprite(c,f),
-			m_Sprite(sprite)
+		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, bool flipped = false, Fade f = None) : ColorSprite(c,f),
+			m_Sprite(sprite),
+			m_Flipped(flipped)
 			{}
 
 		void animate( const float& t, AnimData* d, IGame* game );
 
 	private:
 		MoveableSprite * m_Sprite;
+		bool m_Flipped;
 	};
 
 	/** @name DrawAnimatedSprite
