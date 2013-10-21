@@ -106,7 +106,7 @@ void Mars::ProccessInput()
 
 glm::vec3 Mars::GetTeamColor(int owner) const
 {
-    return owner == 1 ? glm::vec3(1.0f,0.6f,0.6f) : glm::vec3(0.6f,0.6f,1.0f);
+    return owner == 1 ? glm::vec3(1.0f,0.5f,0.5f) : glm::vec3(0.5f,0.5f,1.0f);
 }
 
 void Mars::drawObjectSelection() const
@@ -369,7 +369,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
             int& counterValue = counter[tileIter->id];
 
             SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), "pump", counterValue);
-            pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(1.0f,1.0f,1.0f, 1.0f)));
+            pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(GetTeamColor(tileIter->owner),1.0f)));
             turn.addAnimatable(pPump);
 
             // todo: only play animation if there is water nearby
@@ -708,8 +708,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
         else
             texture = "filler";
 
-        glm::vec4 unitColor = unitIter->owner == 1? glm::vec4(0.8f,0.2f,0.2f,1.0f) : glm::vec4(0.2f,0.2f,0.8f,1.0f);
-
         SmartPointer<MoveableSprite> pUnit = new MoveableSprite(texture);
 
 		for(auto& animationIter : unitIter->m_Animations)
@@ -750,7 +748,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 
 		}
 
-        pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, unitColor, unitIter->m_Flipped));
+        pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, glm::vec4(GetTeamColor(unitIter->owner),1.0f), unitIter->m_Flipped));
         turn.addAnimatable(pUnit);
 
 		turn[unitIter->id]["owner"] = unitIter->owner;
