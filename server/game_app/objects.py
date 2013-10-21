@@ -285,7 +285,7 @@ class Unit(Mappable):
     
     # Check if target is dead
     if target.healthLeft <= 0:
-      self.game.objects.players[self.owner].totalUnits -= 1
+      self.game.objects.players[target.owner].totalUnits -= 1
       self.game.grid[x][y].remove(target)
       self.game.removeObject(target)
     
