@@ -100,6 +100,9 @@ class Match(DefaultGameWorld):
     self.create_spawns()
     self.create_pumps()
 
+    for pump in self.objects.pumpStations:
+      pump.create_siegeTiles()
+
     self.nextTurn()
 
     return True
