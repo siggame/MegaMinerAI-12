@@ -51,14 +51,16 @@ namespace visualizer
     void DrawAnimatedSprite::animate(const float &t, AnimData*d, IGame* game)
     {
         ColorSprite::animate(t, d, game);
-        game->renderer->drawAnimQuad( m_Sprite->pos.x, m_Sprite->pos.y, m_Sprite->scale.x, m_Sprite->scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * t));
+
+        float animTime = m_Sprite->m_SingleFrame ? t : 1.0f;
+        game->renderer->drawAnimQuad( m_Sprite->pos.x, m_Sprite->pos.y, m_Sprite->scale.x, m_Sprite->scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * animTime));
     }
 
 	void DrawTextBox::animate(const float &, AnimData*, IGame* game)
 	{
         game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
 
-        game->renderer->drawText(m_Pos.x, m_Pos.y, m_Font, m_Text, m_Size, IRenderer::Center);
+        game->renderer->drawText(m_Pos.x, m_Pos.y, "Roboto", m_Text, m_Size, m_Alignment);
 
 	};
 

@@ -19,16 +19,17 @@ using namespace std;
 
 namespace visualizer
 {
-	struct Rect
-	{
-		int left;
-		int top;
-		int right;
-		int bottom;
-	};
 
     class Mars: public QThread, public AnimSequence, public IGame
     {
+        struct Rect
+        {
+            int left;
+            int top;
+            int right;
+            int bottom;
+        };
+
         Q_OBJECT;
         Q_INTERFACES( visualizer::IGame );
         private:
@@ -126,6 +127,14 @@ namespace visualizer
             bool m_suicide;
 			list<int> m_selectedUnitIDs;
             std::map<std::string, bool> m_renderTagState;
+
+            static const unsigned int GRID_OFFSET = 2;
+
+            glm::vec3 GetTeamColor(int) const;
+
+            void BuildWorld();
+            void UpdateWorld(int state);
+            void RenderHUD(int state, Frame& turn);
 
 			void RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& turnMap, Frame& turn);
 
