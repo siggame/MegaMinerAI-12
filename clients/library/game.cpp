@@ -231,7 +231,7 @@ DLLEXPORT void getStatus(Connection* c)
   UNLOCK( &c->mutex );
 }
 
-
+//#TODO: Are we going to do something about playerTalk?
 DLLEXPORT int playerTalk(_Player* object, char* message)
 {
   stringstream expr;
