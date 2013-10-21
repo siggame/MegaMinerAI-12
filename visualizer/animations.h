@@ -92,6 +92,26 @@ namespace visualizer
 		MoveableSprite * m_Sprite;
 	};
 
+	/** @name DrawAnimatedSprite
+	  * @inherits Anim
+	  * @prupose Will draw an animated sprite. Must know the number of frames
+      *   contained in the sprite to render correctly
+      */
+    class DrawAnimatedSprite :
+        public ColorSprite
+    {
+    public:
+        DrawAnimatedSprite(AnimatedSprite* sprite, const glm::vec4& c, Fade f = None) :
+            ColorSprite(c, f),
+            m_Sprite(sprite)
+            {}
+
+        void animate( const float& t, AnimData* d, IGame* game );
+
+    private:
+        AnimatedSprite * m_Sprite;
+    };
+
 	/** @name DrawTextBox
       * @inherits Anim
       * @purpose Draws the TextBox to the screen.
