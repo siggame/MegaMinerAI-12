@@ -12,6 +12,7 @@ class AI(BaseAI):
   mySpawnTiles = []
   enemySpawnTiles = []
   myPumpTiles = []
+  myPumpTilesSet = set()
   enemyPumpTiles = []
   myUnits = []
   enemyUnits = []
@@ -51,20 +52,14 @@ class AI(BaseAI):
     # Tuples iceTile: (pumpTile, aStarPath)
     iceToPump = dict()
     
-    # Find all the distance from every ice tile to the nearest pump (cost = dig)
+    # Find all the distance from every ice tile to the nearest pump
     for iceTile in [tile for tile in self.tiles if tile.owner == 3]:
-      shortestPath = breadthFirst(self, iceTile.x, iceTile.y,
-        lambda tile: tile.pumpID != -1,
-        lambda tile: )
-      iceToPump[iceTile] = breadthFirst()
-      iceToPump[iceTile] = min([(pumpTile,
-        aStar(self, iceTile.x, iceTile.y, pumpTile.x, pumpTile.y,
-        lambda tile: (tile.pumpID == -1 and tile.owner == 2) or tile.owner == 3,
-        lambda tile: 1 - tile.isTrench)
-        ) for pumpTile in self.myPumpTiles], key = lambda pair: len(pair[1]))
+      iceToPump[iceTile] = uniformCostSearch(self, iceTile.x, iceTile.y,
+        lambda tile: tile in self.myPumpTilesSet, # GOAL - find any of my pumps
+        lambda tile: tile.owner == 2 or tile.owner == 3 or tile in self.myPumpTilesSet, # VALID - dirt or trench or ice
+        lambda tile: not (tile.isTrench or tile.owner == 3))  # COST - 0 = trench or ice
     # Go through the path
-    for iceTile, pair in iceToPump.iteritems():
-      path = pair[1]
+    for iceTile, path in iceToPump.iteritems():
       # Check every tile in the path and see if it needs to be dug
       for pos in path:
         tile = getTile(self, pos[0], pos[1])
@@ -72,14 +67,16 @@ class AI(BaseAI):
         if tile.isTrench and tile not in self.myCollectionTrenches:
           self.myCollectionTrenches.append(tile)
         # Need to dig here?
-        if not tile.isTrench and tile.owner != 3:
-          self.neededTrenches.append(tile)         
+        if not tile.isTrench and tile.owner == 2:
+          self.neededTrenches.append(tile)
     
   def findAvailableUnits(self):
     takenUnits = set()
     for mission in self.missions:
       if isinstance(mission, AttackMission):
-        takenUnits.add(mission.hero)
+        takenUnits.add(self.unitByID(mission.heroID))
+      elif isinstance(mission, DigMission):
+        takenUnits.add(self.unitByID(mission.heroID))
     return [unit for unit in self.myUnits if unit not in takenUnits]
 
   def spawnUnitCenter(self, type):
@@ -143,6 +140,7 @@ class AI(BaseAI):
     self.myUnits = getMyUnits(self)
     self.enemyUnits = getEnemyUnits(self)
     self.myPumpTiles = getMyPumpTiles(self)
+    self.myPumpTilesSet = set(self.myPumpTiles)
     self.enemyPumpTiles = getEnemyPumpTiles(self)
 
     self.unitByID = cacheUnitIDs(self)

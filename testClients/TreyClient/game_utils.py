@@ -169,7 +169,7 @@ def aStar(ai, startX, startY, goalX, goalY, isValidTile, tileCost):
     # Black Magic ahead
     current = min(open, key = lambda obj: f_score[obj]) # the node in open set having the lowest f_score[] value
     if current == goal:
-      return reconstructPath(ai, cameFrom, goal)
+      return reconstructPath(cameFrom, goal)
      
     open.remove(current) # remove current from open set
     closed.add(current)
@@ -193,65 +193,46 @@ def aStar(ai, startX, startY, goalX, goalY, isValidTile, tileCost):
   return None
 
 # Returns list of 2-tuples
-def reconstructPath(ai, came_from, current_node):
+def reconstructPath(came_from, current_node):
   if current_node in came_from:
-    p = reconstructPath(ai, came_from, came_from[current_node])
+    p = reconstructPath(came_from, came_from[current_node])
     p.append(current_node)
     return p
   else:
     return [current_node]
 
 def uniformCostSearch(ai, startX, startY, goalCondition, isValidTile, tileCost):
-  node = (startX, startY)
-  cost = 0
+  node = (0, (startX, startY))
   frontier = [] #:= priority queue containing node only
+  heappush(frontier, node)
   explored = set()  # empty set
+  cameFrom = dict()
   while len(frontier) > 0:
     node = heappop(frontier)   #node := frontier.pop()
-    if goalCondition(getTile(node)):
-      return solution
+    if goalCondition(getTile(ai, node[1][0], node[1][1])):
+      return uniformCostSearchSolution(cameFrom, node)
     explored.add(node)
-    for each of node's neighbors n
-      if n is not in explored
-        if n is not in frontier
-          frontier.add(n)
-        else if n is in frontier with higher cost
-          replace existing node with n
+    for offset in offsets: #for each of node's neighbors n
+      pos = (node[1][0] + offset[0], node[1][1] + offset[1])
+      if isOnMap(ai, pos[0], pos[1]) and isValidTile(getTile(ai, pos[0], pos[1])):
+        neighbor = (node[0] + tileCost(pos), pos)
+        if neighbor not in explored:  #if n is not in explored
+          if neighbor not in frontier:  #if n is not in frontier
+            heappush(frontier, neighbor)#frontier.add(n)
+          else:   #else if n is in frontier with higher cost
+            for index, frontierNode in enumerate(frontier):
+              if frontierNode[0] > neighbor[0]:
+                frontier[index] = neighbor  #replace existing node with n
+                break
   return None
 
-def Dijkstra(ai, startX, startY, goalCondition, isValidTile, tileCost):
-  offsets = ((1,0),(0,1),(-1,0),(0,-1))
-
-  dist = dict()
-
-  start = (startX, startY)
-  dist[start] = 0
-
-  open = []
-
-
-     Q := the set of all nodes in Graph ;                       // All nodes in the graph are
-                                                                 // unoptimized – thus are in Q
-      while Q is not empty:                                      // The main loop
-          u := vertex in Q with smallest distance in dist[] ;    // Source node in first case
-          remove u from Q ;
-          if dist[u] = infinity:
-              break ;                                            // all remaining vertices are
-          end if                                                 // inaccessible from source
-
-          for each neighbor v of u:                              // where v has not yet been
-                                                                 // removed from Q.
-              alt := dist[u] + dist_between(u, v) ;
-              if alt < dist[v]:                                  // Relax (u,v,a)
-                  dist[v]  := alt ;
-                  previous[v]  := u ;
-                  decrease-key v in Q;                           // Reorder v in the Queue
-              end if
-          end for
-      end while
-      return dist;
-  return None
-      
+# Returns list of 2-tuples
+def uniformCostSearchSolution(cameFrom, current):
+  if current in cameFrom:
+    p = uniformCostSearchSolution(cameFrom, cameFrom[current])
+    p.append(current[1])
+  else:
+    return [current[1]]
 
 class game_history:
   def __init__(self, ai, use_colors = False):
