@@ -3,6 +3,8 @@ import time
 
 import operator
 
+from heapq import *
+
 from AI import *
 
 DIGGER = 0
@@ -133,11 +135,16 @@ def costOfMove(ai, tile, healthLeft):
   else:
     return 0.0
 
+def validTrench(ai, tile):
+  if tile.pumpID == -1 and tile.owner == 2:
+    return 1
+  return 0
+    
 def costOfTrenchPath(ai, tile):
   if tile.isTrench:
     return 0.5 / (ai.dfes[tile]**2)
   return 1.0 / (ai.dfes[tile]**2)
-
+  
 
 
 def aStar(ai, startX, startY, goalX, goalY, isValidTile, tileCost):
@@ -152,6 +159,7 @@ def aStar(ai, startX, startY, goalX, goalY, isValidTile, tileCost):
   
   g_score = dict()
   f_score = dict()
+  thisAlgorithmBecomingSkynetCost = 9999999999
   
   g_score[start] = 0 # Cost from start along best known path.
   # Estimated total cost from start to goal through y.
@@ -182,7 +190,7 @@ def aStar(ai, startX, startY, goalX, goalY, isValidTile, tileCost):
           if neighbor not in open:
             open.append(neighbor)
   print('aStar failed!')
-  return start
+  return None
 
 # Returns list of 2-tuples
 def reconstructPath(ai, came_from, current_node):
@@ -193,7 +201,57 @@ def reconstructPath(ai, came_from, current_node):
   else:
     return [current_node]
 
-  
+def uniformCostSearch(ai, startX, startY, goalCondition, isValidTile, tileCost):
+  node = (startX, startY)
+  cost = 0
+  frontier = [] #:= priority queue containing node only
+  explored = set()  # empty set
+  while len(frontier) > 0:
+    node = heappop(frontier)   #node := frontier.pop()
+    if goalCondition(getTile(node)):
+      return solution
+    explored.add(node)
+    for each of node's neighbors n
+      if n is not in explored
+        if n is not in frontier
+          frontier.add(n)
+        else if n is in frontier with higher cost
+          replace existing node with n
+  return None
+
+def Dijkstra(ai, startX, startY, goalCondition, isValidTile, tileCost):
+  offsets = ((1,0),(0,1),(-1,0),(0,-1))
+
+  dist = dict()
+
+  start = (startX, startY)
+  dist[start] = 0
+
+  open = []
+
+
+     Q := the set of all nodes in Graph ;                       // All nodes in the graph are
+                                                                 // unoptimized – thus are in Q
+      while Q is not empty:                                      // The main loop
+          u := vertex in Q with smallest distance in dist[] ;    // Source node in first case
+          remove u from Q ;
+          if dist[u] = infinity:
+              break ;                                            // all remaining vertices are
+          end if                                                 // inaccessible from source
+
+          for each neighbor v of u:                              // where v has not yet been
+                                                                 // removed from Q.
+              alt := dist[u] + dist_between(u, v) ;
+              if alt < dist[v]:                                  // Relax (u,v,a)
+                  dist[v]  := alt ;
+                  previous[v]  := u ;
+                  decrease-key v in Q;                           // Reorder v in the Queue
+              end if
+          end for
+      end while
+      return dist;
+  return None
+      
 
 class game_history:
   def __init__(self, ai, use_colors = False):

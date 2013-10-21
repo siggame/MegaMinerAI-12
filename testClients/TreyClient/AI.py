@@ -29,6 +29,8 @@ class AI(BaseAI):
   threats = []
   threatThreshold = 0.4
   
+  neededTrenches = []
+  
   enemyHistory = 5
   enemyUnitPositions = []
 
@@ -45,7 +47,34 @@ class AI(BaseAI):
   def password():
     return "password"
 
-
+  def findWaterwaysNeeded(self):
+    # Tuples iceTile: (pumpTile, aStarPath)
+    iceToPump = dict()
+    
+    # Find all the distance from every ice tile to the nearest pump (cost = dig)
+    for iceTile in [tile for tile in self.tiles if tile.owner == 3]:
+      shortestPath = breadthFirst(self, iceTile.x, iceTile.y,
+        lambda tile: tile.pumpID != -1,
+        lambda tile: )
+      iceToPump[iceTile] = breadthFirst()
+      iceToPump[iceTile] = min([(pumpTile,
+        aStar(self, iceTile.x, iceTile.y, pumpTile.x, pumpTile.y,
+        lambda tile: (tile.pumpID == -1 and tile.owner == 2) or tile.owner == 3,
+        lambda tile: 1 - tile.isTrench)
+        ) for pumpTile in self.myPumpTiles], key = lambda pair: len(pair[1]))
+    # Go through the path
+    for iceTile, pair in iceToPump.iteritems():
+      path = pair[1]
+      # Check every tile in the path and see if it needs to be dug
+      for pos in path:
+        tile = getTile(self, pos[0], pos[1])
+        # Keep track of which tiles are being used to transport water MY pumps (in case we want to defend them)
+        if tile.isTrench and tile not in self.myCollectionTrenches:
+          self.myCollectionTrenches.append(tile)
+        # Need to dig here?
+        if not tile.isTrench and tile.owner != 3:
+          self.neededTrenches.append(tile)         
+    
   def findAvailableUnits(self):
     takenUnits = set()
     for mission in self.missions:
@@ -74,7 +103,7 @@ class AI(BaseAI):
   # Returns of list of tuples (threat, threatLevel), most important first
   def identifyThreats(self):
     threatLevel = dict()
-    threatsTakenCareOf = set([mission.target for mission in self.missions if isinstance(mission, AttackMission)])
+    threatsTakenCareOf = set([self.unitByID[mission.targetID] for mission in self.missions if isinstance(mission, AttackMission) and mission.targetID in self.unitByID])
     possibleThreats = [unit for unit in self.enemyUnits if unit not in threatsTakenCareOf]
     for unit in possibleThreats:
       nearestPump = findNearestTile(unit.x, unit.y, self.myPumpTiles)
@@ -86,7 +115,7 @@ class AI(BaseAI):
       else:
         threatLevel[unit] = 1.0 / distToPump + 1.0 / distToSpawn
     # Smallest threat first
-    return sorted([(unit, threatLevel[unit]) for unit in self.enemyUnits], key=lambda threat: -threat[1])
+    return sorted([(unit, threatLevel[unit]) for unit in possibleThreats], key=lambda threat: -threat[1])
 
 
 
@@ -121,6 +150,8 @@ class AI(BaseAI):
 
     self.unitAt = cacheUnitPositions(self)
 
+    self.findWaterwaysNeeded()
+    
     self.spawnEgg = set()
     self.availableUnits = self.findAvailableUnits()
     # Identify threats
@@ -131,10 +162,21 @@ class AI(BaseAI):
         if threat[1] > self.threatThreshold:
           heros = getUnitsClosestToFromList(self.availableUnits, threat[0].x, threat[0].y)
           for hero in heros:
-            self.missions.append(AttackMission(threat[1] * 5.0, self, hero, threat[0]))
+            print('Assigned mission {} -> {}'.format(hero.id, threat[0].id))
+            self.missions.append(AttackMission(threat[1] * 5.0, self, hero.id, threat[0].id))
             self.availableUnits.remove(hero)
             break
 
+    # Dig trenches
+    for trench in self.neededTrenches:
+      heros = getUnitsClosestToFromList(self.availableUnits, trench.x, trench.y)
+      for hero in heros:
+        print('Assigned dig mission {} -> ({},{})'.format(hero.id, trench.x, trench.y))
+        self.missions.append(DigMission(1.0, self, hero.id, trench))
+        self.availableUnits.remove(hero)
+        break
+            
+    # Perform missions
     for mission in self.missions:
       mission.step()
       if (isinstance(mission, AttackMission)):
