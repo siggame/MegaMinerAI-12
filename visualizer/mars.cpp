@@ -205,8 +205,8 @@ void Mars::loadGamelog( std::string gamelog )
 
 	// Setup the renderer as a 4 x 4 map by default
 	// TODO: Change board size to something useful
-	renderer->setCamera( 0, 0, m_game->states[0].mapWidth, m_game->states[0].mapHeight);
-	renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight);
+    renderer->setCamera( 0, 2, m_game->states[0].mapWidth, m_game->states[0].mapHeight + 2);
+    renderer->setGridDimensions( m_game->states[0].mapWidth, m_game->states[0].mapHeight + 2);
 
 	m_selectedUnitIDs.clear();
 
@@ -253,7 +253,10 @@ void Mars::UpdateWorld(int state)
 }
 
 void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& trailMap, Frame& turn)
-{
+{    
+    // todo: this could be moved elsewhere,
+    static std::map<int,int> counter;
+
     for(auto& row : m_Tiles)
     {
         for(auto& tileIter : row)
@@ -275,9 +278,12 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
             }
             else if(tileIter.pumpID > - 1)
             {
-                SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "pump", 8);
+                SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter.x, tileIter.y), glm::vec2(1.0f, 1.0f), "pump", counter[tileIter.id]);
                 pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(1.0f,1.0f,1.0f, 1.0f)));
                 turn.addAnimatable(pPump);
+
+                // todo: only play animation if there is water nearby
+                counter[tileIter.id] = ((counter[tileIter.id]) + 1) % 8;
             }
 
             if(!texture.empty())
@@ -732,4 +738,4 @@ void Mars::run()
 
 } // visualizer
 
-Q_EXPORT_PLUGIN2( mars, visualizer::Mars );
+Q_EXPORT_PLUGIN2( Mars, visualizer::Mars );

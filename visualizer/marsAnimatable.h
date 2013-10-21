@@ -66,12 +66,13 @@ namespace visualizer
     struct AnimatedSprite :
         public BaseSprite
     {
-        AnimatedSprite(const glm::vec2& pos, const glm::vec2& scale, const std::string& sprite, const int& frames) :
+        AnimatedSprite(const glm::vec2& pos, const glm::vec2& scale, const std::string& sprite, const int& frames, bool singleFrame = false) :
             BaseSprite(pos, scale, sprite),
-            m_Frames(frames)
+            m_Frames(frames), m_SingleFrame(singleFrame)
             {}
 
         int m_Frames;
+        bool m_SingleFrame;
     };
 
 	struct SplashScreen : public Animatable
