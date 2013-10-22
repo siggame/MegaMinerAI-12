@@ -120,6 +120,39 @@ class Match(DefaultGameWorld):
     return next((player for player in self.objects.players if player.id == playerID), None)
     
   def create_pumps(self):
+    # Create a pumps next to an ice tiles
+    iceTiles = [tile for tile in self.objects.tiles if tile.owner == 3]
+    # Magic
+    pumpOffsets = [
+      ((1,0),  (2,0), (1,1), (2,1)), ((1,0),  (2,0), (1,-1), (2,-1)),
+      ((0,1),  (0,2), (1,1), (1,2)), ((0,1),  (0,2), (-1,1), (-1,2)),
+      ((-1,0),(-2,0), (-1,1),(-2,1)),((-1,-1),(-2,-1)),
+      ((0,-1),(0,-2), (1,-1),(1,-2)),((-1,-1),(-1,-2))
+    ]
+    random.shuffle(pumpOffsets)
+    for i in range(self.numPumpStationsConnectedToIce):
+      iceTile = random.choice(iceTiles)
+      for tileOffsets in pumpOffsets:
+        validPump = True
+        # Check if every spot in the 2x2 square is available for a pump
+        for tileOffset in tileOffsets:
+          if self.grid[iceTile.x + tileOffset[0]][iceTile.x + tileOffset[1]][0].owner != 2:
+            validPump = False
+            break
+        # Put the pump
+        if validPump:
+          pump = self.addObject(PumpStation,[0, 0, 0])
+          otherPump = self.addObject(PumpStation,[1, 0, 0])
+          for tileOffset in tileOffsets:
+            tile = self.grid[iceTile.x + tileOffset[0]][iceTile.y + tileOffset[1]][0]
+            otherTile = self.grid[self.mapWidth - tile.x][tile.y][0]
+
+
+
+
+
+
+
     for i in range(10):
       x = random.randint(0, self.mapWidth / 2 - 1)
       y = random.randint(0, self.mapHeight - 1)
