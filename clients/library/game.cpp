@@ -380,8 +380,8 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   // Can only dig once per turn
   if (object->hasDug == 1)
     return 0;
-  // Can only dig adjacent tiles
-  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
+  // Can only dig adjacent tiles and the tile underneath the digger
+  if (abs(object->x - x) + abs(object->y - y) > 1)
     return 0;
   
   // Can't dig a trench on a trench

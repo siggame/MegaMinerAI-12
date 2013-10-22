@@ -260,8 +260,8 @@ class Unit(Mappable):
       return 'Turn {}: Your filler {} cannot dig.'.format(self.game.turnNumber, self.id)
     elif self.hasDug == 1:
       return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
-    elif abs(self.x-x) + abs(self.y-y) != 1:
-      return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif abs(self.x-x) + abs(self.y-y) > 1:
+      return 'Turn {}: Your {} can only dig adjacent or same tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.isTrench == 1:
       return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.pumpID != -1:
