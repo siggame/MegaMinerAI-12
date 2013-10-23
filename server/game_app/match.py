@@ -137,7 +137,8 @@ class Match(DefaultGameWorld):
         validPump = True
         # Check if every spot in the 2x2 square is available for a pump station
         for tileOffset in tileOffsets:
-          if self.grid[iceTile.x + tileOffset[0]][iceTile.x + tileOffset[1]][0].owner != 2:
+          tile = self.getTile(iceTile.x + tileOffset[0], iceTile.y + tileOffset[1])
+          if tile is None or tile.owner != 2:
             validPump = False
             break
         # Put the pump
@@ -145,8 +146,8 @@ class Match(DefaultGameWorld):
           pump = self.addObject(PumpStation,[0, 0, 0])
           otherPump = self.addObject(PumpStation,[1, 0, 0])
           for tileOffset in tileOffsets:
-            tile = self.grid[iceTile.x + tileOffset[0]][iceTile.y + tileOffset[1]][0]
-            otherTile = self.grid[self.mapWidth - tile.x - 1][tile.y][0]
+            tile = self.getTile(iceTile.x + tileOffset[0], iceTile.y + tileOffset[1])
+            otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
             tile.pumpID = pump.id
             otherTile.pumpID = otherPump.id
             tile.owner = 0
@@ -167,7 +168,7 @@ class Match(DefaultGameWorld):
         valid = True
         # Check 2x2 square
         for tileOffset in squareOffsets:
-          if self.grid[x + tileOffset[0]][y + tileOffset[1]][0].owner != 2:
+          if self.getTile(x + tileOffset[0], y + tileOffset[1]).owner != 2:
             valid = False
             break
         if valid:
@@ -175,31 +176,31 @@ class Match(DefaultGameWorld):
       pump = self.addObject(PumpStation,[0, 0, 0])
       otherPump = self.addObject(PumpStation,[1, 0, 0])
       for tileOffset in squareOffsets:
-        tile = self.grid[x + tileOffset[0]][y + tileOffset[1]][0]
-        otherTile = self.grid[self.mapWidth - tile.x - 1][tile.y][0]
+        tile = self.getTile(x + tileOffset[0], y + tileOffset[1])
+        otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
         tile.pumpID = pump.id
         otherTile.pumpID = otherPump.id
         tile.owner = 0
         otherTile.owner = 1
     
   def create_ice(self):
-    #set_tiles(self)
-    for i in range(10):
-      x = random.randint(0, self.mapWidth / 2 - 1)
-      y = random.randint(0, self.mapHeight - 1)
-
+    for _ in xrange(self.numIceTiles):
+      x = y = 0
+      done = False
+      while not done:
+        x = random.randint(0, self.mapWidth / 2 - 1)
+        y = random.randint(0, self.mapHeight - 1)
+        tile = self.getTile(x, y)
+        otherTile = self.getTile(self.mapWidth - x - 1, y)
+        if tile and tile.owner == 2:
+          done = True
+      randWaterAmount = random.randint(self.minWaterPerIceTile, self.maxWaterPerIceTile)
       tile = self.getTile(x, y)
-      othertile = self.getTile(self.mapWidth - x - 1, y)
-
-      if tile and othertile and tile.owner == 2 and tile.pumpID == -1:
-        randwater = random.randint(10, 50)
-
-        tile.owner = 3
-        othertile.owner = 3
-
-        tile.waterAmount = randwater
-        othertile.waterAmount = randwater
-      
+      otherTile = self.getTile(self.mapWidth - x - 1, y)
+      tile.owner = 3
+      otherTile.owner = 3
+      tile.waterAmount = randWaterAmount
+      otherTile.waterAmount = randWaterAmount
 
   def create_spawns(self):
     #TODO: Better spawner spawning
