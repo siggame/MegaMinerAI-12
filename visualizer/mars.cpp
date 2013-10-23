@@ -379,12 +379,15 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 
 			if(pumpIter != pumps.end())
 			{
-				float percent = 1.0f - (float)pumpIter->second->siegeAmount / (float)m_game->maxSiege;
+				float percent = (float)pumpIter->second->siegeAmount / (float)m_game->maxSiege;
 
-				SmartPointer<Animatable> pumpBar = new Animatable;
-				pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),1.0f,percent,glm::vec4(glm::vec3(0.0f),0.7f)));
+				if(percent != 0.0f)
+				{
+					SmartPointer<Animatable> pumpBar = new Animatable;
+					pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),1.0f,0.3f,percent));
 
-				turn.addAnimatable(pumpBar);
+					turn.addAnimatable(pumpBar);
+				}
 			}
 
 			// todo: only play animation if there is water nearby

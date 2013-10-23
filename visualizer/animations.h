@@ -94,21 +94,22 @@ namespace visualizer
 		bool m_Flipped;
 	};
 
-    class DrawProgressBar : public ColorSprite
-    {
-    public:
+	class DrawProgressBar : public Anim
+	{
+	public:
 
-        DrawProgressBar(const glm::vec2& pos, float width, float percent, const glm::vec4& c, Fade f = None);
+		DrawProgressBar(const glm::vec2& pos, float width, float height, float percent);
 
-        void animate( const float& t, AnimData* d, IGame* game );
+		void animate( const float& t, AnimData* d, IGame* game );
 
-    private:
+	private:
 
-        glm::vec2 m_pos;
-        float m_width;
-        float m_percent;
+		glm::vec2 m_pos;
+		float m_width;
+		float m_height;
+		float m_percent;
 
-    };
+	};
 
 	/** @name DrawAnimatedSprite
 	  * @inherits Anim
