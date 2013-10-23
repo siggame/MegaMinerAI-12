@@ -120,21 +120,22 @@ class Match(DefaultGameWorld):
     return next((player for player in self.objects.players if player.id == playerID), None)
     
   def create_pumps(self):
-    # Create a pumps next to an ice tiles
-    iceTiles = [tile for tile in self.objects.tiles if tile.owner == 3]
+    # Create a pump stations next to an ice tiles
+    # Get all ice tiles on left side of map
+    iceTiles = [tile for tile in self.objects.tiles if tile.owner == 3 and tile.x <= self.mapWidth / 2]
     # Magic
     pumpOffsets = [
-      ((1,0),  (2,0), (1,1), (2,1)), ((1,0),  (2,0), (1,-1), (2,-1)),
-      ((0,1),  (0,2), (1,1), (1,2)), ((0,1),  (0,2), (-1,1), (-1,2)),
-      ((-1,0),(-2,0), (-1,1),(-2,1)),((-1,-1),(-2,-1)),
-      ((0,-1),(0,-2), (1,-1),(1,-2)),((-1,-1),(-1,-2))
+      ((1,0), (2,0), (1,1), (2,1)),  ((1,0), (2,0), (1,-1), (2,-1)),
+      ((0,1), (0,2), (1,1), (1,2)),  ((0,1), (0,2), (-1,1), (-1,2)),
+      ((-1,0), (-2,0), (-1,1), (-2,1)),  ((-1,0), (-2,0), (-1,-1), (-2,-1)),
+      ((0,-1), (0,-2), (1,-1), (1,-2)),  ((0,-1), (0,-2), (-1,-1), (-1,-2))
     ]
     random.shuffle(pumpOffsets)
-    for i in range(self.numPumpStationsConnectedToIce):
+    for _ in xrange(self.numPumpStationsConnectedToIce):
       iceTile = random.choice(iceTiles)
       for tileOffsets in pumpOffsets:
         validPump = True
-        # Check if every spot in the 2x2 square is available for a pump
+        # Check if every spot in the 2x2 square is available for a pump station
         for tileOffset in tileOffsets:
           if self.grid[iceTile.x + tileOffset[0]][iceTile.x + tileOffset[1]][0].owner != 2:
             validPump = False
@@ -145,28 +146,41 @@ class Match(DefaultGameWorld):
           otherPump = self.addObject(PumpStation,[1, 0, 0])
           for tileOffset in tileOffsets:
             tile = self.grid[iceTile.x + tileOffset[0]][iceTile.y + tileOffset[1]][0]
-            otherTile = self.grid[self.mapWidth - tile.x][tile.y][0]
+            otherTile = self.grid[self.mapWidth - tile.x - 1][tile.y][0]
+            tile.pumpID = pump.id
+            otherTile.pumpID = otherPump.id
+            tile.owner = 0
+            otherTile.owner = 1
+          iceTiles.remove(iceTile)  # So we don't put two pump stations next to the same ice tile
+          break
 
-
-
-
-
-
-
-    for i in range(10):
-      x = random.randint(0, self.mapWidth / 2 - 1)
-      y = random.randint(0, self.mapHeight - 1)
-      tile = self.getTile(x, y)
-      othertile = self.getTile(self.mapWidth - x - 1, y)
-      # Check if it is an empty tile
-      if tile and othertile and tile.owner == 2 and tile.pumpID == -1:
-        pump = self.addObject(PumpStation,[0, 0, 0])
-        tile.owner = 0
+    # Create randomly placed pump stations
+    squareOffsets = [
+      (0,0),(1,0),(0,1),(1,1)
+    ]
+    for _ in xrange(self.numPumpStations):
+      x = y = 0
+      done = False
+      while not done:
+        x = random.randint(0, self.mapWidth / 2 - 2)
+        y = random.randint(0, self.mapHeight - 2)
+        valid = True
+        # Check 2x2 square
+        for tileOffset in squareOffsets:
+          if self.grid[x + tileOffset[0]][y + tileOffset[1]][0].owner != 2:
+            valid = False
+            break
+        if valid:
+          done = True
+      pump = self.addObject(PumpStation,[0, 0, 0])
+      otherPump = self.addObject(PumpStation,[1, 0, 0])
+      for tileOffset in squareOffsets:
+        tile = self.grid[x + tileOffset[0]][y + tileOffset[1]][0]
+        otherTile = self.grid[self.mapWidth - tile.x - 1][tile.y][0]
         tile.pumpID = pump.id
-
-        otherpump = self.addObject(PumpStation,[1, 0, 0])
-        othertile.owner = 1
-        othertile.pumpID = otherpump.id
+        otherTile.pumpID = otherPump.id
+        tile.owner = 0
+        otherTile.owner = 1
     
   def create_ice(self):
     #set_tiles(self)
