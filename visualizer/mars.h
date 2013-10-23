@@ -65,11 +65,20 @@ namespace visualizer
                         {}
                 };
 
+                struct PumpStation : public parser::PumpStation, public Animatable
+                {
+                    PumpStation(const parser::GameState& state, const parser::PumpStation& pump) :
+                        parser::PumpStation(pump),
+                        Animatable(state, pump.id)
+                        {}
+                };
+
 				struct State
 				{
                     std::map<int, SmartPointer<parser::Player> > players;
                     std::map<int, SmartPointer<Unit> > units;
                     std::map<int, SmartPointer<Tile> > tiles;
+                    std::map<int, SmartPointer<PumpStation> > pump;
                     std::vector<std::vector< SmartPointer<Tile> > > tileGrid;
 					int playerID;
 					int turnNumber;
@@ -77,18 +86,22 @@ namespace visualizer
 
 				Game(parser::Game* game);
 
-				int mapWidth;
-			    int mapHeight;
-			    int maxHealth;
-			    int trenchDamage;
-			    int waterDamage;
-			    int attackDamage;
-			    int offensePower;
-			    int defensePower;
-			    int maxUnits;
-			    int unitCost;
-			    int gameNumber;
-			    int winner;
+                int mapWidth;
+                int mapHeight;
+                int maxHealth;
+                int trenchDamage;
+                int waterDamage;
+                int turnNumber;
+                int attackDamage;
+                int offensePower;
+                int defensePower;
+                int maxUnits;
+                int unitCost;
+                int playerID;
+                int gameNumber;
+                int maxSiege;
+                float oxygenRate;
+                int winner;
 			    std::string winReason;
 
 			  	std::vector<State> states;

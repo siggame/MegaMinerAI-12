@@ -94,6 +94,22 @@ namespace visualizer
 		bool m_Flipped;
 	};
 
+    class DrawProgressBar : public ColorSprite
+    {
+    public:
+
+        DrawProgressBar(const glm::vec2& pos, float width, float percent, const glm::vec4& c, Fade f = None);
+
+        void animate( const float& t, AnimData* d, IGame* game );
+
+    private:
+
+        glm::vec2 m_pos;
+        float m_width;
+        float m_percent;
+
+    };
+
 	/** @name DrawAnimatedSprite
 	  * @inherits Anim
 	  * @prupose Will draw an animated sprite. Must know the number of frames
