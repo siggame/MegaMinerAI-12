@@ -324,18 +324,38 @@ void Mars::loadGamelog( std::string gamelog )
 
 void Mars::RenderHUD()
 {
+    int turn = timeManager->getTurn();
+
+    // unlucky as shit
+    const float barWidth = 13.0f;
+
+    float totalWater = m_game->states[turn].players[0]->waterStored + m_game->states[turn].players[1]->waterStored;
+    float lengthBlue;
+    if(totalWater != 0)
+        lengthBlue = (m_game->states[turn].players[0]->waterStored / totalWater) * barWidth;
+    else
+        lengthBlue = 0;
+
+    float lengthRed = barWidth - lengthBlue;
+
 	// Render player #0
 	renderer->setColor( Color(1.0f, 1.0f, 1.0f, 1.0f));
 	renderer->drawText(0.0f, m_game->mapHeight + 1.0f , "Roboto", m_game->states[0].players[0]->playerName, 3.0f, IRenderer::Left);
 
+    // Render player #1
 	renderer->drawText(40.0f, m_game->mapHeight + 1.0f , "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
 
 
     renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank_back");
 
+    renderer->setColor(Color(0.5f, 0.5f, 1.0f, 0.5f));
+    renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
+
+    renderer->setColor(Color(1.0f, 0.5f, 0.5f, 0.5f));
+    renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
+
+    renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
 	renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank");
-
-
 }
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
