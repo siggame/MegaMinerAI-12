@@ -141,7 +141,7 @@ namespace visualizer
 			list<int> m_selectedUnitIDs;
             std::map<std::string, bool> m_renderTagState;
 
-			static const unsigned int GRID_OFFSET = 2;
+			static const unsigned int GRID_OFFSET = 1;
 
             glm::vec3 GetTeamColor(int) const;
 

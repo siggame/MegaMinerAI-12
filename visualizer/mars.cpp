@@ -41,13 +41,13 @@ void Mars::GetSelectedRect(Rect &out) const
 {
 	const Input& input = gui->getInput();
 
-	int x = input.x;
+	int x = input.x - GRID_OFFSET;
 	int y = input.y - GRID_OFFSET;
-	int width = input.sx - x;
-	int height = input.sy - y;
+	int width = input.sx - x - GRID_OFFSET;
+	int height = input.sy - y - GRID_OFFSET;
 
 	int right = x + width;
-	int bottom = y + height - GRID_OFFSET;
+	int bottom = y + height;
 
 	out.left = min(x,right);
 	out.top = min(y,bottom);
@@ -154,6 +154,9 @@ void Mars::drawQuadAroundObj(const SmartPointer<parser::Mappable> obj, const glm
 
 void Mars::preDraw()
 {
+	renderer->push();
+	renderer->translate(GRID_OFFSET, GRID_OFFSET);
+
 	ProccessInput();
 
 	renderer->setColor(Color());
@@ -168,6 +171,8 @@ void Mars::preDraw()
 void Mars::postDraw()
 {
 	drawObjectSelection();
+
+	renderer->pop();
 }
 
 void Mars::drawGrid()
@@ -306,8 +311,8 @@ void Mars::loadGamelog( std::string gamelog )
 	// Setup the renderer as a 4 x 4 map by default
 	// TODO: Change board size to something useful
 
-	renderer->setCamera( 0.0f, GRID_OFFSET, m_game->mapWidth, m_game->mapHeight);
-	renderer->setGridDimensions( m_game->mapWidth, m_game->mapHeight);
+	renderer->setCamera( 0, 0, m_game->mapWidth + GRID_OFFSET*2, m_game->mapHeight + 4 + GRID_OFFSET*2);
+	renderer->setGridDimensions( m_game->mapWidth + GRID_OFFSET*2, m_game->mapHeight + 4 + GRID_OFFSET*2);
 
 	m_selectedUnitIDs.clear();
 
