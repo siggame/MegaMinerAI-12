@@ -164,6 +164,7 @@ void Mars::preDraw()
 	renderer->drawTexturedQuad(0.0f,0.0f,m_game->mapWidth,m_game->mapHeight,"dirt");
 
 	drawGrid();
+    RenderHUD();
 
 // Handle player input here
 }
@@ -311,6 +312,7 @@ void Mars::loadGamelog( std::string gamelog )
 	// Setup the renderer as a 4 x 4 map by default
 	// TODO: Change board size to something useful
 
+
 	renderer->setCamera( 0, 0, m_game->mapWidth + GRID_OFFSET*2, m_game->mapHeight + 4 + GRID_OFFSET*2);
 	renderer->setGridDimensions( m_game->mapWidth + GRID_OFFSET*2, m_game->mapHeight + 4 + GRID_OFFSET*2);
 
@@ -320,31 +322,15 @@ void Mars::loadGamelog( std::string gamelog )
 } // Mars::loadGamelog()
 
 
-void Mars::RenderHUD(int state, Frame &turn)
+void Mars::RenderHUD()
 {
 	// Render player #0
-	SmartPointer<Animatable> pText = new Animatable;
-	DrawTextBox * textBox = new DrawTextBox(m_game->states[0].players[0]->playerName,
-											glm::vec2(5.0f,-1.0f),
-											glm::vec4(1.0f,1.0f,1.0f,1.0f),
-											2.0f,
-											IRenderer::Left
-											);
+	renderer->setColor( Color(1.0f, 1.0f, 1.0f, 1.0f));
+	renderer->drawText(0.0f, m_game->mapHeight + 1.0f , "Roboto", m_game->states[0].players[0]->playerName, 3.0f, IRenderer::Left);
 
-	pText->addKeyFrame(textBox);
-	turn.addAnimatable(pText);
+	renderer->drawText(40.0f, m_game->mapHeight + 1.0f , "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
 
-	// Render player #1
-	pText = new Animatable;
-	textBox = new DrawTextBox(m_game->states[0].players[1]->playerName,
-											glm::vec2(35.0f,-1.0f),
-											glm::vec4(1.0f,1.0f,1.0f,1.0f),
-											2.0f,
-											IRenderer::Right
-											);
-
-	pText->addKeyFrame(textBox);
-	turn.addAnimatable(pText);
+	renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank");
 }
 
 void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& trailMap, Frame& turn)
@@ -825,7 +811,6 @@ void Mars::run()
 		Frame turn;  // The frame that will be drawn
 
 		RenderWorld(state, trail, trailMap, turn);
-		RenderHUD(state,turn);
 
 		if(state >= (int)(m_game->states.size() - 10))
 		{

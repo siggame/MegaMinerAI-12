@@ -141,13 +141,14 @@ namespace visualizer
 			list<int> m_selectedUnitIDs;
             std::map<std::string, bool> m_renderTagState;
 
+
 			static const unsigned int GRID_OFFSET = 1;
 
             glm::vec3 GetTeamColor(int) const;
 
             void BuildWorld();
             void UpdateWorld(int state);
-            void RenderHUD(int state, Frame& turn);
+            void RenderHUD();
 
 			void RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& turnMap, Frame& turn);
 
