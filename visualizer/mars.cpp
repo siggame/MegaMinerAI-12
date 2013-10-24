@@ -447,10 +447,14 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				{
 					if(pumpCounter == 0)
 					{
-						SmartPointer<Animatable> pumpBar = new Animatable;
-						pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),1.0f,0.3f,percent));
+						auto eastPumpIter = pumps.find(m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->pumpID);
+						if(eastPumpIter == pumps.end() || (eastPumpIter->second->id != pumpIter->second->id))
+						{
+							SmartPointer<Animatable> pumpBar = new Animatable;
+							pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.3f,percent));
 
-						turn.addAnimatable(pumpBar);
+							turn.addAnimatable(pumpBar);
+						}
 					}
 				}
 			}
