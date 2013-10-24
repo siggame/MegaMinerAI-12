@@ -6,6 +6,7 @@
 #include <utility>
 #include <time.h>
 #include <list>
+#include <glm/glm.hpp>
 
 namespace visualizer
 {
@@ -376,23 +377,25 @@ void Mars::RenderHUD()
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 {
-	for(int i = -1; i <= 1; ++i)
+	const glm::ivec2 coords[] =
 	{
-		for(int j = -1; j <= 1; ++j)
+		glm::ivec2(-1.0f,0.0f),
+		glm::ivec2(1.0f,0.0f),
+		glm::ivec2(0.0f,-1.0f),
+		glm::ivec2(0.0f,1.0f)
+	};
+
+	for(unsigned int i = 0; i < 4; ++i)
+	{
+		int xPos = coords[i].x + xPosIn;
+		int yPos = coords[i].y + yPosIn;
+
+		if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
 		{
-			if(abs(i) == abs(j))
-				continue;
-
-			int xPos = xPosIn + j;
-			int yPos = yPosIn + i;
-
-			if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
+			const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
+			if((pTile->owner == 3) || (pTile->isTrench == true))
 			{
-				const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
-				if((pTile->owner == 3) || (pTile->isTrench == true))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
 	}
@@ -423,7 +426,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		{
 			texture = "trench";
 		}
-		else if(tileIter->pumpID > - 1)
+		else if(tileIter->pumpID > -1)
 		{
 			int& counterValue = counter[tileIter->id];
 
