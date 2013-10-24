@@ -379,10 +379,10 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 {
 	const glm::ivec2 coords[] =
 	{
-		glm::ivec2(-1.0f,0.0f),
-		glm::ivec2(1.0f,0.0f),
-		glm::ivec2(0.0f,-1.0f),
-		glm::ivec2(0.0f,1.0f)
+		glm::ivec2(-1,0),
+		glm::ivec2(1,0),
+		glm::ivec2(0,-1),
+		glm::ivec2(0,1)
 	};
 
 	for(auto& i : coords)
