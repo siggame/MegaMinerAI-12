@@ -29,10 +29,10 @@ namespace visualizer
 	{
 		IRenderer& renderer = *game->renderer;
 
-		renderer.setColor(Color(0.0f,0.0f,0.0f,1.0f));
+		renderer.setColor(Color(0.0f,0.0f,0.0f,0.7f));
 		renderer.drawQuad(m_pos.x + m_width,m_pos.y, -(1.0f - m_percent) * m_width, m_height); // height
 
-		renderer.setColor(Color(1.0f,0.0f,0.0f,1.0f));
+		renderer.setColor(Color(1.0f,0.0f,0.0f,0.5f));
 		renderer.drawQuad(m_pos.x,m_pos.y, m_percent * m_width, m_height);
 
 		// enable this to draw the % in the progress bar
@@ -57,7 +57,7 @@ namespace visualizer
 	{
         ColorSprite::animate(t,d,game);
         game->renderer->drawRotatedTexturedQuad(m_sprite->pos.x, m_sprite->pos.y,
-                  m_sprite->scale.x, m_sprite->scale.y, m_rot, m_sprite->m_sprite);
+				  m_sprite->scale.x, m_sprite->scale.y, m_rot, m_sprite->m_sprite);
 	}
 
 	void DrawSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)

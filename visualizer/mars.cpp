@@ -306,8 +306,8 @@ void Mars::loadGamelog( std::string gamelog )
 	// Setup the renderer as a 4 x 4 map by default
 	// TODO: Change board size to something useful
 
-	renderer->setCamera( 0.0f, GRID_OFFSET, m_game->mapWidth, m_game->mapHeight + GRID_OFFSET);
-	renderer->setGridDimensions( m_game->mapWidth, m_game->mapHeight + GRID_OFFSET);
+	renderer->setCamera( 0.0f, GRID_OFFSET, m_game->mapWidth, m_game->mapHeight);
+	renderer->setGridDimensions( m_game->mapWidth, m_game->mapHeight);
 
 	m_selectedUnitIDs.clear();
 
