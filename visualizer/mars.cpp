@@ -159,6 +159,9 @@ void Mars::preDraw()
 
 	ProccessInput();
 
+    renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
+	renderer->drawTexturedQuad(-1.0f, -1.0f, 77, 37 , "background");
+
 	renderer->setColor(Color());
 	//renderer->drawTexturedQuad(-2.0f,-2.0f,40.0f,40.0f,"stars");
 	renderer->drawTexturedQuad(0.0f,0.0f,m_game->mapWidth,m_game->mapHeight,"dirt");
