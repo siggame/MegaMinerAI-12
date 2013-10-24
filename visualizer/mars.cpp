@@ -385,10 +385,10 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 		glm::ivec2(0.0f,1.0f)
 	};
 
-	for(unsigned int i = 0; i < 4; ++i)
+	for(auto& i : coords)
 	{
-		int xPos = coords[i].x + xPosIn;
-		int yPos = coords[i].y + yPosIn;
+		int xPos = i.x + xPosIn;
+		int yPos = i.y + yPosIn;
 
 		if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
 		{
