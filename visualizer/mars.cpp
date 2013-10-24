@@ -324,10 +324,10 @@ void Mars::loadGamelog( std::string gamelog )
 
 void Mars::RenderHUD()
 {
+    std::ostringstream waterInfo;
     int turn = timeManager->getTurn();
 
-    // unlucky as shit
-    const float barWidth = 13.0f;
+    const float barWidth = 13.0f;  // <--- unlucky as shit
 
     float totalWater = m_game->states[turn].players[0]->waterStored + m_game->states[turn].players[1]->waterStored;
     float lengthBlue;
@@ -338,22 +338,36 @@ void Mars::RenderHUD()
 
     float lengthRed = barWidth - lengthBlue;
 
-	// Render player #0
-	renderer->setColor( Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawText(0.0f, m_game->mapHeight + 1.0f , "Roboto", m_game->states[0].players[0]->playerName, 3.0f, IRenderer::Left);
+	// Render player #0 info
+	renderer->setColor( Color(0.5f, 0.5f, 1.0f, 1.0f));
+	renderer->drawText(0.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[0]->playerName, 3.0f, IRenderer::Left);
+
+    waterInfo << "Water Amount: " << m_game->states[turn].players[0]->waterStored;
+    renderer->drawText(1.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
+    waterInfo.str("");
 
     // Render player #1
-	renderer->drawText(40.0f, m_game->mapHeight + 1.0f , "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
+    renderer->setColor(Color(1.0f, 0.5f, 0.5f, 1.0f));
+	renderer->drawText(40.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
 
+    waterInfo << "Water Amount: " << m_game->states[turn].players[1]->waterStored;
+    renderer->drawText(35.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
 
+    // Render the back of the tank
+    renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
     renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank_back");
 
-    renderer->setColor(Color(0.5f, 0.5f, 1.0f, 0.5f));
+    // Render the Bar
+    renderer->setColor(Color(0.5f, 0.5f, 1.0f, 0.3f));
     renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
 
-    renderer->setColor(Color(1.0f, 0.5f, 0.5f, 0.5f));
+    renderer->setColor(Color(1.0f, 0.5f, 0.5f, 0.3f));
     renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
 
+    renderer->setColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
+    renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2)) + lengthBlue - 0.1f, m_game->mapHeight + 1.2f, 0.2f, 2.0f);
+
+    // Render the front of the tank
     renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
 	renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank");
 }
@@ -712,8 +726,8 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				SmartPointer<Animatable> pText = new Animatable;
 				waterAmountString << tileIter->waterAmount;
 				DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
-														glm::vec2(tileIter->x + 0.5, tileIter->y + 0.25),
-														glm::vec4(0.0f,0.0f,0.0f,1.0f),
+														glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
+														glm::vec4(0.3f,0.0f,1.0f,1.0f),
 														3.0f);
 
 				pText->addKeyFrame(textBox);
