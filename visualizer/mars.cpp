@@ -408,6 +408,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 	// todo: this could be moved elsewhere,
 	static std::map<int,int> counter;
 
+	unsigned int pumpCounter = 0;
 	for(auto& iter : m_game->states[state].tiles)
 	{
 		auto& tileIter = iter.second;
@@ -444,10 +445,13 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 
 				if(percent != 0.0f)
 				{
-					SmartPointer<Animatable> pumpBar = new Animatable;
-					pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),1.0f,0.3f,percent));
+					if(pumpCounter == 0)
+					{
+						SmartPointer<Animatable> pumpBar = new Animatable;
+						pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),1.0f,0.3f,percent));
 
-					turn.addAnimatable(pumpBar);
+						turn.addAnimatable(pumpBar);
+					}
 				}
 			}
 
@@ -455,6 +459,8 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 			{
 				counterValue = (counterValue + 1) % 8;
 			}
+
+			pumpCounter = (pumpCounter + 1) % 2;
 		}
 
 		if(!texture.empty())
