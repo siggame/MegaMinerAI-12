@@ -333,6 +333,32 @@ void Mars::RenderHUD()
 	renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank");
 }
 
+bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
+{
+	for(int i = -1; i <= 1; ++i)
+	{
+		for(int j = -1; j <= 1; ++j)
+		{
+			if(abs(i) == abs(j))
+				continue;
+
+			int xPos = xPosIn + j;
+			int yPos = yPosIn + i;
+
+			if((xPos > 0) && (yPos < m_game->mapHeight - 1))
+			{
+				const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
+				if((pTile->owner == 3) || (pTile->isTrench == true))
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& trailMap, Frame& turn)
 {
 	// todo: this could be moved elsewhere,
@@ -381,15 +407,10 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				}
 			}
 
-			if((tileIter->y > 0 && (m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->owner == 3))						||
-			  ((tileIter->y < m_game->mapHeight - 1) && (m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->owner == 3)) ||
-			  ((tileIter->x > 0) && (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->owner == 3))						||
-			  ((tileIter->x < m_game->mapWidth - 1) && (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->owner == 3)))
+			if(IsWaterNearTilePos(state,tileIter->x,tileIter->y))
 			{
 				counterValue = (counterValue + 1) % 8;
 			}
-
-
 		}
 
 		if(!texture.empty())
