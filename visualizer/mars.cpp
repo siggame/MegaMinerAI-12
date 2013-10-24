@@ -381,8 +381,15 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				}
 			}
 
-			// todo: only play animation if there is water nearby
-			counterValue = (counterValue + 1) % 8;
+			if((tileIter->y > 0 && (m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->owner == 3))						||
+			  ((tileIter->y < m_game->mapHeight - 1) && (m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->owner == 3)) ||
+			  ((tileIter->x > 0) && (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->owner == 3))						||
+			  ((tileIter->x < m_game->mapWidth - 1) && (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->owner == 3)))
+			{
+				counterValue = (counterValue + 1) % 8;
+			}
+
+
 		}
 
 		if(!texture.empty())
