@@ -330,7 +330,12 @@ void Mars::RenderHUD()
 
 	renderer->drawText(40.0f, m_game->mapHeight + 1.0f , "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
 
+
+    renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank_back");
+
 	renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank");
+
+
 }
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
