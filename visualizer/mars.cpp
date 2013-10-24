@@ -100,7 +100,6 @@ void Mars::ProccessInput()
 
 		gui->updateDebugWindow();
 		gui->updateDebugUnitFocus();
-		cout<<"Selected Units:" << m_selectedUnitIDs.size() << endl;
 	}
 }
 
@@ -387,7 +386,7 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 			int xPos = xPosIn + j;
 			int yPos = yPosIn + i;
 
-			if((xPos > 0) && (yPos < m_game->mapHeight - 1))
+			if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
 			{
 				const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
 				if((pTile->owner == 3) || (pTile->isTrench == true))
