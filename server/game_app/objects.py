@@ -362,7 +362,7 @@ class Tile(Mappable):
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.oxygen < self.game.unitCost:
       return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, self.x, self.y)
-    if type not in [0,1]:
+    if type not in [0,1,2]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
