@@ -89,6 +89,10 @@ namespace visualizer
 
 		void animate( const float& t, AnimData* d, IGame* game );
 
+	protected:
+
+		glm::vec2 m_pos;
+
 	private:
 		MoveableSprite * m_Sprite;
 		bool m_Flipped;
@@ -98,9 +102,12 @@ namespace visualizer
 	{
 	public:
 
+		DrawProgressBar(float width, float height, float percent);
 		DrawProgressBar(const glm::vec2& pos, float width, float height, float percent);
 
 		void animate( const float& t, AnimData* d, IGame* game );
+
+		void SetPos(const glm::vec2& pos) { m_pos = pos; }
 
 	private:
 
@@ -109,6 +116,20 @@ namespace visualizer
 		float m_height;
 		float m_percent;
 
+	};
+
+	class DrawSmoothSpriteProgressBar : public DrawSmoothMoveSprite
+	{
+	public:
+
+		DrawSmoothSpriteProgressBar(MoveableSprite * sprite, DrawProgressBar* pBar, const glm::vec4& c, bool flipped = false, Fade f = None) :
+			DrawSmoothMoveSprite(sprite,c,flipped,f), m_pProgressBar(pBar)  {}
+
+
+		void animate( const float& t, AnimData* d, IGame* game );
+
+	private:
+		SmartPointer<DrawProgressBar> m_pProgressBar;
 	};
 
 	/** @name DrawAnimatedSprite
