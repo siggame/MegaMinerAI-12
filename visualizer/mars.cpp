@@ -7,6 +7,7 @@
 #include <time.h>
 #include <list>
 #include <glm/glm.hpp>
+#include <queue>
 
 namespace visualizer
 {
@@ -407,6 +408,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 {
 	// todo: this could be moved elsewhere,
 	static std::map<int,int> counter;
+	std::queue<SmartPointer<Animatable>> pumpList;
 
 	unsigned int pumpCounter = 0;
 	for(auto& iter : m_game->states[state].tiles)
@@ -447,13 +449,13 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				{
 					if(pumpCounter == 0)
 					{
-						auto eastPumpIter = pumps.find(m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->pumpID);
+						auto eastPumpIter = tileIter->x > 0 ? pumps.find(m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->pumpID) : pumps.end();
 						if(eastPumpIter == pumps.end() || (eastPumpIter->second->id != pumpIter->second->id))
 						{
 							SmartPointer<Animatable> pumpBar = new Animatable;
 							pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.3f,percent));
 
-							turn.addAnimatable(pumpBar);
+							pumpList.push(pumpBar);
 						}
 					}
 				}
@@ -466,6 +468,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 
 			pumpCounter = (pumpCounter + 1) % 2;
 		}
+
 
 		if(!texture.empty())
 		{
@@ -857,6 +860,11 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		turn[unitIter->id]["Y"] = unitIter->y;
 	}
 
+	while(!pumpList.empty())
+	{
+		turn.addAnimatable(pumpList.front());
+		pumpList.pop();
+	}
 
 }
 
