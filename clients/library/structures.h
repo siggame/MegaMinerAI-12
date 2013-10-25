@@ -10,6 +10,7 @@ struct _Mappable;
 struct _PumpStation;
 struct _Unit;
 struct _Tile;
+struct _UnitType;
 
 
 struct _Player
@@ -52,6 +53,11 @@ struct _Unit
   int maxHealth;
   int movementLeft;
   int maxMovement;
+  int range;
+  int offensePower;
+  int defensePower;
+  int digPower;
+  int fillPower;
 };
 struct _Tile
 {
@@ -62,7 +68,23 @@ struct _Tile
   int owner;
   int pumpID;
   int waterAmount;
-  int isTrench;
+  int depth;
+};
+struct _UnitType
+{
+  Connection* _c;
+  int id;
+  char* name;
+  int type;
+  int cost;
+  int attackPower;
+  int digPower;
+  int fillPower;
+  int maxHealth;
+  int maxMovement;
+  int offensePower;
+  int defensePower;
+  int range;
 };
 
 #endif

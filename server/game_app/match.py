@@ -32,15 +32,10 @@ class Match(DefaultGameWorld):
     #TODO: INITIALIZE THESE!
     self.mapWidth = None
     self.mapHeight = None
-    self.maxHealth = None
     self.trenchDamage = None
     self.waterDamage = None
     self.turnNumber = None
-    self.attackDamage = None
-    self.offensePower = None
-    self.defensePower = None
     self.maxUnits = None
-    self.unitCost = None
     self.playerID = None
     self.gameNumber = id
     self.maxSiege = None
@@ -116,15 +111,10 @@ class Match(DefaultGameWorld):
         dict(
           mapWidth = self.mapWidth,
           mapHeight = self.mapHeight,
-          maxHealth = self.maxHealth,
           trenchDamage = self.trenchDamage,
           waterDamage = self.waterDamage,
           turnNumber = self.turnNumber,
-          attackDamage = self.attackDamage,
-          offensePower = self.offensePower,
-          defensePower = self.defensePower,
           maxUnits = self.maxUnits,
-          unitCost = self.unitCost,
           playerID = self.playerID,
           gameNumber = self.gameNumber,
           maxSiege = self.maxSiege,
@@ -134,6 +124,7 @@ class Match(DefaultGameWorld):
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
           Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
           Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
+          UnitTypes = [i.toJson() for i in self.objects.values() if i.__class__ is UnitType],
           animations = self.jsonAnimations
         )
       )
@@ -227,7 +218,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.trenchDamage, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
@@ -239,6 +230,9 @@ class Match(DefaultGameWorld):
     updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["Tile"] + [i.toList() for i in updated])
+    updated = [i for i in self.objects.values() if i.__class__ is UnitType and i.updatedAt > self.turnNumber-3]
+    if updated:
+      typeLists.append(["UnitType"] + [i.toList() for i in updated])
 
     msg.extend(typeLists)
 
