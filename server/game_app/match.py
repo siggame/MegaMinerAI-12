@@ -217,7 +217,6 @@ class Match(DefaultGameWorld):
           otherTile.isTrench = 1
           # TODO: add large dugness value to trench
 
-    
   def create_ice(self):
     for _ in xrange(self.numIceTiles):
       x = y = 0
@@ -238,16 +237,34 @@ class Match(DefaultGameWorld):
       otherTile.waterAmount = randWaterAmount
 
   def create_spawns(self):
-    #TODO: Better spawner spawning
-    #Set Tiles on far sides as spawns
-    for y in range(self.mapHeight):
-      for x in range(self.mapWidth/2):
-          tile = self.getTile(x, y)
-          othertile = self.getTile(self.mapWidth - x - 1, y)
-          rand = random.random()
-          if tile and othertile and rand > .98 and tile.owner == 2 and othertile.owner == 2:
-            tile.owner = 0
-            othertile.owner = 1
+    # Create spawn point in back of base
+    homeBaseOffsets = [(0,-1),(0,0),(0,1)]
+    done = False
+    while not done:
+      y = self.mapHeight / 2 + random.randint(-7, 7)
+      done = True
+      for offset in homeBaseOffsets:
+        tile = self.getTile(0 + offset[0], y + offset[1])
+        if not tile or tile.owner != 2:
+          done = False
+    for offset in homeBaseOffsets:
+      tile = self.getTile(0 + offset[0], y + offset[1])
+      otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
+      tile.owner = 0
+      otherTile.owner = 1
+
+    # Create random spawn points
+    for _ in xrange(random.randint(self.minRandSpawnPoints, self.maxRandSpawnPoints)):
+      done = False
+      while not done:
+        x = random.randint(0, self.mapWidth / 2 - self.spawnPointBufferSpace)
+        y = random.randint(0, self.mapHeight - 1)
+        tile = self.getTile(x, y)
+        if tile and tile.owner == 2:
+          done = True
+      otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
+      tile.owner = 0
+      otherTile.owner = 1
     return
 
   def waterFlow(self):
