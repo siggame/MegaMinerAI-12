@@ -225,7 +225,6 @@ class Match(DefaultGameWorld):
         x = random.randint(0, self.mapWidth / 2 - 1)
         y = random.randint(0, self.mapHeight - 1)
         tile = self.getTile(x, y)
-        otherTile = self.getTile(self.mapWidth - x - 1, y)
         if tile and tile.owner == 2:
           done = True
       randWaterAmount = random.randint(self.minWaterPerIceTile, self.maxWaterPerIceTile)
@@ -270,32 +269,32 @@ class Match(DefaultGameWorld):
   def waterFlow(self):
     offsets = ([1,0],[0,1],[-1,0],[0,-1])
   
-    closedIce = []
+    closedIce = set()
   
     # Find every ice tile
     for ice in self.objects.tiles:
       if ice.owner == 3 and ice.waterAmount > 0 and ice not in closedIce:
         open = []
-        closed = []
+        closed = set()
         newTiles = []
         pumps = []
         iceTiles = []
     
         open.append(ice)
         iceTiles.append(ice)
-        closedIce.append(ice)
+        closedIce.add(ice)
         
-        while len(open) > 0:
+        while open:
           # Get next tile in open[]
-          tile = open[-1]
+          tile = open.pop()
           
           # Check neighbors
           for offset in offsets:
-            newx = tile.x + offset[0]
-            newy = tile.y + offset[1]
+            newX = tile.x + offset[0]
+            newY = tile.y + offset[1]
             
             # Check if a valid tile
-            neighbor = self.getTile(newx, newy)
+            neighbor = self.getTile(newX, newY)
             if neighbor != None:
               if neighbor not in closed and neighbor not in open:
                 # Trench
@@ -303,24 +302,23 @@ class Match(DefaultGameWorld):
                   if neighbor.waterAmount > 0:
                     open.append(neighbor)
                   else:
-                    closed.append(neighbor)
+                    closed.add(neighbor)
                     newTiles.append(neighbor)
                 # Pump
                 elif neighbor.pumpID != -1:
-                  closed.append(neighbor)
+                  closed.add(neighbor)
                   if neighbor.pumpID not in pumps:
                     pumps.append(neighbor.pumpID)
                 # Ice
                 elif neighbor.owner == 3 and neighbor not in closedIce:
                   iceTiles.append(neighbor)
-                  closedIce.append(neighbor)
+                  closedIce.add(neighbor)
                   open.append(neighbor)
-          
-          open.remove(tile)
-          closed.append(tile)
+
+          closed.add(tile)
           
         # Check if we need to expand water
-        if len(newTiles) > 0:
+        if newTiles:
           # Remove one water from every ice tile in system
           for iceTile in iceTiles:
             iceTile.waterAmount -= 1
@@ -332,7 +330,7 @@ class Match(DefaultGameWorld):
             tile.waterAmount = 1
             
         # Check for pumps
-        if len(pumps) > 0:
+        if pumps:
           # Remove one water from every ice tile in system
           for iceTile in iceTiles:
             if iceTile.waterAmount > 0:
@@ -342,7 +340,7 @@ class Match(DefaultGameWorld):
                 iceTile.waterAmount = 0
           # Give points to owners of pump stations
           for pumpID in pumps:
-            self.getPlayerFromId(self.getPump(pumpID).owner).waterStored += 1
+            self.getPlayerFromId(self.getPump(pumpID).owner).waterStored += len(iceTiles)
             
     return
 
