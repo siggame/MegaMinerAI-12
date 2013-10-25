@@ -456,8 +456,7 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  // TODO: uncomment
-  //target->healthLeft -= object->attackPower
+  target->healthLeft -= object->attackPower;
   
   return 1;
 }
