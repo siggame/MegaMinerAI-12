@@ -115,9 +115,9 @@ class PumpStation(object):
 
       #Defending
       if unit.owner == self.owner:
-        self.siegeAmount -= self.game.defensePower
+        self.siegeAmount -= unit.defensePower
       elif unit.owner == self.owner^1:
-        self.siegeAmount += self.game.offensePower
+        self.siegeAmount += unit.offensePower
       else:
         print('Unit owner not 0 or 1: {}'.format(self.owner))
 
@@ -374,9 +374,9 @@ class Tile(Mappable):
 
     player.oxygen -= self.game.unitCost
 
-    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
+    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower']
     unit = self.unitStats
-    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.unit.maxHealth, self.unit.maxHealth, self.unit.maxMovement, self.unit.maxMovement ]
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.unit.maxHealth, self.unit.maxHealth, self.unit.maxMovement, self.unit.maxMovement, self.unit.range, self.unit.offensePower, self.unit.defensePower, self.unit.digPower, self.unit.fillPower]
     player.spawnQueue.append(newUnitStats)
     player.totalUnits += 1
 
