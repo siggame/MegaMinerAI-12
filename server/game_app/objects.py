@@ -115,9 +115,9 @@ class PumpStation(object):
 
       #Defending
       if unit.owner == self.owner:
-        self.siegeAmount -= self.game.defensePower
+        self.siegeAmount -= unit.defensePower
       elif unit.owner == self.owner^1:
-        self.siegeAmount += self.game.offensePower
+        self.siegeAmount += unit.offensePower
       else:
         print('Unit owner not 0 or 1: {}'.format(self.owner))
 
@@ -366,7 +366,7 @@ class Tile(Mappable):
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.oxygen < self.game.unitCost:
       return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, self.x, self.y)
-    if type not in [0,1]:
+    if type not in [0,1,2]:
       return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
@@ -375,8 +375,9 @@ class Tile(Mappable):
 
     player.oxygen -= self.game.unitCost
 
-    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
-    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, 1, 1 ]
+    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower']
+    unit = self.unitStats
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.unit.maxHealth, self.unit.maxHealth, self.unit.maxMovement, self.unit.maxMovement, self.unit.range, self.unit.offensePower, self.unit.defensePower, self.unit.digPower, self.unit.fillPower]
     player.spawnQueue.append(newUnitStats)
     player.totalUnits += 1
 
