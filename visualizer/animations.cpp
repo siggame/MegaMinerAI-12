@@ -25,6 +25,11 @@ namespace visualizer
 	{
 	}
 
+	DrawProgressBar::DrawProgressBar(float width, float height, float percent) :
+		m_width(width), m_height(height), m_percent(percent)
+	{
+	}
+
 	void DrawProgressBar::animate(const float &t, AnimData* d, IGame *game)
 	{
 		IRenderer& renderer = *game->renderer;
@@ -45,6 +50,14 @@ namespace visualizer
 			renderer.setColor(Color(1.0f,1.0f,1.0f,1.0f));
 			renderer.drawText(middle,m_pos.y - 0.1f,"Roboto",stream.str(),5.0f*m_height,IRenderer::Center);
 		}*/
+	}
+
+	void DrawSmoothSpriteProgressBar::animate(const float &t, AnimData *d, IGame *game)
+	{
+		DrawSmoothMoveSprite::animate(t,d,game);
+
+		m_pProgressBar->SetPos(m_pos);
+		m_pProgressBar->animate(t,d,game);
 	}
 
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)
@@ -68,10 +81,10 @@ namespace visualizer
 
 
 		glm::vec2 diff = thisMove.to - thisMove.from;
-		glm::vec2 pos = thisMove.from + diff * subT;
+		m_pos = thisMove.from + diff * subT;
 
         ColorSprite::animate(t, d, game);
-		game->renderer->drawTexturedQuad(pos.x, pos.y, 1.0f, 1.0f,
+		game->renderer->drawTexturedQuad(m_pos.x, m_pos.y, 1.0f, 1.0f,
 										 m_Sprite->m_SpriteName, m_Flipped);
 
 	}

@@ -406,9 +406,9 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 
 void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& trailMap, Frame& turn)
 {
-	// todo: this could be moved elsewhere,
+	// todo: this could be moved elsewhere, it should be
 	static std::map<int,int> counter;
-	std::queue<SmartPointer<Animatable>> pumpList;
+	std::queue<SmartPointer<Animatable>> animList;
 
 	unsigned int pumpCounter = 0;
 	for(auto& iter : m_game->states[state].tiles)
@@ -455,7 +455,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 							SmartPointer<Animatable> pumpBar = new Animatable;
 							pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.3f,percent));
 
-							pumpList.push(pumpBar);
+							animList.push(pumpBar);
 						}
 					}
 				}
@@ -801,6 +801,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		else
 			texture = "filler";
 
+
 		SmartPointer<MoveableSprite> pUnit = new MoveableSprite(texture);
 
 		for(auto& animationIter : unitIter->m_Animations)
@@ -812,7 +813,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 
 				if(trailMap[move.toY][move.toX] == 0)
 				{
-					 //trail.push_back(glm::ivec2(move.fromX, move.fromY));
+					//trail.push_back(glm::ivec2(move.fromX, move.fromY));
 					trail.push_back(glm::ivec2(move.toX, move.toY));
 				}
 
@@ -847,7 +848,14 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 
 		}
 
-		pUnit->addKeyFrame(new DrawSmoothMoveSprite(pUnit, glm::vec4(GetTeamColor(unitIter->owner),1.0f), unitIter->m_Flipped));
+		/*SmartPointer<Animatable> healthBar = new Animatable;
+		healthBar->addKeyFrame(new DrawProgressBar(glm::vec2(unitIter->x,unitIter->y),1.0f,0.2f,unitIter->healthLeft / (float)unitIter->maxHealth));
+
+		animList.push(healthBar);*/
+
+		DrawProgressBar* pBar = new DrawProgressBar(1.0f,0.2f,unitIter->healthLeft / (float)unitIter->maxHealth);
+
+		pUnit->addKeyFrame(new DrawSmoothSpriteProgressBar(pUnit, pBar , glm::vec4(GetTeamColor(unitIter->owner),1.0f), unitIter->m_Flipped));
 		turn.addAnimatable(pUnit);
 
 		turn[unitIter->id]["owner"] = unitIter->owner;
@@ -860,10 +868,10 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		turn[unitIter->id]["Y"] = unitIter->y;
 	}
 
-	while(!pumpList.empty())
+	while(!animList.empty())
 	{
-		turn.addAnimatable(pumpList.front());
-		pumpList.pop();
+		turn.addAnimatable(animList.front());
+		animList.pop();
 	}
 
 }
