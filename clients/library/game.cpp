@@ -57,15 +57,10 @@ DLLEXPORT Connection* createConnection()
 
   c->mapWidth = 0;
   c->mapHeight = 0;
-  c->maxHealth = 0;
   c->trenchDamage = 0;
   c->waterDamage = 0;
   c->turnNumber = 0;
-  c->attackDamage = 0;
-  c->offensePower = 0;
-  c->defensePower = 0;
   c->maxUnits = 0;
-  c->unitCost = 0;
   c->playerID = 0;
   c->gameNumber = 0;
   c->maxSiege = 0;
@@ -80,6 +75,8 @@ DLLEXPORT Connection* createConnection()
   c->UnitCount = 0;
   c->Tiles = NULL;
   c->TileCount = 0;
+  c->UnitTypes = NULL;
+  c->UnitTypeCount = 0;
   return c;
 }
 
@@ -123,6 +120,14 @@ DLLEXPORT void destroyConnection(Connection* c)
     {
     }
     delete[] c->Tiles;
+  }
+  if(c->UnitTypes)
+  {
+    for(int i = 0; i < c->UnitTypeCount; i++)
+    {
+      delete[] c->UnitTypes[i].name;
+    }
+    delete[] c->UnitTypes;
   }
   delete c;
 }
@@ -498,6 +503,7 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
 }
 
 
+
 //Utility functions for parsing data
 void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
 {
@@ -585,6 +591,16 @@ void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
   sub = sub->next;
   object->maxMovement = atoi(sub->val);
   sub = sub->next;
+  object->range = atoi(sub->val);
+  sub = sub->next;
+  object->offensePower = atoi(sub->val);
+  sub = sub->next;
+  object->defensePower = atoi(sub->val);
+  sub = sub->next;
+  object->digPower = atoi(sub->val);
+  sub = sub->next;
+  object->fillPower = atoi(sub->val);
+  sub = sub->next;
 
 }
 void parseTile(Connection* c, _Tile* object, sexp_t* expression)
@@ -606,7 +622,42 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   sub = sub->next;
   object->waterAmount = atoi(sub->val);
   sub = sub->next;
-  object->isTrench = atoi(sub->val);
+  object->depth = atoi(sub->val);
+  sub = sub->next;
+
+}
+void parseUnitType(Connection* c, _UnitType* object, sexp_t* expression)
+{
+  sexp_t* sub;
+  sub = expression->list;
+
+  object->_c = c;
+
+  object->id = atoi(sub->val);
+  sub = sub->next;
+  object->name = new char[strlen(sub->val)+1];
+  strncpy(object->name, sub->val, strlen(sub->val));
+  object->name[strlen(sub->val)] = 0;
+  sub = sub->next;
+  object->type = atoi(sub->val);
+  sub = sub->next;
+  object->cost = atoi(sub->val);
+  sub = sub->next;
+  object->attackPower = atoi(sub->val);
+  sub = sub->next;
+  object->digPower = atoi(sub->val);
+  sub = sub->next;
+  object->fillPower = atoi(sub->val);
+  sub = sub->next;
+  object->maxHealth = atoi(sub->val);
+  sub = sub->next;
+  object->maxMovement = atoi(sub->val);
+  sub = sub->next;
+  object->offensePower = atoi(sub->val);
+  sub = sub->next;
+  object->defensePower = atoi(sub->val);
+  sub = sub->next;
+  object->range = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -685,9 +736,6 @@ DLLEXPORT int networkLoop(Connection* c)
           c->mapHeight = atoi(sub->val);
           sub = sub->next;
 
-          c->maxHealth = atoi(sub->val);
-          sub = sub->next;
-
           c->trenchDamage = atoi(sub->val);
           sub = sub->next;
 
@@ -697,19 +745,7 @@ DLLEXPORT int networkLoop(Connection* c)
           c->turnNumber = atoi(sub->val);
           sub = sub->next;
 
-          c->attackDamage = atoi(sub->val);
-          sub = sub->next;
-
-          c->offensePower = atoi(sub->val);
-          sub = sub->next;
-
-          c->defensePower = atoi(sub->val);
-          sub = sub->next;
-
           c->maxUnits = atoi(sub->val);
-          sub = sub->next;
-
-          c->unitCost = atoi(sub->val);
           sub = sub->next;
 
           c->playerID = atoi(sub->val);
@@ -837,6 +873,37 @@ DLLEXPORT int networkLoop(Connection* c)
             }
           }
         }
+        else if(string(sub->val) == "UnitType")
+        {
+          if(c->UnitTypes)
+          {
+            sub = sub->next;
+            for(int i = 0; i < c->UnitTypeCount; i++)
+            {
+              if(!sub)
+              {
+                break;
+              }
+              int id = atoi(sub->list->val);
+              if(id == c->UnitTypes[i].id)
+              {
+                delete[] c->UnitTypes[i].name;
+                parseUnitType(c, c->UnitTypes+i, sub);
+                sub = sub->next;
+              }
+            }
+          }
+          else
+          {
+            c->UnitTypeCount =  sexp_list_length(expression)-1; //-1 for the header
+            c->UnitTypes = new _UnitType[c->UnitTypeCount];
+            for(int i = 0; i < c->UnitTypeCount; i++)
+            {
+              sub = sub->next;
+              parseUnitType(c, c->UnitTypes+i, sub);
+            }
+          }
+        }
       }
       destroy_sexp(base);
       return 1;
@@ -896,6 +963,15 @@ DLLEXPORT int getTileCount(Connection* c)
   return c->TileCount;
 }
 
+DLLEXPORT _UnitType* getUnitType(Connection* c, int num)
+{
+  return c->UnitTypes + num;
+}
+DLLEXPORT int getUnitTypeCount(Connection* c)
+{
+  return c->UnitTypeCount;
+}
+
 
 DLLEXPORT int getMapWidth(Connection* c)
 {
@@ -904,10 +980,6 @@ DLLEXPORT int getMapWidth(Connection* c)
 DLLEXPORT int getMapHeight(Connection* c)
 {
   return c->mapHeight;
-}
-DLLEXPORT int getMaxHealth(Connection* c)
-{
-  return c->maxHealth;
 }
 DLLEXPORT int getTrenchDamage(Connection* c)
 {
@@ -921,25 +993,9 @@ DLLEXPORT int getTurnNumber(Connection* c)
 {
   return c->turnNumber;
 }
-DLLEXPORT int getAttackDamage(Connection* c)
-{
-  return c->attackDamage;
-}
-DLLEXPORT int getOffensePower(Connection* c)
-{
-  return c->offensePower;
-}
-DLLEXPORT int getDefensePower(Connection* c)
-{
-  return c->defensePower;
-}
 DLLEXPORT int getMaxUnits(Connection* c)
 {
   return c->maxUnits;
-}
-DLLEXPORT int getUnitCost(Connection* c)
-{
-  return c->unitCost;
 }
 DLLEXPORT int getPlayerID(Connection* c)
 {

@@ -103,6 +103,26 @@ DLLEXPORT int unitGetMaxMovement(_Unit* ptr)
 {
   return ptr->maxMovement;
 }
+DLLEXPORT int unitGetRange(_Unit* ptr)
+{
+  return ptr->range;
+}
+DLLEXPORT int unitGetOffensePower(_Unit* ptr)
+{
+  return ptr->offensePower;
+}
+DLLEXPORT int unitGetDefensePower(_Unit* ptr)
+{
+  return ptr->defensePower;
+}
+DLLEXPORT int unitGetDigPower(_Unit* ptr)
+{
+  return ptr->digPower;
+}
+DLLEXPORT int unitGetFillPower(_Unit* ptr)
+{
+  return ptr->fillPower;
+}
 DLLEXPORT int tileGetId(_Tile* ptr)
 {
   return ptr->id;
@@ -127,9 +147,57 @@ DLLEXPORT int tileGetWaterAmount(_Tile* ptr)
 {
   return ptr->waterAmount;
 }
-DLLEXPORT int tileGetIsTrench(_Tile* ptr)
+DLLEXPORT int tileGetDepth(_Tile* ptr)
 {
-  return ptr->isTrench;
+  return ptr->depth;
+}
+DLLEXPORT int unitTypeGetId(_UnitType* ptr)
+{
+  return ptr->id;
+}
+DLLEXPORT char* unitTypeGetName(_UnitType* ptr)
+{
+  return ptr->name;
+}
+DLLEXPORT int unitTypeGetType(_UnitType* ptr)
+{
+  return ptr->type;
+}
+DLLEXPORT int unitTypeGetCost(_UnitType* ptr)
+{
+  return ptr->cost;
+}
+DLLEXPORT int unitTypeGetAttackPower(_UnitType* ptr)
+{
+  return ptr->attackPower;
+}
+DLLEXPORT int unitTypeGetDigPower(_UnitType* ptr)
+{
+  return ptr->digPower;
+}
+DLLEXPORT int unitTypeGetFillPower(_UnitType* ptr)
+{
+  return ptr->fillPower;
+}
+DLLEXPORT int unitTypeGetMaxHealth(_UnitType* ptr)
+{
+  return ptr->maxHealth;
+}
+DLLEXPORT int unitTypeGetMaxMovement(_UnitType* ptr)
+{
+  return ptr->maxMovement;
+}
+DLLEXPORT int unitTypeGetOffensePower(_UnitType* ptr)
+{
+  return ptr->offensePower;
+}
+DLLEXPORT int unitTypeGetDefensePower(_UnitType* ptr)
+{
+  return ptr->defensePower;
+}
+DLLEXPORT int unitTypeGetRange(_UnitType* ptr)
+{
+  return ptr->range;
 }
 
 }

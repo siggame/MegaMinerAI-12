@@ -14,13 +14,13 @@
 namespace parser
 {
 
-const int SPAWN = 0;
-const int MOVE = 1;
-const int FILL = 2;
-const int DEATH = 3;
-const int DIG = 4;
-const int FLOW = 5;
-const int ATTACK = 6;
+const int FILL = 0;
+const int SPAWN = 1;
+const int DIG = 2;
+const int ATTACK = 3;
+const int FLOW = 4;
+const int MOVE = 5;
+const int DEATH = 6;
 
 struct Player
 {
@@ -64,6 +64,11 @@ struct Unit: public Mappable
   int maxHealth;
   int movementLeft;
   int maxMovement;
+  int range;
+  int offensePower;
+  int defensePower;
+  int digPower;
+  int fillPower;
 
   friend std::ostream& operator<<(std::ostream& stream, Unit obj);
 };
@@ -73,9 +78,27 @@ struct Tile: public Mappable
   int owner;
   int pumpID;
   int waterAmount;
-  int isTrench;
+  int depth;
 
   friend std::ostream& operator<<(std::ostream& stream, Tile obj);
+};
+
+struct UnitType
+{
+  int id;
+  char* name;
+  int type;
+  int cost;
+  int attackPower;
+  int digPower;
+  int fillPower;
+  int maxHealth;
+  int maxMovement;
+  int offensePower;
+  int defensePower;
+  int range;
+
+  friend std::ostream& operator<<(std::ostream& stream, UnitType obj);
 };
 
 
@@ -84,12 +107,45 @@ struct Animation
   int type;
 };
 
+struct fill : public Animation
+{
+  int actingID;
+  int tileID;
+
+  friend std::ostream& operator<<(std::ostream& stream, fill obj);
+};
+
 struct spawn : public Animation
 {
   int sourceID;
   int unitID;
 
   friend std::ostream& operator<<(std::ostream& stream, spawn obj);
+};
+
+struct dig : public Animation
+{
+  int actingID;
+  int tileID;
+
+  friend std::ostream& operator<<(std::ostream& stream, dig obj);
+};
+
+struct attack : public Animation
+{
+  int actingID;
+  int targetID;
+
+  friend std::ostream& operator<<(std::ostream& stream, attack obj);
+};
+
+struct flow : public Animation
+{
+  int sourceID;
+  int destID;
+  int waterAmount;
+
+  friend std::ostream& operator<<(std::ostream& stream, flow obj);
 };
 
 struct move : public Animation
@@ -103,44 +159,11 @@ struct move : public Animation
   friend std::ostream& operator<<(std::ostream& stream, move obj);
 };
 
-struct fill : public Animation
-{
-  int actingID;
-  int tileID;
-
-  friend std::ostream& operator<<(std::ostream& stream, fill obj);
-};
-
 struct death : public Animation
 {
   int sourceID;
 
   friend std::ostream& operator<<(std::ostream& stream, death obj);
-};
-
-struct dig : public Animation
-{
-  int actingID;
-  int tileID;
-
-  friend std::ostream& operator<<(std::ostream& stream, dig obj);
-};
-
-struct flow : public Animation
-{
-  int sourceID;
-  int destID;
-  int waterAmount;
-
-  friend std::ostream& operator<<(std::ostream& stream, flow obj);
-};
-
-struct attack : public Animation
-{
-  int actingID;
-  int targetID;
-
-  friend std::ostream& operator<<(std::ostream& stream, attack obj);
 };
 
 
@@ -156,18 +179,14 @@ struct GameState
   std::map<int,PumpStation> pumpStations;
   std::map<int,Unit> units;
   std::map<int,Tile> tiles;
+  std::map<int,UnitType> unitTypes;
 
   int mapWidth;
   int mapHeight;
-  int maxHealth;
   int trenchDamage;
   int waterDamage;
   int turnNumber;
-  int attackDamage;
-  int offensePower;
-  int defensePower;
   int maxUnits;
-  int unitCost;
   int playerID;
   int gameNumber;
   int maxSiege;

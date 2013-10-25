@@ -109,7 +109,7 @@ public class Unit: Mappable
     }
   }
 
-  ///The type of this unit (digger/filler).
+  ///The type of this unit. This type refers to list of UnitTypes.
   public int Type
   {
     get
@@ -193,6 +193,61 @@ public class Unit: Mappable
     {
       validify();
       int value = Client.unitGetMaxMovement(ptr);
+      return value;
+    }
+  }
+
+  ///The range of this unit's attack.
+  public int Range
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetRange(ptr);
+      return value;
+    }
+  }
+
+  ///The power of the unit's offensive siege ability.
+  public int OffensePower
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetOffensePower(ptr);
+      return value;
+    }
+  }
+
+  ///The power of the unit's defensive siege ability.
+  public int DefensePower
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetDefensePower(ptr);
+      return value;
+    }
+  }
+
+  ///The power of this unit types's digging ability.
+  public int DigPower
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetDigPower(ptr);
+      return value;
+    }
+  }
+
+  ///The power of this unit type's filling ability.
+  public int FillPower
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetFillPower(ptr);
       return value;
     }
   }

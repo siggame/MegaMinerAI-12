@@ -110,13 +110,13 @@ public class Tile: Mappable
     }
   }
 
-  ///Whether the tile is a trench or not.
-  public int IsTrench
+  ///The depth of the tile. Tile is a trench if depth is greater than zero.
+  public int Depth
   {
     get
     {
       validify();
-      int value = Client.tileGetIsTrench(ptr);
+      int value = Client.tileGetDepth(ptr);
       return value;
     }
   }

@@ -68,9 +68,6 @@ library.getMapWidth.argtypes = [c_void_p]
 library.getMapHeight.restype = c_int
 library.getMapHeight.argtypes = [c_void_p]
 
-library.getMaxHealth.restype = c_int
-library.getMaxHealth.argtypes = [c_void_p]
-
 library.getTrenchDamage.restype = c_int
 library.getTrenchDamage.argtypes = [c_void_p]
 
@@ -80,20 +77,8 @@ library.getWaterDamage.argtypes = [c_void_p]
 library.getTurnNumber.restype = c_int
 library.getTurnNumber.argtypes = [c_void_p]
 
-library.getAttackDamage.restype = c_int
-library.getAttackDamage.argtypes = [c_void_p]
-
-library.getOffensePower.restype = c_int
-library.getOffensePower.argtypes = [c_void_p]
-
-library.getDefensePower.restype = c_int
-library.getDefensePower.argtypes = [c_void_p]
-
 library.getMaxUnits.restype = c_int
 library.getMaxUnits.argtypes = [c_void_p]
-
-library.getUnitCost.restype = c_int
-library.getUnitCost.argtypes = [c_void_p]
 
 library.getPlayerID.restype = c_int
 library.getPlayerID.argtypes = [c_void_p]
@@ -136,6 +121,12 @@ library.getTile.argtypes = [c_void_p, c_int]
 
 library.getTileCount.restype = c_int
 library.getTileCount.argtypes = [c_void_p]
+
+library.getUnitType.restype = c_void_p
+library.getUnitType.argtypes = [c_void_p, c_int]
+
+library.getUnitTypeCount.restype = c_int
+library.getUnitTypeCount.argtypes = [c_void_p]
 
 # getters
 
@@ -215,6 +206,21 @@ library.unitGetMovementLeft.argtypes = [c_void_p]
 library.unitGetMaxMovement.restype = c_int
 library.unitGetMaxMovement.argtypes = [c_void_p]
 
+library.unitGetRange.restype = c_int
+library.unitGetRange.argtypes = [c_void_p]
+
+library.unitGetOffensePower.restype = c_int
+library.unitGetOffensePower.argtypes = [c_void_p]
+
+library.unitGetDefensePower.restype = c_int
+library.unitGetDefensePower.argtypes = [c_void_p]
+
+library.unitGetDigPower.restype = c_int
+library.unitGetDigPower.argtypes = [c_void_p]
+
+library.unitGetFillPower.restype = c_int
+library.unitGetFillPower.argtypes = [c_void_p]
+
 library.tileGetId.restype = c_int
 library.tileGetId.argtypes = [c_void_p]
 
@@ -233,8 +239,44 @@ library.tileGetPumpID.argtypes = [c_void_p]
 library.tileGetWaterAmount.restype = c_int
 library.tileGetWaterAmount.argtypes = [c_void_p]
 
-library.tileGetIsTrench.restype = c_int
-library.tileGetIsTrench.argtypes = [c_void_p]
+library.tileGetDepth.restype = c_int
+library.tileGetDepth.argtypes = [c_void_p]
+
+library.unitTypeGetId.restype = c_int
+library.unitTypeGetId.argtypes = [c_void_p]
+
+library.unitTypeGetName.restype = c_char_p
+library.unitTypeGetName.argtypes = [c_void_p]
+
+library.unitTypeGetType.restype = c_int
+library.unitTypeGetType.argtypes = [c_void_p]
+
+library.unitTypeGetCost.restype = c_int
+library.unitTypeGetCost.argtypes = [c_void_p]
+
+library.unitTypeGetAttackPower.restype = c_int
+library.unitTypeGetAttackPower.argtypes = [c_void_p]
+
+library.unitTypeGetDigPower.restype = c_int
+library.unitTypeGetDigPower.argtypes = [c_void_p]
+
+library.unitTypeGetFillPower.restype = c_int
+library.unitTypeGetFillPower.argtypes = [c_void_p]
+
+library.unitTypeGetMaxHealth.restype = c_int
+library.unitTypeGetMaxHealth.argtypes = [c_void_p]
+
+library.unitTypeGetMaxMovement.restype = c_int
+library.unitTypeGetMaxMovement.argtypes = [c_void_p]
+
+library.unitTypeGetOffensePower.restype = c_int
+library.unitTypeGetOffensePower.argtypes = [c_void_p]
+
+library.unitTypeGetDefensePower.restype = c_int
+library.unitTypeGetDefensePower.argtypes = [c_void_p]
+
+library.unitTypeGetRange.restype = c_int
+library.unitTypeGetRange.argtypes = [c_void_p]
 
 
 #Properties

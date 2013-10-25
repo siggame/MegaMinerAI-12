@@ -53,6 +53,11 @@ std::ostream& operator<<(std::ostream& stream, Unit ob)
   stream << "maxHealth: " << ob.maxHealth  <<'\n';
   stream << "movementLeft: " << ob.movementLeft  <<'\n';
   stream << "maxMovement: " << ob.maxMovement  <<'\n';
+  stream << "range: " << ob.range  <<'\n';
+  stream << "offensePower: " << ob.offensePower  <<'\n';
+  stream << "defensePower: " << ob.defensePower  <<'\n';
+  stream << "digPower: " << ob.digPower  <<'\n';
+  stream << "fillPower: " << ob.fillPower  <<'\n';
   return stream;
 }
 
@@ -65,10 +70,37 @@ std::ostream& operator<<(std::ostream& stream, Tile ob)
   stream << "owner: " << ob.owner  <<'\n';
   stream << "pumpID: " << ob.pumpID  <<'\n';
   stream << "waterAmount: " << ob.waterAmount  <<'\n';
-  stream << "isTrench: " << ob.isTrench  <<'\n';
+  stream << "depth: " << ob.depth  <<'\n';
   return stream;
 }
 
+
+std::ostream& operator<<(std::ostream& stream, UnitType ob)
+{
+  stream << "id: " << ob.id  <<'\n';
+  stream << "name: " << ob.name  <<'\n';
+  stream << "type: " << ob.type  <<'\n';
+  stream << "cost: " << ob.cost  <<'\n';
+  stream << "attackPower: " << ob.attackPower  <<'\n';
+  stream << "digPower: " << ob.digPower  <<'\n';
+  stream << "fillPower: " << ob.fillPower  <<'\n';
+  stream << "maxHealth: " << ob.maxHealth  <<'\n';
+  stream << "maxMovement: " << ob.maxMovement  <<'\n';
+  stream << "offensePower: " << ob.offensePower  <<'\n';
+  stream << "defensePower: " << ob.defensePower  <<'\n';
+  stream << "range: " << ob.range  <<'\n';
+  return stream;
+}
+
+
+
+std::ostream& operator<<(std::ostream& stream, fill ob)
+{
+  stream << "fill" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "tileID: " << ob.tileID  <<'\n';
+  return stream;
+}
 
 
 std::ostream& operator<<(std::ostream& stream, spawn ob)
@@ -76,6 +108,34 @@ std::ostream& operator<<(std::ostream& stream, spawn ob)
   stream << "spawn" << "\n";
   stream << "sourceID: " << ob.sourceID  <<'\n';
   stream << "unitID: " << ob.unitID  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, dig ob)
+{
+  stream << "dig" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "tileID: " << ob.tileID  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, attack ob)
+{
+  stream << "attack" << "\n";
+  stream << "actingID: " << ob.actingID  <<'\n';
+  stream << "targetID: " << ob.targetID  <<'\n';
+  return stream;
+}
+
+
+std::ostream& operator<<(std::ostream& stream, flow ob)
+{
+  stream << "flow" << "\n";
+  stream << "sourceID: " << ob.sourceID  <<'\n';
+  stream << "destID: " << ob.destID  <<'\n';
+  stream << "waterAmount: " << ob.waterAmount  <<'\n';
   return stream;
 }
 
@@ -92,15 +152,6 @@ std::ostream& operator<<(std::ostream& stream, move ob)
 }
 
 
-std::ostream& operator<<(std::ostream& stream, fill ob)
-{
-  stream << "fill" << "\n";
-  stream << "actingID: " << ob.actingID  <<'\n';
-  stream << "tileID: " << ob.tileID  <<'\n';
-  return stream;
-}
-
-
 std::ostream& operator<<(std::ostream& stream, death ob)
 {
   stream << "death" << "\n";
@@ -109,47 +160,14 @@ std::ostream& operator<<(std::ostream& stream, death ob)
 }
 
 
-std::ostream& operator<<(std::ostream& stream, dig ob)
-{
-  stream << "dig" << "\n";
-  stream << "actingID: " << ob.actingID  <<'\n';
-  stream << "tileID: " << ob.tileID  <<'\n';
-  return stream;
-}
-
-
-std::ostream& operator<<(std::ostream& stream, flow ob)
-{
-  stream << "flow" << "\n";
-  stream << "sourceID: " << ob.sourceID  <<'\n';
-  stream << "destID: " << ob.destID  <<'\n';
-  stream << "waterAmount: " << ob.waterAmount  <<'\n';
-  return stream;
-}
-
-
-std::ostream& operator<<(std::ostream& stream, attack ob)
-{
-  stream << "attack" << "\n";
-  stream << "actingID: " << ob.actingID  <<'\n';
-  stream << "targetID: " << ob.targetID  <<'\n';
-  return stream;
-}
-
-
 std::ostream& operator<<(std::ostream& stream, GameState ob)
 {
   stream << "mapWidth: " << ob.mapWidth  <<'\n';
   stream << "mapHeight: " << ob.mapHeight  <<'\n';
-  stream << "maxHealth: " << ob.maxHealth  <<'\n';
   stream << "trenchDamage: " << ob.trenchDamage  <<'\n';
   stream << "waterDamage: " << ob.waterDamage  <<'\n';
   stream << "turnNumber: " << ob.turnNumber  <<'\n';
-  stream << "attackDamage: " << ob.attackDamage  <<'\n';
-  stream << "offensePower: " << ob.offensePower  <<'\n';
-  stream << "defensePower: " << ob.defensePower  <<'\n';
   stream << "maxUnits: " << ob.maxUnits  <<'\n';
-  stream << "unitCost: " << ob.unitCost  <<'\n';
   stream << "playerID: " << ob.playerID  <<'\n';
   stream << "gameNumber: " << ob.gameNumber  <<'\n';
   stream << "maxSiege: " << ob.maxSiege  <<'\n';
@@ -170,6 +188,9 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   stream << "\n\nTiles:\n";
   for(std::map<int,Tile>::iterator i = ob.tiles.begin(); i != ob.tiles.end(); i++)
     stream << i->second << '\n';
+  stream << "\n\nUnitTypes:\n";
+  for(std::map<int,UnitType>::iterator i = ob.unitTypes.begin(); i != ob.unitTypes.end(); i++)
+    stream << i->second << '\n';
   stream << "\nAnimation\n";
   for
     (
@@ -180,20 +201,20 @@ std::ostream& operator<<(std::ostream& stream, GameState ob)
   {
   for(std::vector< SmartPointer< Animation > >::iterator i = j->second.begin(); i != j->second.end(); i++)
   {
-//    if((*(*i)).type == SPAWN)
-//      stream << *((spawn*)*i) << "\n";
-//    if((*(*i)).type == MOVE)
-//      stream << *((move*)*i) << "\n";
 //    if((*(*i)).type == FILL)
 //      stream << *((fill*)*i) << "\n";
-//    if((*(*i)).type == DEATH)
-//      stream << *((death*)*i) << "\n";
+//    if((*(*i)).type == SPAWN)
+//      stream << *((spawn*)*i) << "\n";
 //    if((*(*i)).type == DIG)
 //      stream << *((dig*)*i) << "\n";
-//    if((*(*i)).type == FLOW)
-//      stream << *((flow*)*i) << "\n";
 //    if((*(*i)).type == ATTACK)
 //      stream << *((attack*)*i) << "\n";
+//    if((*(*i)).type == FLOW)
+//      stream << *((flow*)*i) << "\n";
+//    if((*(*i)).type == MOVE)
+//      stream << *((move*)*i) << "\n";
+//    if((*(*i)).type == DEATH)
+//      stream << *((death*)*i) << "\n";
   }
   
 

@@ -69,11 +69,11 @@ class Tile extends Mappable
     validify();
     return Client.INSTANCE.tileGetWaterAmount(ptr);
   }
-  ///Whether the tile is a trench or not.
-  public int getIsTrench()
+  ///The depth of the tile. Tile is a trench if depth is greater than zero.
+  public int getDepth()
   {
     validify();
-    return Client.INSTANCE.tileGetIsTrench(ptr);
+    return Client.INSTANCE.tileGetDepth(ptr);
   }
 
 }
