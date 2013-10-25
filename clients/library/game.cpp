@@ -301,14 +301,14 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   object->movementLeft -= 1;
   
   // Apply damage for moving into/outof trenches
-  if (tile->isTrench)
+  if (tile->depth > 0)
   {
     if (tile->waterAmount > 0)
       object->healthLeft -= getWaterDamage(c);
-    else if (!prevTile->isTrench)
+    else if (!prevTile->depth > 0)
       object->healthLeft -= getTrenchDamage(c);
   }
-  else if (prevTile->isTrench)
+  else if (prevTile->depth > 0)
     object->healthLeft -= getTrenchDamage(c);
   
   // Don't do any client-side object deletion?
@@ -344,7 +344,7 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
     return 0;
   
   // Must fill in trenches
-  if (tile->isTrench == 0)
+  if (tile->depth == 0)
     return 0;
   // Can't fill in trenches with water
   if (tile->waterAmount > 0)
@@ -357,7 +357,7 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   }
   
   // Set the tile to not be a trench
-  tile->isTrench = 0;
+  tile->depth = 0;
   // Unit can no longer move
   object->movementLeft = 0;
   
@@ -394,7 +394,7 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
     return 0;
   
   // Can't dig a trench on a trench
-  if (tile->isTrench == 1)
+  if (tile->depth >= 1)
     return 0;
   // Can't dig a trenches on pumps
   if (tile->pumpID != -1)
@@ -413,7 +413,7 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   }
   
   // Set the tile to be a trench
-  tile->isTrench = 1;
+  tile->depth = 1;
   // Unit can no longer move
   object->movementLeft = 0;
   
@@ -454,7 +454,7 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  target->healthLeft -= getAttackDamage(c);
+  target->healthLeft -= object->attackPower;
   
   return 1;
 }

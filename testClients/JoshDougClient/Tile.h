@@ -26,8 +26,8 @@ class Tile : public Mappable {
   int pumpID();
   ///The amount of water contained on the tile.
   int waterAmount();
-  ///Whether the tile is a trench or not.
-  int isTrench();
+  ///The depth of the tile. Tile is a trench if depth is greater than zero.
+  int depth();
 
   // Actions
   ///Attempt to spawn a unit of a type on this tile.
