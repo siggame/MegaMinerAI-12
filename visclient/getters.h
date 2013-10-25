@@ -51,6 +51,7 @@ DLLEXPORT int unitGetOffensePower(_Unit* ptr);
 DLLEXPORT int unitGetDefensePower(_Unit* ptr);
 DLLEXPORT int unitGetDigPower(_Unit* ptr);
 DLLEXPORT int unitGetFillPower(_Unit* ptr);
+DLLEXPORT int unitGetAttackPower(_Unit* ptr);
 
 
 DLLEXPORT int tileGetId(_Tile* ptr);

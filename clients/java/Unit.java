@@ -156,5 +156,11 @@ class Unit extends Mappable
     validify();
     return Client.INSTANCE.unitGetFillPower(ptr);
   }
+  ///The power of this unit type's attack.
+  public int getAttackPower()
+  {
+    validify();
+    return Client.INSTANCE.unitGetAttackPower(ptr);
+  }
 
 }

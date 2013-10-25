@@ -149,6 +149,8 @@ public class Client {
   public static extern int unitGetDigPower(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetFillPower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitGetAttackPower(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int tileGetId(IntPtr ptr);

@@ -96,6 +96,11 @@ int Unit::fillPower()
   return ((_Unit*)ptr)->fillPower;
 }
 
+int Unit::attackPower()
+{
+  return ((_Unit*)ptr)->attackPower;
+}
+
 
 bool Unit::move(int x, int y)
 {
@@ -138,5 +143,6 @@ std::ostream& operator<<(std::ostream& stream,Unit ob)
   stream << "defensePower: " << ((_Unit*)ob.ptr)->defensePower  <<'\n';
   stream << "digPower: " << ((_Unit*)ob.ptr)->digPower  <<'\n';
   stream << "fillPower: " << ((_Unit*)ob.ptr)->fillPower  <<'\n';
+  stream << "attackPower: " << ((_Unit*)ob.ptr)->attackPower  <<'\n';
   return stream;
 }

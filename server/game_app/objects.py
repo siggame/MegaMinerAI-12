@@ -138,8 +138,8 @@ class PumpStation(object):
       object.__setattr__(self, name, value)
 
 class Unit(Mappable):
-  game_state_attributes = ['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digPower', 'fillPower']
-  def __init__(self, game, id, x, y, owner, type, hasAttacked, hasDug, hasFilled, healthLeft, maxHealth, movementLeft, maxMovement, range, offensePower, defensePower, digPower, fillPower):
+  game_state_attributes = ['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digPower', 'fillPower', 'attackPower']
+  def __init__(self, game, id, x, y, owner, type, hasAttacked, hasDug, hasFilled, healthLeft, maxHealth, movementLeft, maxMovement, range, offensePower, defensePower, digPower, fillPower, attackPower):
     self.game = game
     self.id = id
     self.x = x
@@ -158,14 +158,15 @@ class Unit(Mappable):
     self.defensePower = defensePower
     self.digPower = digPower
     self.fillPower = fillPower
+    self.attackPower = attackPower
     self.updatedAt = game.turnNumber
 
   def toList(self):
-    return [self.id, self.x, self.y, self.owner, self.type, self.hasAttacked, self.hasDug, self.hasFilled, self.healthLeft, self.maxHealth, self.movementLeft, self.maxMovement, self.range, self.offensePower, self.defensePower, self.digPower, self.fillPower, ]
+    return [self.id, self.x, self.y, self.owner, self.type, self.hasAttacked, self.hasDug, self.hasFilled, self.healthLeft, self.maxHealth, self.movementLeft, self.maxMovement, self.range, self.offensePower, self.defensePower, self.digPower, self.fillPower, self.attackPower, ]
   
   # This will not work if the object has variables other than primitives
   def toJson(self):
-    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDug = self.hasDug, hasFilled = self.hasFilled, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, range = self.range, offensePower = self.offensePower, defensePower = self.defensePower, digPower = self.digPower, fillPower = self.fillPower, )
+    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDug = self.hasDug, hasFilled = self.hasFilled, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, range = self.range, offensePower = self.offensePower, defensePower = self.defensePower, digPower = self.digPower, fillPower = self.fillPower, attackPower = self.attackPower, )
 
   @staticmethod
   def handleDeath(unit):
@@ -423,17 +424,6 @@ class UnitType(object):
 
 
 # The following are animations and do not need to have any logic added
-class FillAnimation:
-  def __init__(self, actingID, tileID):
-    self.actingID = actingID
-    self.tileID = tileID
-
-  def toList(self):
-    return ["fill", self.actingID, self.tileID, ]
-
-  def toJson(self):
-    return dict(type = "fill", actingID = self.actingID, tileID = self.tileID)
-
 class SpawnAnimation:
   def __init__(self, sourceID, unitID):
     self.sourceID = sourceID
@@ -445,6 +435,17 @@ class SpawnAnimation:
   def toJson(self):
     return dict(type = "spawn", sourceID = self.sourceID, unitID = self.unitID)
 
+class FillAnimation:
+  def __init__(self, actingID, tileID):
+    self.actingID = actingID
+    self.tileID = tileID
+
+  def toList(self):
+    return ["fill", self.actingID, self.tileID, ]
+
+  def toJson(self):
+    return dict(type = "fill", actingID = self.actingID, tileID = self.tileID)
+
 class DigAnimation:
   def __init__(self, actingID, tileID):
     self.actingID = actingID
@@ -455,17 +456,6 @@ class DigAnimation:
 
   def toJson(self):
     return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
-
-class AttackAnimation:
-  def __init__(self, actingID, targetID):
-    self.actingID = actingID
-    self.targetID = targetID
-
-  def toList(self):
-    return ["attack", self.actingID, self.targetID, ]
-
-  def toJson(self):
-    return dict(type = "attack", actingID = self.actingID, targetID = self.targetID)
 
 class FlowAnimation:
   def __init__(self, sourceID, destID, waterAmount):
@@ -492,6 +482,17 @@ class MoveAnimation:
 
   def toJson(self):
     return dict(type = "move", actingID = self.actingID, fromX = self.fromX, fromY = self.fromY, toX = self.toX, toY = self.toY)
+
+class AttackAnimation:
+  def __init__(self, actingID, targetID):
+    self.actingID = actingID
+    self.targetID = targetID
+
+  def toList(self):
+    return ["attack", self.actingID, self.targetID, ]
+
+  def toJson(self):
+    return dict(type = "attack", actingID = self.actingID, targetID = self.targetID)
 
 class DeathAnimation:
   def __init__(self, sourceID):
