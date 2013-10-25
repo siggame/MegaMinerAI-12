@@ -8,6 +8,7 @@ class ObjectHolder(dict):
     self.pumpStations = []
     self.units = []
     self.tiles = []
+    self.unitTypes = []
 
   def __setitem__(self, key, value):
     if key in self:
@@ -23,6 +24,8 @@ class ObjectHolder(dict):
       self.units.append(value)
     if isinstance(value, objects.Tile):
       self.tiles.append(value)
+    if isinstance(value, objects.UnitType):
+      self.unitTypes.append(value)
 
   def __delitem__(self, key):
     value = self[key]
@@ -37,6 +40,8 @@ class ObjectHolder(dict):
       self.units.remove(value)
     if value in self.tiles:
       self.tiles.remove(value)
+    if value in self.unitTypes:
+      self.unitTypes.remove(value)
 
   def clear(self):
     for i in self.keys():

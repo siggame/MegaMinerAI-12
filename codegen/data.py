@@ -8,20 +8,15 @@ gameName = "Mars"
 constants = [
   ]
 
-modelOrder = ['Player', 'Mappable', 'PumpStation', 'Unit', 'Tile']
+modelOrder = ['Player', 'Mappable', 'PumpStation', 'Unit', 'Tile', 'UnitType']
 
 globals = [
   Variable('mapWidth', int, 'The width of the total map.'),
   Variable('mapHeight', int, 'The height of the total map.'),
-  Variable('maxHealth', int, 'The maximum amount of health a unit will have.'),
   Variable('trenchDamage', int, 'The amount of damage walking over a trench.'),
   Variable('waterDamage', int, 'The amount of damage walking over water.'),
   Variable('turnNumber', int, 'The current turn number.'),
-  Variable('attackDamage', int, 'The amount of damage a unit will deal.'),
-  Variable('offensePower', int, 'How quickly a unit will siege a PumpStation.'),
-  Variable('defensePower', int, 'How much a unit will slow a siege.'),
   Variable('maxUnits', int, 'The maximum number of units allowed per player.'),
-  Variable('unitCost', int, 'The cost of spawning in a new unit'),
   Variable('playerID', int, 'The id of the current player.'),
   Variable('gameNumber', int, 'What number game this is for the server'),
   Variable('maxSiege', int, 'The maximum siege value before the PumpStation is sieged.'),
@@ -53,7 +48,7 @@ Tile = Model('Tile',
     Variable('owner', int, 'The owner of the tile.'),
     Variable('pumpID', int, 'Determines if this tile is a part of a Pump Station.'),
     Variable('waterAmount', int, 'The amount of water contained on the tile.'),
-    Variable('isTrench', int, 'Whether the tile is a trench or not.'),
+    Variable('depth', int, 'The depth of the tile. Tile is a trench if depth is greater than zero.'),
     ],
   functions=[
     Function('spawn',[Variable('type',int)],
@@ -68,7 +63,7 @@ Unit = Model('Unit',
   parent = Mappable,
   data = [
     Variable('owner', int, 'The owner of this unit.'),
-    Variable('type', int, 'The type of this unit (digger/filler).'),
+    Variable('type', int, 'The type of this unit. This type refers to list of UnitTypes.'),
     Variable('hasAttacked', int, 'Whether current unit has attacked or not.'),
     Variable('hasDug', int, 'Whether the current unit has dug or not.'),
     Variable('hasFilled', int, 'Whether the current unit has filled or not.'),
@@ -76,6 +71,11 @@ Unit = Model('Unit',
     Variable('maxHealth', int, 'The maximum amount of this health this unit can have'),
     Variable('movementLeft', int, 'The number of moves this unit has remaining.'),
     Variable('maxMovement', int, 'The maximum number of moves this unit can move.'),
+    Variable('range', int, 'The range of this unit\'s attack.'),
+    Variable('offensePower', int, 'The power of the unit\'s offensive siege ability.'),
+    Variable('defensePower', int, 'The power of the unit\'s defensive siege ability.'),
+    Variable('digPower', int, 'The power of this unit types\'s digging ability.'),
+    Variable('fillPower', int, 'The power of this unit type\'s filling ability.'),
 
     ],
   doc='Represents a single unit on the map.',
@@ -102,6 +102,27 @@ PumpStation = Model('PumpStation',
   functions=[
   ],
   doc='Represents a base to which you want to lead water.',
+  permanent = True,
+  )
+
+#UNITTYPE
+UnitType = Model('UnitType',
+  data = [
+    Variable('name', str, 'The name of this type of unit.'),
+    Variable('type', int, 'The UnitType specific id representing this type of unit.'),
+    Variable('cost', int, 'The oxygen cost to spawn this unit type into the game.'),
+    Variable('attackPower', int, 'The power of the attack of this type of unit.'),
+    Variable('digPower', int, 'The power of this unit types\'s digging ability.'),
+    Variable('fillPower', int, 'The power of this unit type\'s filling ability.'),
+    Variable('maxHealth', int, 'The maximum amount of this health this unit can have'),
+    Variable('maxMovement', int, 'The maximum number of moves this unit can move.'),
+    Variable('offensePower', int, 'The power of the unit type\'s offensive siege ability.'),
+    Variable('defensePower', int, 'The power of the unit type\'s defensive siege ability.'),
+    Variable('range', int, 'The range of the unit type\'s attack.')
+
+    ],
+  doc='Represents type of unit.',
+  functions=[],
   permanent = True,
   )
 

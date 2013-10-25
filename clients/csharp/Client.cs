@@ -43,23 +43,13 @@ public class Client {
   [DllImport("client")]
   public static extern int getMapHeight(IntPtr connection);
   [DllImport("client")]
-  public static extern int getMaxHealth(IntPtr connection);
-  [DllImport("client")]
   public static extern int getTrenchDamage(IntPtr connection);
   [DllImport("client")]
   public static extern int getWaterDamage(IntPtr connection);
   [DllImport("client")]
   public static extern int getTurnNumber(IntPtr connection);
   [DllImport("client")]
-  public static extern int getAttackDamage(IntPtr connection);
-  [DllImport("client")]
-  public static extern int getOffensePower(IntPtr connection);
-  [DllImport("client")]
-  public static extern int getDefensePower(IntPtr connection);
-  [DllImport("client")]
   public static extern int getMaxUnits(IntPtr connection);
-  [DllImport("client")]
-  public static extern int getUnitCost(IntPtr connection);
   [DllImport("client")]
   public static extern int getPlayerID(IntPtr connection);
   [DllImport("client")]
@@ -89,6 +79,10 @@ public class Client {
   public static extern IntPtr getTile(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getTileCount(IntPtr connection);
+  [DllImport("client")]
+  public static extern IntPtr getUnitType(IntPtr connection, int num);
+  [DllImport("client")]
+  public static extern int getUnitTypeCount(IntPtr connection);
 
 
     //getters
@@ -145,6 +139,16 @@ public class Client {
   public static extern int unitGetMovementLeft(IntPtr ptr);
   [DllImport("client")]
   public static extern int unitGetMaxMovement(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitGetRange(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitGetOffensePower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitGetDefensePower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitGetDigPower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitGetFillPower(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int tileGetId(IntPtr ptr);
@@ -159,7 +163,32 @@ public class Client {
   [DllImport("client")]
   public static extern int tileGetWaterAmount(IntPtr ptr);
   [DllImport("client")]
-  public static extern int tileGetIsTrench(IntPtr ptr);
+  public static extern int tileGetDepth(IntPtr ptr);
+
+  [DllImport("client")]
+  public static extern int unitTypeGetId(IntPtr ptr);
+  [DllImport("client")]
+  public static extern IntPtr unitTypeGetName(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetType(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetCost(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetAttackPower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetDigPower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetFillPower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetMaxHealth(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetMaxMovement(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetOffensePower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetDefensePower(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int unitTypeGetRange(IntPtr ptr);
 
 
     //properties

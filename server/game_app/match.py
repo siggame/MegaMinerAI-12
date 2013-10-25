@@ -35,7 +35,6 @@ class Match(DefaultGameWorld):
 
     self.mapWidth = self.mapWidth
     self.mapHeight = self.mapHeight
-    self.maxHealth = self.maxHealth
     self.trenchDamage = self.trenchDamage
     self.waterDamage = self.waterDamage
     self.turnNumber = -1
@@ -93,7 +92,7 @@ class Match(DefaultGameWorld):
     self.turn = self.players[-1]
     self.turnNumber = -1
 
-    # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'isTrench']
+    # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth']
     self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
 
     self.create_ice()
@@ -213,8 +212,8 @@ class Match(DefaultGameWorld):
       for tile in path:
         if tile.owner == 2:
           otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
-          tile.isTrench = 1
-          otherTile.isTrench = 1
+          tile.depth = 100000
+          otherTile.depth = 100000
           # TODO: add large dugness value to trench
 
   def create_ice(self):
@@ -298,7 +297,7 @@ class Match(DefaultGameWorld):
             if neighbor != None:
               if neighbor not in closed and neighbor not in open:
                 # Trench
-                if neighbor.isTrench:
+                if neighbor.depth > 0:
                   if neighbor.waterAmount > 0:
                     open.append(neighbor)
                   else:
@@ -370,15 +369,10 @@ class Match(DefaultGameWorld):
         dict(
           mapWidth = self.mapWidth,
           mapHeight = self.mapHeight,
-          maxHealth = self.maxHealth,
           trenchDamage = self.trenchDamage,
           waterDamage = self.waterDamage,
           turnNumber = self.turnNumber,
-          attackDamage = self.attackDamage,
-          offensePower = self.offensePower,
-          defensePower = self.defensePower,
           maxUnits = self.maxUnits,
-          unitCost = self.unitCost,
           playerID = self.playerID,
           gameNumber = self.gameNumber,
           maxSiege = self.maxSiege,
@@ -388,6 +382,7 @@ class Match(DefaultGameWorld):
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
           Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
           Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
+          UnitTypes = [i.toJson() for i in self.objects.values() if i.__class__ is UnitType],
           animations = self.jsonAnimations
         )
       )
@@ -555,7 +550,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.trenchDamage, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
@@ -567,6 +562,9 @@ class Match(DefaultGameWorld):
     updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["Tile"] + [i.toList() for i in updated])
+    updated = [i for i in self.objects.values() if i.__class__ is UnitType and i.updatedAt > self.turnNumber-3]
+    if updated:
+      typeLists.append(["UnitType"] + [i.toList() for i in updated])
 
     msg.extend(typeLists)
 

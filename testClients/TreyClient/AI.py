@@ -57,7 +57,7 @@ class AI(BaseAI):
       shortestPath = uniformCostSearch(self, iceTile.x, iceTile.y, 6,
         lambda tile: tile in self.myPumpTilesSet, # GOAL - find any of my pumps
         lambda tile: tile.owner == 2 or tile.owner == 3 or tile in self.myPumpTilesSet, # VALID - dirt or trench or ice
-        lambda tile: not (tile.isTrench or tile.owner == 3))  # COST - 0 = trench or ice
+        lambda tile: not (tile.depth > 0 or tile.owner == 3))  # COST - 0 = trench or ice
       if shortestPath is not None:
         iceToPump[iceTile] = shortestPath
         print("Length of iceToPump: {}".format(len(shortestPath)))
@@ -67,10 +67,10 @@ class AI(BaseAI):
       for pos in path:
         tile = getTile(self, pos[0], pos[1])
         # Keep track of which tiles are being used to transport water MY pumps (in case we want to defend them)
-        if tile.isTrench and tile not in self.myCollectionTrenches:
+        if tile.depth > 0 and tile not in self.myCollectionTrenches:
           self.myCollectionTrenches.append(tile)
         # Need to dig here?
-        if not tile.isTrench and tile.owner == 2:
+        if not tile.depth > 0 and tile.owner == 2:
           self.neededTrenches.append(tile)
 
   def findWaterwayTrenchesNeeded(self):
