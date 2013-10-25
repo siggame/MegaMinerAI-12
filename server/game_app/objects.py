@@ -196,7 +196,9 @@ class Unit(Mappable):
       return 'Turn {}: Your unit {} is trying to move onto the enemy\'s spawn base. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your unit {} can only move one unit away. ({}.{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    
+
+    prevTile = self.game.getTile(self.x, self.y)
+
     self.game.grid[self.x][self.y].remove(self)
 
     self.game.addAnimation(MoveAnimation(self.id,self.x,self.y,x,y))
@@ -208,10 +210,16 @@ class Unit(Mappable):
     # Apply damage for moving into a trench
     tile = self.game.getTile(x, y)
     if tile.isTrench:
+      # Damage for moving through water
       if tile.waterAmount > 0:
         self.healthLeft -= self.game.waterDamage + self.game.trenchDamage
-      else:
+      # Damage for moving into a trench
+      elif not prevTile.isTrench:
         self.healthLeft -= self.game.trenchDamage
+      self.handleDeath(self)
+    # Damage for coming out of a trench
+    elif prevTile.isTrench:
+      self.healthLeft -= self.game.trenchDamage
       self.handleDeath(self)
 
     return True
@@ -260,8 +268,8 @@ class Unit(Mappable):
       return 'Turn {}: Your filler {} cannot dig.'.format(self.game.turnNumber, self.id)
     elif self.hasDug == 1:
       return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
-    elif abs(self.x-x) + abs(self.y-y) != 1:
-      return 'Turn {}: Your {} can only dig adjacent Tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif abs(self.x-x) + abs(self.y-y) > 1:
+      return 'Turn {}: Your {} can only dig adjacent or same tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.isTrench == 1:
       return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.pumpID != -1:

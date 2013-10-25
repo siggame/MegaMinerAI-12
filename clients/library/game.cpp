@@ -286,6 +286,8 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   if (abs(object->x - x) + abs(object->y - y) != 1)
     return 0;
     
+  _Tile* prevTile = getTile(c, object->x * getMapHeight(c) + object->y);
+    
   // Move the unit
   object->x = x;
   object->y = y;
@@ -293,14 +295,16 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   // Decrement movement
   object->movementLeft -= 1;
   
-  // Apply damage for moving into trenches
+  // Apply damage for moving into/outof trenches
   if (tile->isTrench)
   {
     if (tile->waterAmount > 0)
       object->healthLeft -= getWaterDamage(c);
-    else
+    else if (!prevTile->isTrench)
       object->healthLeft -= getTrenchDamage(c);
   }
+  else if (prevTile->isTrench)
+    object->healthLeft -= getTrenchDamage(c);
   
   // Don't do any client-side object deletion?
   
@@ -380,8 +384,8 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   // Can only dig once per turn
   if (object->hasDug == 1)
     return 0;
-  // Can only dig adjacent tiles
-  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
+  // Can only dig adjacent tiles and the tile underneath the digger
+  if (abs(object->x - x) + abs(object->y - y) > 1)
     return 0;
   
   // Can't dig a trench on a trench
