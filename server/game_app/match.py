@@ -212,7 +212,7 @@ class Match(DefaultGameWorld):
       # Dig it up on both sides of map
       for tile in path:
         if tile.owner == 2:
-          otherTile = self.getTile(self.mapWidth - tile.x, tile.y)
+          otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
           tile.isTrench = 1
           otherTile.isTrench = 1
           # TODO: add large dugness value to trench
