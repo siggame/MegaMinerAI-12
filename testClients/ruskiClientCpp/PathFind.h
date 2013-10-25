@@ -101,17 +101,6 @@ TileList PathFinder::reconstructPath(CoordTileDict* parents, current)
     if parents->find(current)
 }
 
-  def __reconstruct_path(self, parents, node):
-    if node in parents.keys():
-      p = self.__reconstruct_path(parents, parents[node])
-      p.append(node)
-      return p
-    else:
-      p = [node]
-      return p
-
-
-
 ##endif
 
 /*
