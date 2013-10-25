@@ -131,7 +131,7 @@ class Match(DefaultGameWorld):
       ((0,-1), (0,-2), (1,-1), (1,-2)),  ((0,-1), (0,-2), (-1,-1), (-1,-2))
     ]
     random.shuffle(pumpOffsets)
-    for _ in xrange(self.numPumpStationsConnectedToIce):
+    for _ in xrange(self.numPumpStationsAdjacentToIce):
       iceTile = random.choice(iceTiles)
       for tileOffsets in pumpOffsets:
         validPump = True
@@ -159,6 +159,9 @@ class Match(DefaultGameWorld):
     squareOffsets = [
       (0,0),(1,0),(0,1),(1,1)
     ]
+    bigSquareOffsets = [
+      (-1,0),(-1,-1),(0,-1),(1,-1),(2,-1),(2,0),(2,1),(2,2),(1,2),(0,2),(-1,2),(-1,1)
+    ]
     for _ in xrange(self.numPumpStations):
       x = y = 0
       done = False
@@ -172,7 +175,13 @@ class Match(DefaultGameWorld):
             valid = False
             break
         if valid:
-          done = True
+          # Check 4x4 Square
+          for tileOffset in bigSquareOffsets:
+            tile = self.getTile(x + tileOffset[0], y + tileOffset[1])
+            if tile and tile.owner != 2:
+              valid = False
+              break
+        done = valid
       pump = self.addObject(PumpStation,[0, 0, 0])
       otherPump = self.addObject(PumpStation,[1, 0, 0])
       for tileOffset in squareOffsets:
@@ -182,6 +191,32 @@ class Match(DefaultGameWorld):
         otherTile.pumpID = otherPump.id
         tile.owner = 0
         otherTile.owner = 1
+
+    # Create paths to pump stations
+    # All pumps on left side of map
+    pumps = [pump for pump in self.objects.pumpStations if pump.owner == 0]
+    # NOTE: make sure numPaths <= numPumpStations
+    for _ in xrange(self.numPaths):
+      # Select a random pump from left side
+      pump = random.choice(pumps)
+      # Remove that pump so that the next path doesn't go to same pump
+      pumps.remove(pump)
+      # Select a random tile from that pump
+      pumpTile = random.choice([tile for tile in self.objects.tiles if tile.pumpID == pump.id])
+      # Find the nearest ice tile on left side of map
+      iceTile = min([tile for tile in self.objects.tiles if tile.owner == 3 and tile.x <= self.mapWidth / 2],
+        key=lambda tile: abs(tile.x - pumpTile.x) + abs(tile.y - pumpTile.y))
+      # Find path between them
+      path = aStar(self, pumpTile, iceTile,
+        lambda tile: tile.owner == 2 or tile.owner == 3)
+      # Dig it up on both sides of map
+      for tile in path:
+        if tile.owner == 2:
+          otherTile = self.getTile(self.mapWidth - tile.x, tile.y)
+          tile.isTrench = 1
+          otherTile.isTrench = 1
+          # TODO: add large dugness value to trench
+
     
   def create_ice(self):
     for _ in xrange(self.numIceTiles):
