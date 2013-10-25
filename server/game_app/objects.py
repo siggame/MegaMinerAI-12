@@ -372,7 +372,8 @@ class Tile(Mappable):
     player.oxygen -= self.game.unitCost
 
     #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
-    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, 1, 1 ]
+    unit = self.unitStats
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.unit.maxHealth, self.unit.maxHealth, self.unit.maxMovement, self.unit.maxMovement ]
     player.spawnQueue.append(newUnitStats)
     player.totalUnits += 1
 
