@@ -177,6 +177,11 @@ class Unit(Mappable):
       unit.game.addAnimation(DeathAnimation(unit.id))
 
   def nextTurn(self):
+    tile = self.game.getTile(self.x, self.y)
+    # Damage for standing in water
+    if tile.isTrench and tile.waterAmount > 0:
+      self.healthLeft -= self.game.waterDamage
+
     # Reset flags if it is unit owner's turn
     if self.owner == self.game.playerID:
       self.movementLeft = self.maxMovement
@@ -184,7 +189,8 @@ class Unit(Mappable):
       self.hasFilled = 0
       self.hasDug = 0
 
-      self.handleDeath(self)
+    self.handleDeath(self)
+
     return True
 
   def move(self, x, y):
