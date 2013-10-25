@@ -404,6 +404,14 @@ class Unit(Mappable):
   ##The power of this unit type's filling ability.
   fillPower = property(getFillPower)
 
+  #\cond
+  def getAttackPower(self):
+    self.validify()
+    return library.unitGetAttackPower(self._ptr)
+  #\endcond
+  ##The power of this unit type's attack.
+  attackPower = property(getAttackPower)
+
 
   def __str__(self):
     self.validify()
@@ -425,6 +433,7 @@ class Unit(Mappable):
     ret += "defensePower: %s\n" % self.getDefensePower()
     ret += "digPower: %s\n" % self.getDigPower()
     ret += "fillPower: %s\n" % self.getFillPower()
+    ret += "attackPower: %s\n" % self.getAttackPower()
     return ret
 
 ##Represents a single tile on the map, can contain some amount of water.

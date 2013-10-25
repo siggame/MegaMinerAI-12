@@ -85,6 +85,7 @@ public interface Client extends Library {
   int unitGetDefensePower(Pointer ptr);
   int unitGetDigPower(Pointer ptr);
   int unitGetFillPower(Pointer ptr);
+  int unitGetAttackPower(Pointer ptr);
 
   int tileGetId(Pointer ptr);
   int tileGetX(Pointer ptr);

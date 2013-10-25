@@ -221,6 +221,9 @@ library.unitGetDigPower.argtypes = [c_void_p]
 library.unitGetFillPower.restype = c_int
 library.unitGetFillPower.argtypes = [c_void_p]
 
+library.unitGetAttackPower.restype = c_int
+library.unitGetAttackPower.argtypes = [c_void_p]
+
 library.tileGetId.restype = c_int
 library.tileGetId.argtypes = [c_void_p]
 

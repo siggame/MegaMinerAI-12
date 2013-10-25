@@ -123,6 +123,10 @@ DLLEXPORT int unitGetFillPower(_Unit* ptr)
 {
   return ptr->fillPower;
 }
+DLLEXPORT int unitGetAttackPower(_Unit* ptr)
+{
+  return ptr->attackPower;
+}
 DLLEXPORT int tileGetId(_Tile* ptr)
 {
   return ptr->id;

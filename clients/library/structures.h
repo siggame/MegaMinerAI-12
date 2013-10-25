@@ -58,6 +58,7 @@ struct _Unit
   int defensePower;
   int digPower;
   int fillPower;
+  int attackPower;
 };
 struct _Tile
 {

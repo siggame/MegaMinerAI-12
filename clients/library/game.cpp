@@ -412,6 +412,8 @@ void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
   sub = sub->next;
   object->fillPower = atoi(sub->val);
   sub = sub->next;
+  object->attackPower = atoi(sub->val);
+  sub = sub->next;
 
 }
 void parseTile(Connection* c, _Tile* object, sexp_t* expression)

@@ -76,6 +76,7 @@ Unit = Model('Unit',
     Variable('defensePower', int, 'The power of the unit\'s defensive siege ability.'),
     Variable('digPower', int, 'The power of this unit types\'s digging ability.'),
     Variable('fillPower', int, 'The power of this unit type\'s filling ability.'),
+    Variable('attackPower', int, 'The power of this unit type\'s attack.'),
 
     ],
   doc='Represents a single unit on the map.',

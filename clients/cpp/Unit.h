@@ -50,6 +50,8 @@ class Unit : public Mappable {
   int digPower();
   ///The power of this unit type's filling ability.
   int fillPower();
+  ///The power of this unit type's attack.
+  int attackPower();
 
   // Actions
   ///Make the unit move to the respective x and y location.

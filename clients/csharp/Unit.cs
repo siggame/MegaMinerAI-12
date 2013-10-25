@@ -252,5 +252,16 @@ public class Unit: Mappable
     }
   }
 
+  ///The power of this unit type's attack.
+  public int AttackPower
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetAttackPower(ptr);
+      return value;
+    }
+  }
+
 }
 
