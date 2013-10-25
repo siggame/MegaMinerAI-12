@@ -286,6 +286,8 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   if (abs(object->x - x) + abs(object->y - y) != 1)
     return 0;
     
+  _Tile* prevTile = getTile(c, object->x * getMapHeight(c) + object->y);
+    
   // Move the unit
   object->x = x;
   object->y = y;
@@ -293,14 +295,16 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   // Decrement movement
   object->movementLeft -= 1;
   
-  // Apply damage for moving into trenches
+  // Apply damage for moving into/outof trenches
   if (tile->isTrench)
   {
     if (tile->waterAmount > 0)
       object->healthLeft -= getWaterDamage(c);
-    else
+    else if (!prevTile->isTrench)
       object->healthLeft -= getTrenchDamage(c);
   }
+  else if (prevTile->isTrench)
+    object->healthLeft -= getTrenchDamage(c);
   
   // Don't do any client-side object deletion?
   
