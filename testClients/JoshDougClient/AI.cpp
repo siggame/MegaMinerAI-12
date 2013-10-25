@@ -53,8 +53,8 @@ void AI::moveUnits()
       units[i].move(units[i].x()+xDir[randomDir], units[i].y()+ yDir[randomDir] );
       if (units[i].y()+1 >= mapHeight())
       {
-        units[i].dig(*getTile(units[i].x(), units[i].y()+1));
-        units[i].fill(*getTile(units[i].x(), units[i].y()+1));
+        //units[i].dig(*getTile(units[i].x(), units[i].y()+1));
+        //units[i].fill(*getTile(units[i].x(), units[i].y()+1));
       }
     }
   }
