@@ -13,4 +13,7 @@ texture trench_corner textures/Trench_Corner.png
 texture trench_tail textures/Trench_Tail.png
 texture trench_tip textures/Trench_Tip.png
 texture trail textures/footprint.png
+texture tank textures/Water_Tank.png
+texture tank_back textures/Water_Tank_Back.png
+texture background textures/background.png
 animation pump textures/pump.png
