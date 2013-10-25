@@ -356,8 +356,10 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
       return 0;
   }
   
-  // Set the tile to not be a trench
-  tile->depth = 0;
+  // Decrease the trenche's depth
+  tile->depth -= object->fillPower;
+  if (tile->depth < 0)
+    tile->depth = 0;
   // Unit can no longer move
   object->movementLeft = 0;
   
@@ -412,8 +414,8 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
       return 0;
   }
   
-  // Set the tile to be a trench
-  tile->depth = 1;
+  // Increase the tiles depth
+  tile->depth += object->digPower;
   // Unit can no longer move
   object->movementLeft = 0;
   
@@ -454,7 +456,8 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  target->healthLeft -= object->attackPower;
+  // TODO: uncomment
+  //target->healthLeft -= object->attackPower
   
   return 1;
 }
@@ -475,13 +478,24 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   // Can only spawn on current player's spawn tiles
   if (object->owner != getPlayerID(c))
     return 0;
-  // Only spawn if player has enough resources
-  if (getPlayer(c, object->owner)->oxygen < getUnitCost(c))
-    return 0;
-  // Can only spawn Fillers and Diggers
-  if (type != 0 && type != 1)
-    return 0;
   
+  // Find unit cost
+  int unitCost = -1;
+  for (int i = 0; i < getUnitTypeCount(c); ++i)
+  {
+    if (getUnitType(c, i)->type == type)
+    {
+      unitCost = getUnitType(c, i)->cost;
+      break;
+    }
+  }
+  // If a unit type with matching type was not found, then they entered an invalid unit type
+  if (unitCost == -1)
+    return 0;
+  // Only spawn if player has enough resources
+  if (getPlayer(c, object->owner)->oxygen < unitCost)
+    return 0;
+
   int count = 0;
   
   // Cannot spawn unit on top of another unit
@@ -496,8 +510,8 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   // Cannot spawn more than MaxUnits units
   if (count >= getMaxUnits(c))
     return 0;
-  
-  getPlayer(c, getPlayerID(c))->oxygen -= getUnitCost(c);
+
+  getPlayer(c, getPlayerID(c))->oxygen -= unitCost;
   
   return 1;
 }
