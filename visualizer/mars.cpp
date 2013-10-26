@@ -394,7 +394,7 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 		if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
 		{
 			const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
-			if((pTile->owner == 3) || (pTile->isTrench == true))
+			if((pTile->owner == 3) || (pTile->waterAmount > 0))
 			{
 				return true;
 			}
