@@ -411,12 +411,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 	static std::queue<SmartPointer<Animatable>> deathList;
 	std::queue<SmartPointer<Animatable>> animList;
 
-	while(!deathList.empty())
-	{
-		turn.addAnimatable(deathList.front());
-		deathList.pop();
-	}
-
 	unsigned int pumpCounter = 0;
 	for(auto& iter : m_game->states[state].tiles)
 	{
@@ -797,6 +791,12 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 	}
 
 
+	while(!deathList.empty())
+	{
+		turn.addAnimatable(deathList.front());
+		deathList.pop();
+	}
+
 	// For each UNIT in the frame
 	for(auto & unit : m_game->states[state].units)
 	{
@@ -1008,30 +1008,13 @@ Mars::Game::Game(parser::Game* game) :
 	for(auto& tile : states[0].tiles)
 		states[0].tileGrid[tile.second->x][tile.second->y] = tile.second;
 
-
 	for(int i = 1; i < (int) game->states.size(); i++)
 	{
 		for(auto& player : game->states[i].players)
 			states[i].players[player.second.id] = SmartPointer<parser::Player>(new parser::Player(player.second));
 
-
 		for(auto& unit : game->states[i].units)
-		{
-			bool bAlive = true;
-			if((i + 1) < (int)game->states.size())
-			{
-				if(game->states[i + 1].units.find(unit.second.id) == game->states[i + 1].units.end())
-				{
-					bAlive = false;
-				}
-			}
-
-			if(bAlive)
-			{
-				states[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
-			}
-
-		}
+			states[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
 
 		// set all pointer this frame to the one before
 		for(auto& tileBefore : states[i-1].tiles)
