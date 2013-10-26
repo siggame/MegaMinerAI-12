@@ -180,7 +180,7 @@ class Unit(Mappable):
   def nextTurn(self):
     tile = self.game.getTile(self.x, self.y)
     # Damage for standing in water
-    if tile.isTrench and tile.waterAmount > 0:
+    if tile.depth > 0 and tile.waterAmount > 0:
       self.healthLeft -= self.game.waterDamage
 
     # Reset flags if it is unit owner's turn
@@ -255,7 +255,7 @@ class Unit(Mappable):
       return 'Turn {}: Your unit {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
     
     # Set the Tile to not be a trench
-    tile.depth -= 1
+    tile.depth -= self.fillPower
     if tile.depth < 0:
       tile.depth = 0
     # Unit can no longer move
@@ -270,8 +270,6 @@ class Unit(Mappable):
   def dig(self, tile):
     x = tile.x
     y = tile.y
-
-    # DIGGERS ARE TYPE 0
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
@@ -291,8 +289,8 @@ class Unit(Mappable):
       return 'Turn {}: Your {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     
     #Add one to the depth
-    tile.depth += 1
-    # Unit can no longer move
+    tile.depth += self.digPower
+    tile.turnsUntilDeposition = self.game.depositionRate
     self.movementLeft = 0
     
     self.hasDug = 1
@@ -355,10 +353,15 @@ class Tile(Mappable):
   # This will not work if the object has variables other than primitives
   def toJson(self):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, pumpID = self.pumpID, waterAmount = self.waterAmount, depth = self.depth, turnsUntilDeposit = self.turnsUntilDeposit, )
-  
+
   def nextTurn(self):
-    #TODO: Tile Next Turn (Possible Flow Logic?)
-    pass
+    if self.depth > 0:
+      if self.turnsUntilDeposit <= 0:
+        self.turnsUntilDeposit = self.game.depositionRate
+        self.depth -= 1
+    else:
+      self.turnsUntilDeposit -= 1
+    return
 
   def spawn(self, type):
     player = self.game.objects.players[self.game.playerID]
@@ -367,18 +370,20 @@ class Tile(Mappable):
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.oxygen < self.game.unitCost:
       return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, self.x, self.y)
-    if type not in [0,1,2]:
-      return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.totalUnits >= self.game.maxUnits:
       return 'Turn {} You cannot spawn a unit because you already have the maximum amount of units ({})'.format(self.game.turnNumber, self.game.maxUnits)
 
-    player.oxygen -= self.game.unitCost
+
+    unittype = self.game.typeToUnitType(type)
+    if unittype is None:
+      return 'Turn {}: You cannot spawn a unit with this type.'.format(self.game.turnNumber)
+
+    player.oxygen -= unittype.cost
 
     #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower']
-    unit = self.unitStats
-    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.unit.maxHealth, self.unit.maxHealth, self.unit.maxMovement, self.unit.maxMovement, self.unit.range, self.unit.offensePower, self.unit.defensePower, self.unit.digPower, self.unit.fillPower]
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower]
     player.spawnQueue.append(newUnitStats)
     player.totalUnits += 1
 

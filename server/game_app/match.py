@@ -92,9 +92,9 @@ class Match(DefaultGameWorld):
 
     self.turn = self.players[-1]
     self.turnNumber = -1
-
+    # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth', 'turnsUntilDeposit']
     # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth']
-    self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
 
     self.create_ice()
     self.create_spawns()
@@ -234,6 +234,12 @@ class Match(DefaultGameWorld):
       otherTile.owner = 3
       tile.waterAmount = randWaterAmount
       otherTile.waterAmount = randWaterAmount
+
+  def typeToUnitType(self, type):
+    for unittype in self.objects.unitTypes:
+      if unittype.type == type:
+        return unittype
+    return None
 
   def create_spawns(self):
     # Create spawn point in back of base
