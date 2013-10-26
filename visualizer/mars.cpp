@@ -408,7 +408,14 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 {
 	// todo: this could be moved elsewhere, it should be
 	static std::map<int,int> counter;
+	static std::queue<SmartPointer<Animatable>> deathList;
 	std::queue<SmartPointer<Animatable>> animList;
+
+	while(!deathList.empty())
+	{
+		turn.addAnimatable(deathList.front());
+		deathList.pop();
+	}
 
 	unsigned int pumpCounter = 0;
 	for(auto& iter : m_game->states[state].tiles)
@@ -822,6 +829,17 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 			}
 		}
 
+		if((state + 1) < (int)m_game->states.size())
+		{
+			if(m_game->states[state + 1].units.find(unitIter->id) == m_game->states[state + 1].units.end())
+			{
+				SmartPointer<AnimatedSprite> pDeathAnimation = new AnimatedSprite(glm::vec2(unitIter->x, unitIter->y), glm::vec2(1.0f), "death", 7,true);
+				pDeathAnimation->addKeyFrame(new DrawAnimatedSprite(pDeathAnimation,glm::vec4(GetTeamColor(unitIter->owner),1.0f)));
+
+				deathList.push(pDeathAnimation);
+			}
+		}
+
 		if(pUnit->m_Moves.empty())
 		{
 			pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter->x, unitIter->y), glm::vec2(unitIter->x, unitIter->y)));
@@ -847,11 +865,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				unitIter->m_Flipped = m_game->states[state - 1].units.at(unitIter->id)->m_Flipped;
 
 		}
-
-		/*SmartPointer<Animatable> healthBar = new Animatable;
-		healthBar->addKeyFrame(new DrawProgressBar(glm::vec2(unitIter->x,unitIter->y),1.0f,0.2f,unitIter->healthLeft / (float)unitIter->maxHealth));
-
-		animList.push(healthBar);*/
 
 		DrawProgressBar* pBar = new DrawProgressBar(1.0f,0.2f,unitIter->healthLeft / (float)unitIter->maxHealth);
 
@@ -1002,29 +1015,22 @@ Mars::Game::Game(parser::Game* game) :
 			states[i].players[player.second.id] = SmartPointer<parser::Player>(new parser::Player(player.second));
 
 
-
 		for(auto& unit : game->states[i].units)
 		{
-			states[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
-		// LOGIC FOR AFTER UNITS ARE DELTAS
-		/*
-			bool death = false;
-			auto anims = game->states[i].animations.find(unit.second.id);
-
-			if(anims != game->states[i].animations.end())
+			bool bAlive = true;
+			if((i + 1) < (int)game->states.size())
 			{
-				for(auto& anim : (*anims).second)
-					if(anim->type == parser::DEATH)
-						death = true;
-
-				if(death == true)
-					States[i].units.erase(unit.second.id);
-				else
-					States[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
+				if(game->states[i + 1].units.find(unit.second.id) == game->states[i + 1].units.end())
+				{
+					bAlive = false;
+				}
 			}
-			else
-				States[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
-		*/
+
+			if(bAlive)
+			{
+				states[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
+			}
+
 		}
 
 		// set all pointer this frame to the one before

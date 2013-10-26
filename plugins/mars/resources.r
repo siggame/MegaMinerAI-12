@@ -17,3 +17,4 @@ texture tank textures/Water_Tank.png
 texture tank_back textures/Water_Tank_Back.png
 texture background textures/background.png
 animation pump textures/pump.png
+animation death textures/death.png
