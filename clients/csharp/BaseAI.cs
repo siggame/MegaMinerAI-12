@@ -153,4 +153,10 @@ public abstract class BaseAI
     float value = Client.getOxygenRate(connection);
     return value;
   }
+  ///The number of turns until sediment is deposited on the trenches.
+  public int depositionRate()
+  {
+    int value = Client.getDepositionRate(connection);
+    return value;
+  }
 }

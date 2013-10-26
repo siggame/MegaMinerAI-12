@@ -58,6 +58,8 @@ public class Client {
   public static extern int getMaxSiege(IntPtr connection);
   [DllImport("client")]
   public static extern float getOxygenRate(IntPtr connection);
+  [DllImport("client")]
+  public static extern int getDepositionRate(IntPtr connection);
 
   [DllImport("client")]
   public static extern IntPtr getPlayer(IntPtr connection, int num);
@@ -166,6 +168,8 @@ public class Client {
   public static extern int tileGetWaterAmount(IntPtr ptr);
   [DllImport("client")]
   public static extern int tileGetDepth(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetTurnsUntilDeposit(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int unitTypeGetId(IntPtr ptr);

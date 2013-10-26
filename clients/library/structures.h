@@ -70,6 +70,7 @@ struct _Tile
   int pumpID;
   int waterAmount;
   int depth;
+  int turnsUntilDeposit;
 };
 struct _UnitType
 {

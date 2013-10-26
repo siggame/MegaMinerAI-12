@@ -40,6 +40,7 @@ class Match(DefaultGameWorld):
     self.gameNumber = id
     self.maxSiege = None
     self.oxygenRate = None
+    self.depositionRate = None
 
   #this is here to be wrapped
   def __del__(self):
@@ -119,6 +120,7 @@ class Match(DefaultGameWorld):
           gameNumber = self.gameNumber,
           maxSiege = self.maxSiege,
           oxygenRate = self.oxygenRate,
+          depositionRate = self.depositionRate,
           Players = [i.toJson() for i in self.objects.values() if i.__class__ is Player],
           Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
@@ -218,7 +220,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.trenchDamage, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.trenchDamage, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate, self.depositionRate])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])

@@ -129,8 +129,8 @@ class Unit(Mappable):
       object.__setattr__(self, name, value)
 
 class Tile(Mappable):
-  game_state_attributes = ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth']
-  def __init__(self, game, id, x, y, owner, pumpID, waterAmount, depth):
+  game_state_attributes = ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth', 'turnsUntilDeposit']
+  def __init__(self, game, id, x, y, owner, pumpID, waterAmount, depth, turnsUntilDeposit):
     self.game = game
     self.id = id
     self.x = x
@@ -139,14 +139,15 @@ class Tile(Mappable):
     self.pumpID = pumpID
     self.waterAmount = waterAmount
     self.depth = depth
+    self.turnsUntilDeposit = turnsUntilDeposit
     self.updatedAt = game.turnNumber
 
   def toList(self):
-    return [self.id, self.x, self.y, self.owner, self.pumpID, self.waterAmount, self.depth, ]
+    return [self.id, self.x, self.y, self.owner, self.pumpID, self.waterAmount, self.depth, self.turnsUntilDeposit, ]
   
   # This will not work if the object has variables other than primitives
   def toJson(self):
-    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, pumpID = self.pumpID, waterAmount = self.waterAmount, depth = self.depth, )
+    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, pumpID = self.pumpID, waterAmount = self.waterAmount, depth = self.depth, turnsUntilDeposit = self.turnsUntilDeposit, )
   
   def nextTurn(self):
     pass
@@ -194,39 +195,6 @@ class UnitType(object):
 
 
 # The following are animations and do not need to have any logic added
-class SpawnAnimation:
-  def __init__(self, sourceID, unitID):
-    self.sourceID = sourceID
-    self.unitID = unitID
-
-  def toList(self):
-    return ["spawn", self.sourceID, self.unitID, ]
-
-  def toJson(self):
-    return dict(type = "spawn", sourceID = self.sourceID, unitID = self.unitID)
-
-class FillAnimation:
-  def __init__(self, actingID, tileID):
-    self.actingID = actingID
-    self.tileID = tileID
-
-  def toList(self):
-    return ["fill", self.actingID, self.tileID, ]
-
-  def toJson(self):
-    return dict(type = "fill", actingID = self.actingID, tileID = self.tileID)
-
-class DigAnimation:
-  def __init__(self, actingID, tileID):
-    self.actingID = actingID
-    self.tileID = tileID
-
-  def toList(self):
-    return ["dig", self.actingID, self.tileID, ]
-
-  def toJson(self):
-    return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
-
 class FlowAnimation:
   def __init__(self, sourceID, destID, waterAmount):
     self.sourceID = sourceID
@@ -239,19 +207,16 @@ class FlowAnimation:
   def toJson(self):
     return dict(type = "flow", sourceID = self.sourceID, destID = self.destID, waterAmount = self.waterAmount)
 
-class MoveAnimation:
-  def __init__(self, actingID, fromX, fromY, toX, toY):
+class DigAnimation:
+  def __init__(self, actingID, tileID):
     self.actingID = actingID
-    self.fromX = fromX
-    self.fromY = fromY
-    self.toX = toX
-    self.toY = toY
+    self.tileID = tileID
 
   def toList(self):
-    return ["move", self.actingID, self.fromX, self.fromY, self.toX, self.toY, ]
+    return ["dig", self.actingID, self.tileID, ]
 
   def toJson(self):
-    return dict(type = "move", actingID = self.actingID, fromX = self.fromX, fromY = self.fromY, toX = self.toX, toY = self.toY)
+    return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
 
 class AttackAnimation:
   def __init__(self, actingID, targetID):
@@ -273,4 +238,40 @@ class DeathAnimation:
 
   def toJson(self):
     return dict(type = "death", sourceID = self.sourceID)
+
+class MoveAnimation:
+  def __init__(self, actingID, fromX, fromY, toX, toY):
+    self.actingID = actingID
+    self.fromX = fromX
+    self.fromY = fromY
+    self.toX = toX
+    self.toY = toY
+
+  def toList(self):
+    return ["move", self.actingID, self.fromX, self.fromY, self.toX, self.toY, ]
+
+  def toJson(self):
+    return dict(type = "move", actingID = self.actingID, fromX = self.fromX, fromY = self.fromY, toX = self.toX, toY = self.toY)
+
+class FillAnimation:
+  def __init__(self, actingID, tileID):
+    self.actingID = actingID
+    self.tileID = tileID
+
+  def toList(self):
+    return ["fill", self.actingID, self.tileID, ]
+
+  def toJson(self):
+    return dict(type = "fill", actingID = self.actingID, tileID = self.tileID)
+
+class SpawnAnimation:
+  def __init__(self, sourceID, unitID):
+    self.sourceID = sourceID
+    self.unitID = unitID
+
+  def toList(self):
+    return ["spawn", self.sourceID, self.unitID, ]
+
+  def toJson(self):
+    return dict(type = "spawn", sourceID = self.sourceID, unitID = self.unitID)
 

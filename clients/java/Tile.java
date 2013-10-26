@@ -75,5 +75,11 @@ class Tile extends Mappable
     validify();
     return Client.INSTANCE.tileGetDepth(ptr);
   }
+  ///The number of turns until sediment is deposited on this tile.
+  public int getTurnsUntilDeposit()
+  {
+    validify();
+    return Client.INSTANCE.tileGetTurnsUntilDeposit(ptr);
+  }
 
 }

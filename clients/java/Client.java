@@ -36,6 +36,7 @@ public interface Client extends Library {
   int getGameNumber(Pointer connection);
   int getMaxSiege(Pointer connection);
   float getOxygenRate(Pointer connection);
+  int getDepositionRate(Pointer connection);
 
   Pointer getPlayer(Pointer connection, int num);
   int getPlayerCount(Pointer connection);
@@ -94,6 +95,7 @@ public interface Client extends Library {
   int tileGetPumpID(Pointer ptr);
   int tileGetWaterAmount(Pointer ptr);
   int tileGetDepth(Pointer ptr);
+  int tileGetTurnsUntilDeposit(Pointer ptr);
 
   int unitTypeGetId(Pointer ptr);
   String unitTypeGetName(Pointer ptr);

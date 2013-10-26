@@ -45,6 +45,10 @@ float BaseAI::oxygenRate()
 {
   return getOxygenRate(c);
 }
+int BaseAI::depositionRate()
+{
+  return getDepositionRate(c);
+}
 
 bool BaseAI::startTurn()
 {

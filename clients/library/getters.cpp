@@ -152,6 +152,10 @@ DLLEXPORT int tileGetDepth(_Tile* ptr)
 {
   return ptr->depth;
 }
+DLLEXPORT int tileGetTurnsUntilDeposit(_Tile* ptr)
+{
+  return ptr->turnsUntilDeposit;
+}
 DLLEXPORT int unitTypeGetId(_UnitType* ptr)
 {
   return ptr->id;

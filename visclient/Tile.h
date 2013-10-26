@@ -32,6 +32,8 @@ class Tile : public Mappable {
   int waterAmount();
   ///The depth of the tile. Tile is a trench if depth is greater than zero.
   int depth();
+  ///The number of turns until sediment is deposited on this tile.
+  int turnsUntilDeposit();
 
   // Actions
   ///Attempt to spawn a unit of a type on this tile.

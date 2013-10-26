@@ -44,6 +44,7 @@ struct Connection
   int gameNumber;
   int maxSiege;
   float oxygenRate;
+  int depositionRate;
 
   _Player* Players;
   int PlayerCount;
@@ -106,6 +107,7 @@ DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
 DLLEXPORT int getMaxSiege(Connection* c);
 DLLEXPORT float getOxygenRate(Connection* c);
+DLLEXPORT int getDepositionRate(Connection* c);
 
 DLLEXPORT _Player* getPlayer(Connection* c, int num);
 DLLEXPORT int getPlayerCount(Connection* c);

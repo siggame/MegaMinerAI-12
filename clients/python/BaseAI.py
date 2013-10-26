@@ -102,5 +102,10 @@ class BaseAI:
     return library.getOxygenRate(self.connection)
   #\endcond
   oxygenRate = property(getOxygenRate)
+  #\cond
+  def getDepositionRate(self):
+    return library.getDepositionRate(self.connection)
+  #\endcond
+  depositionRate = property(getDepositionRate)
   def __init__(self, connection):
     self.connection = connection
