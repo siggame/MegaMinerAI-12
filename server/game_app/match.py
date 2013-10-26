@@ -48,7 +48,7 @@ class Match(DefaultGameWorld):
     self.turnLimit = self.turnLimit
     self.maxSiege = self.maxSiege
     self.oxygenRate = self.oxygenRate
-     self.depositionRate = self.depositionRate
+    self.depositionRate = self.depositionRate
 
     self.ice = []
 

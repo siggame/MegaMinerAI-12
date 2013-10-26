@@ -251,10 +251,10 @@ class Unit(Mappable):
       return 'Turn {}: Your unit {} cannot fill something that is not a trench. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.waterAmount > 0:
       return 'Turn {}: Your unit {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
-    elif len(self.game.grid[x][y]) > 1:
+    elif len(self.game.grid[x][y]) > 1 and self not in self.game.grid[x][y]:
       return 'Turn {}: Your unit {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
-    
-    # Set the Tile to not be a trench
+
+    # Decrease the trenches depth
     tile.depth -= self.fillPower
     if tile.depth < 0:
       tile.depth = 0
@@ -288,9 +288,15 @@ class Unit(Mappable):
     elif len(self.game.grid[x][y]) > 1:
       return 'Turn {}: Your {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     
+<<<<<<< HEAD
     #Add one to the depth
     tile.depth += self.digPower
     tile.turnsUntilDeposition = self.game.depositionRate
+=======
+    # Increase the depth of the trench
+    tile.depth += self.digPower
+    # Unit can no longer move
+>>>>>>> d99d78b0fa3bbcfecd021e6acf49b3b5a8e724ee
     self.movementLeft = 0
     
     self.hasDug = 1
@@ -322,7 +328,7 @@ class Unit(Mappable):
     self.game.addAnimation(AttackAnimation(self.id, target.id))
     
     # Deal damage
-    target.healthLeft -= self.game.attackDamage
+    target.healthLeft -= self.attackPower
 
     self.handleDeath(target)
     
@@ -509,9 +515,5 @@ class SpawnAnimation:
     return ["spawn", self.sourceID, self.unitID, ]
 
   def toJson(self):
-<<<<<<< HEAD
-    return dict(type = "death", sourceID = self.sourceID)
-=======
     return dict(type = "spawn", sourceID = self.sourceID, unitID = self.unitID)
 
->>>>>>> run-codegen
