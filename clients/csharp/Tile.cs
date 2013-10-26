@@ -121,5 +121,16 @@ public class Tile: Mappable
     }
   }
 
+  ///The number of turns until sediment is deposited on this tile.
+  public int TurnsUntilDeposit
+  {
+    get
+    {
+      validify();
+      int value = Client.tileGetTurnsUntilDeposit(ptr);
+      return value;
+    }
+  }
+
 }
 

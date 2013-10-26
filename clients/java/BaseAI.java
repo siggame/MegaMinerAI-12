@@ -142,4 +142,9 @@ public abstract class BaseAI
   {
     return Client.INSTANCE.getOxygenRate(connection);
   }
+  ///The number of turns until sediment is deposited on the trenches.
+  int depositionRate()
+  {
+    return Client.INSTANCE.getDepositionRate(connection);
+  }
 }

@@ -21,6 +21,7 @@ globals = [
   Variable('gameNumber', int, 'What number game this is for the server'),
   Variable('maxSiege', int, 'The maximum siege value before the PumpStation is sieged.'),
   Variable('oxygenRate', float, 'The rate at which missing oxygen is regained.'),
+  Variable('depositionRate', int, 'The number of turns until sediment is deposited on the trenches.'),
 ]
 
 playerData = [
@@ -49,6 +50,7 @@ Tile = Model('Tile',
     Variable('pumpID', int, 'Determines if this tile is a part of a Pump Station.'),
     Variable('waterAmount', int, 'The amount of water contained on the tile.'),
     Variable('depth', int, 'The depth of the tile. Tile is a trench if depth is greater than zero.'),
+    Variable('turnsUntilDeposit', int, 'The number of turns until sediment is deposited on this tile.')
     ],
   functions=[
     Function('spawn',[Variable('type',int)],

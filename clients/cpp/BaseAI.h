@@ -51,6 +51,8 @@ public:
   int maxSiege();
   ///The rate at which missing oxygen is regained.
   float oxygenRate();
+  ///The number of turns until sediment is deposited on the trenches.
+  int depositionRate();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

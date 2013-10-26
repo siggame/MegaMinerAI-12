@@ -65,6 +65,7 @@ DLLEXPORT Connection* createConnection()
   c->gameNumber = 0;
   c->maxSiege = 0;
   c->oxygenRate = 0;
+  c->depositionRate = 0;
   c->Players = NULL;
   c->PlayerCount = 0;
   c->Mappables = NULL;
@@ -639,6 +640,8 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   sub = sub->next;
   object->depth = atoi(sub->val);
   sub = sub->next;
+  object->turnsUntilDeposit = atoi(sub->val);
+  sub = sub->next;
 
 }
 void parseUnitType(Connection* c, _UnitType* object, sexp_t* expression)
@@ -773,6 +776,9 @@ DLLEXPORT int networkLoop(Connection* c)
           sub = sub->next;
 
           c->oxygenRate = atof(sub->val);
+          sub = sub->next;
+
+          c->depositionRate = atoi(sub->val);
           sub = sub->next;
 
         }
@@ -1027,4 +1033,8 @@ DLLEXPORT int getMaxSiege(Connection* c)
 DLLEXPORT float getOxygenRate(Connection* c)
 {
   return c->oxygenRate;
+}
+DLLEXPORT int getDepositionRate(Connection* c)
+{
+  return c->depositionRate;
 }
