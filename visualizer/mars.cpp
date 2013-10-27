@@ -60,13 +60,12 @@ void Mars::GetSelectedRect(Rect &out) const
 void Mars::ProccessInput()
 {
 	const Input& input = gui->getInput();
+	int turn = timeManager->getTurn();
 	int unitsSelectable = gui->getDebugOptionState("Units Selectable");
 	int tilesSelectable = gui->getDebugOptionState("Tiles Selectable");
 
-	if( input.leftRelease )
+	if( input.leftRelease && turn < m_game->states.size())
 	{
-		int turn = timeManager->getTurn();
-
 		Rect R;
 		GetSelectedRect(R);
 
@@ -113,29 +112,31 @@ glm::vec3 Mars::GetTeamColor(int owner) const
 void Mars::drawObjectSelection() const
 {
 	int turn = timeManager->getTurn();
+    if(turn < m_game->states.size())
+    {
+        for(auto& iter : m_selectedUnitIDs)
+        {
+            if(m_game->states[turn].units.find(iter) != m_game->states[turn].units.end())
+                drawQuadAroundObj(m_game->states[turn].units.at(iter), glm::vec4(1.0, 0.4, 0.4, 0.6 ));
+        }
 
-	for(auto& iter : m_selectedUnitIDs)
-	{
-		if(m_game->states[turn].units.find(iter) != m_game->states[turn].units.end())
-			drawQuadAroundObj(m_game->states[turn].units.at(iter), glm::vec4(1.0, 0.4, 0.4, 0.6 ));
-	}
+        for(auto& iter : m_selectedUnitIDs)
+        {
+            if(m_game->states[turn].tiles.find(iter) != m_game->states[turn].tiles.end())
+                drawQuadAroundObj(m_game->states[turn].tiles.at(iter), glm::vec4(0.3, 0.0, 1.0, 0.6));
+        }
 
-	for(auto& iter : m_selectedUnitIDs)
-	{
-		if(m_game->states[turn].tiles.find(iter) != m_game->states[turn].tiles.end())
-			drawQuadAroundObj(m_game->states[turn].tiles.at(iter), glm::vec4(0.3, 0.0, 1.0, 0.6));
-	}
+        int focus = gui->getCurrentUnitFocus();
 
-	int focus = gui->getCurrentUnitFocus();
+        if(focus >= 0)
+        {
+            if(m_game->states[turn].units.find(focus) != m_game->states[turn].units.end())
+                drawBoxAroundObj(m_game->states[turn].units.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
-	if(focus >= 0)
-	{
-		if(m_game->states[turn].units.find(focus) != m_game->states[turn].units.end())
-			drawBoxAroundObj(m_game->states[turn].units.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-
-		if(m_game->states[turn].tiles.find(focus) != m_game->states[turn].tiles.end())
-			drawBoxAroundObj(m_game->states[turn].tiles.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-	}
+            if(m_game->states[turn].tiles.find(focus) != m_game->states[turn].tiles.end())
+                drawBoxAroundObj(m_game->states[turn].tiles.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+        }
+    }
 }
 
 void Mars::drawBoxAroundObj(const SmartPointer<parser::Mappable> obj, const glm::vec4& color) const
@@ -247,31 +248,34 @@ void Mars::pruneSelection()
 	bool changed = false;
 	int focus = gui->getCurrentUnitFocus();
 
-	auto iter = m_selectedUnitIDs.begin();
-	while(iter != m_selectedUnitIDs.end())
-	{
-		// if it doesn't exist anymore, remove it from the selection.
-		if(m_game->states[turn].units.find(*iter) == m_game->states[turn].units.end() &&
-		  (m_game->states[turn].tiles.find(*iter) == m_game->states[turn].tiles.end() ||
-		  (m_game->states[turn].tiles.at(*iter)->isTrench == false &&
-		   m_game->states[turn].tiles.at(*iter)->owner != 3 &&
-		   m_game->states[turn].tiles.at(*iter)->pumpID == -1)))
-		{
-			iter = m_selectedUnitIDs.erase(iter);
-			changed = true;
-		}
-		else
-			iter++;
-	}
+    if(turn < m_game->states.size())
+    {
+        auto iter = m_selectedUnitIDs.begin();
+        while(iter != m_selectedUnitIDs.end())
+        {
+            // if it doesn't exist anymore, remove it from the selection.
+            if(m_game->states[turn].units.find(*iter) == m_game->states[turn].units.end() &&
+              (m_game->states[turn].tiles.find(*iter) == m_game->states[turn].tiles.end() ||
+              (m_game->states[turn].tiles.at(*iter)->isTrench == false &&
+               m_game->states[turn].tiles.at(*iter)->owner != 3 &&
+               m_game->states[turn].tiles.at(*iter)->pumpID == -1)))
+            {
+                iter = m_selectedUnitIDs.erase(iter);
+                changed = true;
+            }
+            else
+                iter++;
+        }
 
-	if(changed == true)
-	{
-		gui->updateDebugWindow();
-	}
+        if(changed == true)
+        {
+            gui->updateDebugWindow();
+        }
 
-	// if previous focus is dead/gone then reset it to the top of the table
-	if(std::find(m_selectedUnitIDs.begin(), m_selectedUnitIDs.end(), focus) == m_selectedUnitIDs.end())
-		gui->updateDebugUnitFocus();
+        // if previous focus is dead/gone then reset it to the top of the table
+        if(std::find(m_selectedUnitIDs.begin(), m_selectedUnitIDs.end(), focus) == m_selectedUnitIDs.end())
+            gui->updateDebugUnitFocus();
+    }
 }
 
 void Mars::optionStateChanged()
