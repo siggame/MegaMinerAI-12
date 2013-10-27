@@ -1,5 +1,5 @@
-font DroidSansMono textures/fonts/DroidSansMono.png DroidSansMono.dat
-font Roboto textures/fonts/Roboto.png Roboto.dat
+font DroidSansMono fonts/DroidSansMono.png DroidSansMono.dat
+font Roboto fonts/Roboto.png Roboto.dat
 texture digger textures/digger.png
 texture filler textures/filler.png
 texture water textures/water.png
@@ -13,8 +13,8 @@ texture trench_corner textures/Trench_Corner.png
 texture trench_tail textures/Trench_Tail.png
 texture trench_tip textures/Trench_Tip.png
 texture trail textures/footprint.png
-texture tank textures/Water_Tank.png
-texture tank_back textures/Water_Tank_Back.png
-texture background textures/background.png
-animation pump textures/pump.png
-animation death textures/death.png
+texture tank hud/Water_Tank.png
+texture tank_back hud/Water_Tank_Back.png
+texture background hud/background.png
+animation pump animations/pump.png
+animation death animations/death.png
