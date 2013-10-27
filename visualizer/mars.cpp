@@ -334,6 +334,7 @@ void Mars::RenderHUD()
 {
     std::ostringstream waterInfo;
     int turn = timeManager->getTurn();
+    float tankWidth = 21.0f;
 
     const float barWidth = 13.0f;  // <--- unlucky as shit
 
@@ -363,21 +364,21 @@ void Mars::RenderHUD()
 
     // Render the back of the tank
     renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-    renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank_back");
+    renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,"tank_back");
 
     // Render the Bar
     renderer->setColor(Color(0.5f, 0.5f, 1.0f, 0.3f));
-    renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
+    renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2.0f), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
 
     renderer->setColor(Color(1.0f, 0.5f, 0.5f, 0.3f));
-    renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
+    renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
 
     renderer->setColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
-    renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2)) + lengthBlue - 0.1f, m_game->mapHeight + 1.2f, 0.2f, 2.0f);
+    renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue - 0.1f, m_game->mapHeight + 1.2f, 0.2f, 2.0f);
 
     // Render the front of the tank
     renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawTexturedQuad((m_game->mapWidth/2) - 12.0f, m_game->mapHeight, (m_game->mapWidth/2) + 7.6f, 6.0f,"tank");
+	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,"tank");
 }
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
