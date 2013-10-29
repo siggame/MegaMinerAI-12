@@ -7,6 +7,7 @@ from time import sleep
 import random
 from game_utils import get_tile
 import game_utils
+import math
 
 
 class AI(BaseAI):
@@ -14,6 +15,7 @@ class AI(BaseAI):
   history = None
   spawnTiles = []
   myPumpTiles = []
+  pumpTiles = []
   theIceTiles = []
   foundpump = False
   whichice = 0
@@ -37,7 +39,53 @@ class AI(BaseAI):
     for tile in self.spawnTiles:
       tile.spawn(game_utils.DIGGER)
 
-  def moveUnits(self):
+  @staticmethod
+  def manDist(x1, y1, x2, y2):
+      return abs(x1-x2) + abs(y1-y2)
+  #array[start:end]
+
+
+  def initPumpTiles(self):
+      for tile in self.tiles:
+          if tile.pumpID != -1:
+              self.pumpTiles.append(tile)
+
+  def nearestEnemyPumpTile(self, x, y):
+      nearest_dist, nearest_tile = 10000000, None
+      for tile in self.tiles:
+          #is a pump
+          if tile.pumpID != -1 and tile.owner != self.playerID:
+              curdist = self.manDist(x, y, tile.x, tile.y)
+              if curdist < nearest_dist:
+                  nearest_tile = tile
+                  nearest_dist = curdist
+      return nearest_tile
+
+  def nearestIceTile(self, x, y):
+      nearest_dist, nearest_tile = 10000000, None
+      for tile in self.tiles:
+          #is a pump
+          if tile.owner == 3 and tile.waterAmount > 0:
+              curdist = self.manDist(x, y, tile.x, tile.y)
+              if curdist < nearest_dist:
+                  nearest_tile = tile
+                  nearest_dist = curdist
+      return nearest_tile
+
+
+  def moveUnits2(self):
+      for unit in self.units[0:len(self.units)/2]:
+          neartile = self.nearestIceTile(unit.x, unit.y)
+          if neartile is not None:
+            self.path_find(unit, neartile.x, neartile.y)
+
+      for unit in self.units[len(self.units)/2 +1:len(self.units)-1]:
+          neartile = self.nearestEnemyPumpTile(unit.x, unit.y)
+          if neartile is not None:
+            self.path_find(unit, neartile.x, neartile.y)
+
+
+  def moveUnits1(self):
     count = 0
     for unit in self.units:
       count += 1
@@ -93,6 +141,7 @@ class AI(BaseAI):
     self.getSpawnTiles()
     self.history = game_utils.game_history(self, True)
     self.myPumpTiles = self.findMyPumpTiles()
+    self.pumpTiles = self.initPumpTiles()
     self.theIceTiles = self.findIce()
     return
 
@@ -104,10 +153,58 @@ class AI(BaseAI):
   def path_find(self, unit, x, y):
     count = 0
     while unit.movementLeft > 0:
-      if count > 500:
+      if count > 50:
         return
       count += 1
-      if unit.x < x:
+
+      unit.dig(game_utils.get_tile(self, unit.x, unit.y))
+      if unit.x < x-1:
+        unit.move(unit.x+1, unit.y)
+      elif unit.y > y+1:
+        unit.move(unit.x, unit.y-1)
+      elif unit.x > x+1:
+        unit.move(unit.x-1, unit.y)
+      elif unit.y < y-1:
+        unit.move(unit.x, unit.y+1)
+      elif unit.x < x:
+        unit.move(unit.x+1, unit.y)
+      elif unit.y > y:
+        unit.move(unit.x, unit.y-1)
+      elif unit.x > x:
+        unit.move(unit.x-1, unit.y)
+      elif unit.y < y:
+        unit.move(unit.x, unit.y+1)
+
+  def path_find2(self, unit, x, y):
+    count = 0
+    while unit.movementLeft > 0:
+      if count > 20:
+        unit.move(unit.x, unit.y+1)
+
+      if count > 30:
+        unit.move(unit.x, unit.y-1)
+
+      if count > 40:
+        unit.move(unit.x + 1, unit.y)
+
+      if count > 50:
+        unit.move(unit.x - 1, unit.y)
+
+      if count > 60:
+        unit.move(unit.x, unit.y+1)
+        return
+      count += 1
+
+      
+      if unit.x < x-1:
+        unit.move(unit.x+1, unit.y)
+      elif unit.y > y+1:
+        unit.move(unit.x, unit.y-1)
+      elif unit.x > x+1:
+        unit.move(unit.x-1, unit.y)
+      elif unit.y < y-1:
+        unit.move(unit.x, unit.y+1)
+      elif unit.x < x:
         unit.move(unit.x+1, unit.y)
       elif unit.y > y:
         unit.move(unit.x, unit.y-1)
@@ -125,7 +222,7 @@ class AI(BaseAI):
     self.history.save_snapshot()
 
     self.spawnUnits()
-    self.moveUnits()
+    self.moveUnits2()
 
 
     #SNAPSHOT AT END
