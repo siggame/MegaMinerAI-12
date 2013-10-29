@@ -71,12 +71,20 @@ class Player(GameObject):
   waterStored = property(getWaterStored)
 
   #\cond
-  def getSpawnResources(self):
+  def getOxygen(self):
     self.validify()
-    return library.playerGetSpawnResources(self._ptr)
+    return library.playerGetOxygen(self._ptr)
   #\endcond
-  ##Resource used to spawn in units
-  spawnResources = property(getSpawnResources)
+  ##Resource used to spawn in units.
+  oxygen = property(getOxygen)
+
+  #\cond
+  def getMaxOxygen(self):
+    self.validify()
+    return library.playerGetMaxOxygen(self._ptr)
+  #\endcond
+  ##The player's oxygen cap.
+  maxOxygen = property(getMaxOxygen)
 
 
   def __str__(self):
@@ -86,7 +94,8 @@ class Player(GameObject):
     ret += "playerName: %s\n" % self.getPlayerName()
     ret += "time: %s\n" % self.getTime()
     ret += "waterStored: %s\n" % self.getWaterStored()
-    ret += "spawnResources: %s\n" % self.getSpawnResources()
+    ret += "oxygen: %s\n" % self.getOxygen()
+    ret += "maxOxygen: %s\n" % self.getMaxOxygen()
     return ret
 
 ##A mappable object!
@@ -144,7 +153,7 @@ class Mappable(GameObject):
     ret += "y: %s\n" % self.getY()
     return ret
 
-##Represents a base to which you want to lead water, and a spawn location for new units.
+##Represents a base to which you want to lead water.
 class PumpStation(GameObject):
   def __init__(self, ptr):
     from BaseAI import BaseAI
@@ -191,12 +200,12 @@ class PumpStation(GameObject):
   waterAmount = property(getWaterAmount)
 
   #\cond
-  def getSiegeCount(self):
+  def getSiegeAmount(self):
     self.validify()
-    return library.pumpStationGetSiegeCount(self._ptr)
+    return library.pumpStationGetSiegeAmount(self._ptr)
   #\endcond
-  ##The length of time it takes to capture the PumpStation.
-  siegeCount = property(getSiegeCount)
+  ##The amount the PumpStation has been sieged.
+  siegeAmount = property(getSiegeAmount)
 
 
   def __str__(self):
@@ -205,7 +214,7 @@ class PumpStation(GameObject):
     ret += "id: %s\n" % self.getId()
     ret += "owner: %s\n" % self.getOwner()
     ret += "waterAmount: %s\n" % self.getWaterAmount()
-    ret += "siegeCount: %s\n" % self.getSiegeCount()
+    ret += "siegeAmount: %s\n" % self.getSiegeAmount()
     return ret
 
 ##Represents a single unit on the map.
@@ -308,20 +317,20 @@ class Unit(Mappable):
   hasAttacked = property(getHasAttacked)
 
   #\cond
-  def getHasDigged(self):
+  def getHasDug(self):
     self.validify()
-    return library.unitGetHasDigged(self._ptr)
+    return library.unitGetHasDug(self._ptr)
   #\endcond
-  ##Whether the current unit has digged or not.
-  hasDigged = property(getHasDigged)
+  ##Whether the current unit has dug or not.
+  hasDug = property(getHasDug)
 
   #\cond
-  def getHasBuilt(self):
+  def getHasFilled(self):
     self.validify()
-    return library.unitGetHasBuilt(self._ptr)
+    return library.unitGetHasFilled(self._ptr)
   #\endcond
-  ##Whether the current unit has built or not.
-  hasBuilt = property(getHasBuilt)
+  ##Whether the current unit has filled or not.
+  hasFilled = property(getHasFilled)
 
   #\cond
   def getHealthLeft(self):
@@ -365,8 +374,8 @@ class Unit(Mappable):
     ret += "owner: %s\n" % self.getOwner()
     ret += "type: %s\n" % self.getType()
     ret += "hasAttacked: %s\n" % self.getHasAttacked()
-    ret += "hasDigged: %s\n" % self.getHasDigged()
-    ret += "hasBuilt: %s\n" % self.getHasBuilt()
+    ret += "hasDug: %s\n" % self.getHasDug()
+    ret += "hasFilled: %s\n" % self.getHasFilled()
     ret += "healthLeft: %s\n" % self.getHealthLeft()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
     ret += "movementLeft: %s\n" % self.getMovementLeft()
@@ -433,14 +442,6 @@ class Tile(Mappable):
   owner = property(getOwner)
 
   #\cond
-  def getType(self):
-    self.validify()
-    return library.tileGetType(self._ptr)
-  #\endcond
-  ##The type of tile this tile represents.
-  type = property(getType)
-
-  #\cond
   def getPumpID(self):
     self.validify()
     return library.tileGetPumpID(self._ptr)
@@ -472,7 +473,6 @@ class Tile(Mappable):
     ret += "x: %s\n" % self.getX()
     ret += "y: %s\n" % self.getY()
     ret += "owner: %s\n" % self.getOwner()
-    ret += "type: %s\n" % self.getType()
     ret += "pumpID: %s\n" % self.getPumpID()
     ret += "waterAmount: %s\n" % self.getWaterAmount()
     ret += "isTrench: %s\n" % self.getIsTrench()
