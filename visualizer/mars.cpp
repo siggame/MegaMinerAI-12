@@ -8,6 +8,7 @@
 #include <list>
 #include <glm/glm.hpp>
 #include <queue>
+#include <set>
 
 namespace visualizer
 {
@@ -416,7 +417,8 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 	static std::queue<SmartPointer<Animatable>> deathList;
 	std::queue<SmartPointer<Animatable>> animList;
 
-	unsigned int pumpCounter = 0;
+	std::set<int> pumpStations;
+
 	for(auto& iter : m_game->states[state].tiles)
 	{
 		auto& tileIter = iter.second;
@@ -437,23 +439,18 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		}
 		else if(tileIter->pumpID > -1)
 		{
-			int& counterValue = counter[tileIter->id];
-
-			SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), "pump", counterValue);
-			pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(GetTeamColor(tileIter->owner),1.0f)));
-
-			turn.addAnimatable(pPump);
-
-			auto& pumps = m_game->states[state].pump;
-			auto pumpIter = pumps.find(tileIter->pumpID);
-
-			if(pumpIter != pumps.end())
+			if(pumpStations.insert(tileIter->pumpID).second)
 			{
-				float percent = (float)pumpIter->second->siegeAmount / (float)m_game->maxSiege;
+				int& counterValue = counter[tileIter->id];
 
-				if(percent != 0.0f)
+				auto& pumps = m_game->states[state].pump;
+				auto pumpIter = pumps.find(tileIter->pumpID);
+
+				if(pumpIter != pumps.end())
 				{
-					if(pumpCounter == 0)
+					float percent = (float)pumpIter->second->siegeAmount / (float)m_game->maxSiege;
+
+					if(percent != 0.0f)
 					{
 						auto eastPumpIter = tileIter->x > 0 ? pumps.find(m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->pumpID) : pumps.end();
 						if(eastPumpIter == pumps.end() || (eastPumpIter->second->id != pumpIter->second->id))
@@ -465,14 +462,26 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 						}
 					}
 				}
-			}
 
-			if(IsWaterNearTilePos(state,tileIter->x,tileIter->y))
-			{
-				counterValue = (counterValue + 1) % 8;
-			}
 
-			pumpCounter = (pumpCounter + 1) % 2;
+				SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(2.0f), "pump", counterValue);
+				pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(GetTeamColor(tileIter->owner),1.0f)));
+
+				turn.addAnimatable(pPump);
+
+				//  11
+				// 1x01
+				// 1001
+				//  11
+
+				if(IsWaterNearTilePos(state,tileIter->x,tileIter->y) ||
+				   IsWaterNearTilePos(state,tileIter->x + 1,tileIter->y) ||
+				   IsWaterNearTilePos(state,tileIter->x + 1,tileIter->y + 1) ||
+				   IsWaterNearTilePos(state,tileIter->x,tileIter->y + 1))
+				{
+					counterValue = (counterValue + 1) % 8;
+				}
+			}
 		}
 
 
