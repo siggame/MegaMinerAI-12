@@ -120,15 +120,15 @@ public abstract class BaseAI
   {
     return Client.INSTANCE.getAttackDamage(connection);
   }
-  ///How quickly a unit will siege a base.
-  int offenseCount()
+  ///How quickly a unit will siege a PumpStation.
+  int offensePower()
   {
-    return Client.INSTANCE.getOffenseCount(connection);
+    return Client.INSTANCE.getOffensePower(connection);
   }
-  ///The much a unit will slow a  siege.
-  int defenseCount()
+  ///How much a unit will slow a siege.
+  int defensePower()
   {
-    return Client.INSTANCE.getDefenseCount(connection);
+    return Client.INSTANCE.getDefensePower(connection);
   }
   ///The maximum number of units allowed per player.
   int maxUnits()
@@ -149,5 +149,15 @@ public abstract class BaseAI
   int gameNumber()
   {
     return Client.INSTANCE.getGameNumber(connection);
+  }
+  ///The maximum siege value before the PumpStation is sieged.
+  int maxSiege()
+  {
+    return Client.INSTANCE.getMaxSiege(connection);
+  }
+  ///The rate at which missing oxygen is regained.
+  float oxygenRate()
+  {
+    return Client.INSTANCE.getOxygenRate(connection);
   }
 }

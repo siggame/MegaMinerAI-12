@@ -59,12 +59,14 @@ DLLEXPORT Connection* createConnection()
   c->waterDamage = 0;
   c->turnNumber = 0;
   c->attackDamage = 0;
-  c->offenseCount = 0;
-  c->defenseCount = 0;
+  c->offensePower = 0;
+  c->defensePower = 0;
   c->maxUnits = 0;
   c->unitCost = 0;
   c->playerID = 0;
   c->gameNumber = 0;
+  c->maxSiege = 0;
+  c->oxygenRate = 0;
   c->Players = NULL;
   c->PlayerCount = 0;
   c->Mappables = NULL;
@@ -315,7 +317,9 @@ void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
   sub = sub->next;
   object->waterStored = atoi(sub->val);
   sub = sub->next;
-  object->spawnResources = atoi(sub->val);
+  object->oxygen = atoi(sub->val);
+  sub = sub->next;
+  object->maxOxygen = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -347,7 +351,7 @@ void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
   sub = sub->next;
   object->waterAmount = atoi(sub->val);
   sub = sub->next;
-  object->siegeCount = atoi(sub->val);
+  object->siegeAmount = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -370,9 +374,9 @@ void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
   sub = sub->next;
   object->hasAttacked = atoi(sub->val);
   sub = sub->next;
-  object->hasDigged = atoi(sub->val);
+  object->hasDug = atoi(sub->val);
   sub = sub->next;
-  object->hasBuilt = atoi(sub->val);
+  object->hasFilled = atoi(sub->val);
   sub = sub->next;
   object->healthLeft = atoi(sub->val);
   sub = sub->next;
@@ -398,8 +402,6 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   object->y = atoi(sub->val);
   sub = sub->next;
   object->owner = atoi(sub->val);
-  sub = sub->next;
-  object->type = atoi(sub->val);
   sub = sub->next;
   object->pumpID = atoi(sub->val);
   sub = sub->next;
@@ -499,10 +501,10 @@ DLLEXPORT int networkLoop(Connection* c)
           c->attackDamage = atoi(sub->val);
           sub = sub->next;
 
-          c->offenseCount = atoi(sub->val);
+          c->offensePower = atoi(sub->val);
           sub = sub->next;
 
-          c->defenseCount = atoi(sub->val);
+          c->defensePower = atoi(sub->val);
           sub = sub->next;
 
           c->maxUnits = atoi(sub->val);
@@ -515,6 +517,12 @@ DLLEXPORT int networkLoop(Connection* c)
           sub = sub->next;
 
           c->gameNumber = atoi(sub->val);
+          sub = sub->next;
+
+          c->maxSiege = atoi(sub->val);
+          sub = sub->next;
+
+          c->oxygenRate = atof(sub->val);
           sub = sub->next;
 
         }
@@ -692,13 +700,13 @@ DLLEXPORT int getAttackDamage(Connection* c)
 {
   return c->attackDamage;
 }
-DLLEXPORT int getOffenseCount(Connection* c)
+DLLEXPORT int getOffensePower(Connection* c)
 {
-  return c->offenseCount;
+  return c->offensePower;
 }
-DLLEXPORT int getDefenseCount(Connection* c)
+DLLEXPORT int getDefensePower(Connection* c)
 {
-  return c->defenseCount;
+  return c->defensePower;
 }
 DLLEXPORT int getMaxUnits(Connection* c)
 {
@@ -715,6 +723,14 @@ DLLEXPORT int getPlayerID(Connection* c)
 DLLEXPORT int getGameNumber(Connection* c)
 {
   return c->gameNumber;
+}
+DLLEXPORT int getMaxSiege(Connection* c)
+{
+  return c->maxSiege;
+}
+DLLEXPORT float getOxygenRate(Connection* c)
+{
+  return c->oxygenRate;
 }
 
 }

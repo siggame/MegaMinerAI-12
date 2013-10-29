@@ -44,14 +44,14 @@ int Unit::hasAttacked()
   return ((_Unit*)ptr)->hasAttacked;
 }
 
-int Unit::hasDigged()
+int Unit::hasDug()
 {
-  return ((_Unit*)ptr)->hasDigged;
+  return ((_Unit*)ptr)->hasDug;
 }
 
-int Unit::hasBuilt()
+int Unit::hasFilled()
 {
-  return ((_Unit*)ptr)->hasBuilt;
+  return ((_Unit*)ptr)->hasFilled;
 }
 
 int Unit::healthLeft()
@@ -105,8 +105,8 @@ std::ostream& operator<<(std::ostream& stream,Unit ob)
   stream << "owner: " << ((_Unit*)ob.ptr)->owner  <<'\n';
   stream << "type: " << ((_Unit*)ob.ptr)->type  <<'\n';
   stream << "hasAttacked: " << ((_Unit*)ob.ptr)->hasAttacked  <<'\n';
-  stream << "hasDigged: " << ((_Unit*)ob.ptr)->hasDigged  <<'\n';
-  stream << "hasBuilt: " << ((_Unit*)ob.ptr)->hasBuilt  <<'\n';
+  stream << "hasDug: " << ((_Unit*)ob.ptr)->hasDug  <<'\n';
+  stream << "hasFilled: " << ((_Unit*)ob.ptr)->hasFilled  <<'\n';
   stream << "healthLeft: " << ((_Unit*)ob.ptr)->healthLeft  <<'\n';
   stream << "maxHealth: " << ((_Unit*)ob.ptr)->maxHealth  <<'\n';
   stream << "movementLeft: " << ((_Unit*)ob.ptr)->movementLeft  <<'\n';

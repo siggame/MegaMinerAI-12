@@ -18,8 +18,8 @@ namespace visualizer
       */
 	struct BaseSprite : public Animatable
 	{
-		BaseSprite(const glm::vec2& pos, const glm::vec2& scale, const string& sprite) :
-			pos(pos), scale(scale), m_sprite(sprite)  {}
+		BaseSprite(const glm::vec2& pos, const glm::vec2& scale, const string& sprite, const string& tag = "") :
+			pos(pos), scale(scale), m_sprite(sprite), Animatable(tag)  {}
 
 		glm::vec2 pos;
 		glm::vec2 scale;
@@ -57,6 +57,23 @@ namespace visualizer
 		std::string m_SpriteName;
 		std::vector<Move> m_Moves;
 	};
+
+	/** @name AnimatedSprite
+	  * @inherits Animatable
+	  * @purpose this object is a container for the sprite data of an
+      *    animated sprite. needs the sprite name and the number of frames.
+      */
+    struct AnimatedSprite :
+        public BaseSprite
+    {
+        AnimatedSprite(const glm::vec2& pos, const glm::vec2& scale, const std::string& sprite, const int& frames, bool singleFrame = false) :
+            BaseSprite(pos, scale, sprite),
+            m_Frames(frames), m_SingleFrame(singleFrame)
+            {}
+
+        int m_Frames;
+        bool m_SingleFrame;
+    };
 
 	struct SplashScreen : public Animatable
 	{

@@ -57,12 +57,6 @@ class Tile extends Mappable
     validify();
     return Client.INSTANCE.tileGetOwner(ptr);
   }
-  ///The type of tile this tile represents.
-  public int getType()
-  {
-    validify();
-    return Client.INSTANCE.tileGetType(ptr);
-  }
   ///Determines if this tile is a part of a Pump Station.
   public int getPumpID()
   {

@@ -85,15 +85,15 @@ class BaseAI:
   #\endcond
   attackDamage = property(getAttackDamage)
   #\cond
-  def getOffenseCount(self):
-    return library.getOffenseCount(self.connection)
+  def getOffensePower(self):
+    return library.getOffensePower(self.connection)
   #\endcond
-  offenseCount = property(getOffenseCount)
+  offensePower = property(getOffensePower)
   #\cond
-  def getDefenseCount(self):
-    return library.getDefenseCount(self.connection)
+  def getDefensePower(self):
+    return library.getDefensePower(self.connection)
   #\endcond
-  defenseCount = property(getDefenseCount)
+  defensePower = property(getDefensePower)
   #\cond
   def getMaxUnits(self):
     return library.getMaxUnits(self.connection)
@@ -114,5 +114,15 @@ class BaseAI:
     return library.getGameNumber(self.connection)
   #\endcond
   gameNumber = property(getGameNumber)
+  #\cond
+  def getMaxSiege(self):
+    return library.getMaxSiege(self.connection)
+  #\endcond
+  maxSiege = property(getMaxSiege)
+  #\cond
+  def getOxygenRate(self):
+    return library.getOxygenRate(self.connection)
+  #\endcond
+  oxygenRate = property(getOxygenRate)
   def __init__(self, connection):
     self.connection = connection

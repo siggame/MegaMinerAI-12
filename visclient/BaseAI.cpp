@@ -36,13 +36,13 @@ int BaseAI::attackDamage()
 {
   return getAttackDamage(c);
 }
-int BaseAI::offenseCount()
+int BaseAI::offensePower()
 {
-  return getOffenseCount(c);
+  return getOffensePower(c);
 }
-int BaseAI::defenseCount()
+int BaseAI::defensePower()
 {
-  return getDefenseCount(c);
+  return getDefensePower(c);
 }
 int BaseAI::maxUnits()
 {
@@ -59,6 +59,14 @@ int BaseAI::playerID()
 int BaseAI::gameNumber()
 {
   return getGameNumber(c);
+}
+int BaseAI::maxSiege()
+{
+  return getMaxSiege(c);
+}
+float BaseAI::oxygenRate()
+{
+  return getOxygenRate(c);
 }
 
 bool BaseAI::startTurn()

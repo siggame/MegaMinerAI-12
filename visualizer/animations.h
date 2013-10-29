@@ -82,15 +82,75 @@ namespace visualizer
         public ColorSprite
 	{
 	public:
-		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, Fade f = None) : ColorSprite(c,f),
-			m_Sprite(sprite)
+		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, bool flipped = false, Fade f = None) : ColorSprite(c,f),
+			m_Sprite(sprite),
+			m_Flipped(flipped)
 			{}
 
 		void animate( const float& t, AnimData* d, IGame* game );
 
+	protected:
+
+		glm::vec2 m_pos;
+
 	private:
 		MoveableSprite * m_Sprite;
+		bool m_Flipped;
 	};
+
+	class DrawProgressBar : public Anim
+	{
+	public:
+
+		DrawProgressBar(float width, float height, float percent);
+		DrawProgressBar(const glm::vec2& pos, float width, float height, float percent);
+
+		void animate( const float& t, AnimData* d, IGame* game );
+
+		void SetPos(const glm::vec2& pos) { m_pos = pos; }
+
+	private:
+
+		glm::vec2 m_pos;
+		float m_width;
+		float m_height;
+		float m_percent;
+
+	};
+
+	class DrawSmoothSpriteProgressBar : public DrawSmoothMoveSprite
+	{
+	public:
+
+		DrawSmoothSpriteProgressBar(MoveableSprite * sprite, DrawProgressBar* pBar, const glm::vec4& c, bool flipped = false, Fade f = None) :
+			DrawSmoothMoveSprite(sprite,c,flipped,f), m_pProgressBar(pBar)  {}
+
+
+		void animate( const float& t, AnimData* d, IGame* game );
+
+	private:
+		SmartPointer<DrawProgressBar> m_pProgressBar;
+	};
+
+	/** @name DrawAnimatedSprite
+	  * @inherits Anim
+	  * @prupose Will draw an animated sprite. Must know the number of frames
+      *   contained in the sprite to render correctly
+      */
+    class DrawAnimatedSprite :
+        public ColorSprite
+    {
+    public:
+        DrawAnimatedSprite(AnimatedSprite* sprite, const glm::vec4& c, Fade f = None) :
+            ColorSprite(c, f),
+            m_Sprite(sprite)
+            {}
+
+        void animate( const float& t, AnimData* d, IGame* game );
+
+    private:
+        AnimatedSprite * m_Sprite;
+    };
 
 	/** @name DrawTextBox
       * @inherits Anim
@@ -101,12 +161,12 @@ namespace visualizer
     {
     public:
         DrawTextBox(const std::string& text, const glm::vec2& pos, const glm::vec4& color,
-                const float& size, const std::string& font) :
+                const float& size, IRenderer::Alignment align = IRenderer::Alignment::Center) :
             m_Text(text),
             m_Pos(pos),
             m_Color(color),
             m_Size(size),
-            m_Font(font)
+            m_Alignment(align)
             {}
 
         void animate(const float &t, AnimData *d, IGame *game);
@@ -116,7 +176,7 @@ namespace visualizer
         glm::vec2 m_Pos;
         glm::vec4 m_Color;
         float m_Size;
-        std::string m_Font;
+        IRenderer::Alignment m_Alignment;
     };
 
 	class DrawSplashScreen : public Anim

@@ -131,24 +131,24 @@ public class Unit: Mappable
     }
   }
 
-  ///Whether the current unit has digged or not.
-  public int HasDigged
+  ///Whether the current unit has dug or not.
+  public int HasDug
   {
     get
     {
       validify();
-      int value = Client.unitGetHasDigged(ptr);
+      int value = Client.unitGetHasDug(ptr);
       return value;
     }
   }
 
-  ///Whether the current unit has built or not.
-  public int HasBuilt
+  ///Whether the current unit has filled or not.
+  public int HasFilled
   {
     get
     {
       validify();
-      int value = Client.unitGetHasBuilt(ptr);
+      int value = Client.unitGetHasFilled(ptr);
       return value;
     }
   }
