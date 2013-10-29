@@ -15,7 +15,8 @@ class AI(BaseAI):
   spawnTiles = []
   myPumpTiles = []
   theIceTiles = []
-  foundice = False
+  foundpump = False
+  whichice = 0
   havespawned = False
 
   """The class implementing gameplay logic."""
@@ -34,39 +35,43 @@ class AI(BaseAI):
 
   def spawnUnits(self):
     for tile in self.spawnTiles:
-      if self.havespawned == False:
-        tile.spawn(game_utils.DIGGER)
-        self.havespawned = True
+      tile.spawn(game_utils.DIGGER)
+
   def moveUnits(self):
+    count = 0
     for unit in self.units:
+      count += 1
       if unit.owner == self.playerID:
-        if self.foundice == False:
-          while unit.movementLeft > 0:
-            if unit.x < self.theIceTiles[0].x:
+       #   while unit.movementLeft > 0:
+        if self.foundpump == True & self.whichice < 4 & count < 500:
+          if unit.x < self.theIceTiles[self.whichice].x:
               unit.move(unit.x+1, unit.y)
-            elif unit.y > self.theIceTiles[0].y + 1:
-              unit.move(unit.x, unit.y-1)
-              myoffset = 1
-            elif unit.x > self.theIceTiles[0].x:
-              unit.move(unit.x-1, unit.y)
-            elif unit.y < self.theIceTiles[0].y - 1:
-              unit.move(unit.x, unit.y+1)
-              myoffset = -1
-            else:
-              self.foundice = True
-              tile = game_utils.get_tile(self, unit.x, unit.y + myoffset)
-              unit.dig(tile)
-              while unit.movementLeft > 0:
-                if unit.x < self.myPumpTiles[0].x:
-                  unit.move(unit.x+1, unit.y)
-                elif unit.y > self.myPumpTiles[0].y :
-                  unit.move(unit.x, unit.y)
+          elif unit.y > self.theIceTiles[self.whichice].y + 1:
+            unit.move(unit.x, unit.y-1)
 
-                elif unit.x > self.myPumpTiles[0].x:
-                  unit.move(unit.x-1, unit.y)
-                elif unit.y < self.myPumpTiles[0].y :
-                  unit.move(unit.x, unit.y)
+          elif unit.x > self.theIceTiles[self.whichice].x:
+            unit.move(unit.x-1, unit.y)
+          elif unit.y < self.theIceTiles[self.whichice].y - 1:
+            unit.move(unit.x, unit.y+1)
 
+          else:
+            self.foundpump = False
+            self.whichice+=1
+            tile = game_utils.get_tile(self, unit.x, unit.y)
+            unit.dig(tile)
+          #    while unit.movementLeft > 0:
+        if self.foundpump == False & count < 500:
+          if unit.x < self.myPumpTiles[0].x:
+            unit.move(unit.x+1, unit.y)
+          elif unit.y > self.myPumpTiles[0].y :
+            unit.move(unit.x, unit.y)
+
+          elif unit.x > self.myPumpTiles[0].x:
+            unit.move(unit.x-1, unit.y)
+          elif unit.y < self.myPumpTiles[0].y :
+            unit.move(unit.x, unit.y)
+          else:
+            self.foundpump = True
 
   def findMyPumpTiles(self):
     pumpTiles = []
@@ -80,8 +85,7 @@ class AI(BaseAI):
     ice = []
     for tile in self.tiles:
       if tile.owner == 3:
-        if tile.x < getMapWidth() / 2:
-          ice.append(tile)
+        ice.append(tile)
     return ice
 
   ##This function is called once, before your first turn
@@ -98,7 +102,11 @@ class AI(BaseAI):
     return
   
   def path_find(self, unit, x, y):
+    count = 0
     while unit.movementLeft > 0:
+      if count > 500:
+        return
+      count += 1
       if unit.x < x:
         unit.move(unit.x+1, unit.y)
       elif unit.y > y:
