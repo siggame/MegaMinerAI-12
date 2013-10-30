@@ -159,17 +159,30 @@ void Mars::drawQuadAroundObj(const SmartPointer<parser::Mappable> obj, const glm
 
 void Mars::preDraw()
 {
+
+	//============== todo: fix this interesting code:
+	static float t = 0.0f;
+
+	t += 0.001f; // todo: increment this by the actual dt, not just some const
+	if(t > 15.7f)
+	{
+		t = 0.0f;
+	}
+
+	float tile = 2.0f*sin(0.4f*t) + 4.0f;
+	//============== todo: fix this interesting code ^
+
 	renderer->push();
 	renderer->translate(GRID_OFFSET, GRID_OFFSET);
 
 	ProccessInput();
 
     renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawTexturedQuad(-1.0f, -1.0f, 77, 37 , "background");
+	renderer->drawTexturedQuad(-1.0f, -1.0f, 77, 37 ,tile, "background");
 
 	renderer->setColor(Color());
 	//renderer->drawTexturedQuad(-2.0f,-2.0f,40.0f,40.0f,"stars");
-	renderer->drawTexturedQuad(0.0f,0.0f,m_game->mapWidth,m_game->mapHeight,"dirt");
+	renderer->drawTexturedQuad(0.0f,0.0f,m_game->mapWidth,m_game->mapHeight,1.7f,"dirt");
 
 	drawGrid();
     RenderHUD();
@@ -351,7 +364,7 @@ void Mars::RenderHUD()
 
 	// Render the back of the tank
 	renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,"tank_back");
+	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"tank_back");
 
 	// Render player #0 info
 	glm::vec3 playerColor = GetTeamColor(0);
@@ -380,7 +393,7 @@ void Mars::RenderHUD()
 
     // Render the front of the tank
     renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,"tank");
+	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"tank");
 }
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
