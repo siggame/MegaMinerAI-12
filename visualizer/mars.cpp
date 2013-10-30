@@ -359,13 +359,14 @@ void Mars::RenderHUD()
     const float barWidth = 13.0f;  // <--- unlucky as shit
 
     float totalWater = m_game->states[turn].players[0]->waterStored + m_game->states[turn].players[1]->waterStored;
-    float lengthBlue;
-    if(totalWater != 0)
-        lengthBlue = (m_game->states[turn].players[0]->waterStored / totalWater) * barWidth;
-    else
-        lengthBlue = 0;
+	float lengthBlue = 0.0f;
+	float lengthRed = 0.0f;
 
-    float lengthRed = barWidth - lengthBlue;
+    if(totalWater != 0)
+	{
+        lengthBlue = (m_game->states[turn].players[0]->waterStored / totalWater) * barWidth;
+		lengthRed = barWidth - lengthBlue;
+	}
 
 	// Render the back of the tank
 	renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
