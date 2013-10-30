@@ -479,7 +479,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				   IsWaterNearTilePos(state,tileIter->x + 1,tileIter->y + 1) ||
 				   IsWaterNearTilePos(state,tileIter->x,tileIter->y + 1))
 				{
-					counterValue = (counterValue + 1) % 8;
+					counterValue = (counterValue + 1) % 10;
 				}
 			}
 		}
