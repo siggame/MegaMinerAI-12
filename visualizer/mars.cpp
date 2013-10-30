@@ -163,7 +163,7 @@ void Mars::preDraw()
 	//============== todo: fix this interesting code:
 	static float t = 0.0f;
 
-	t += 0.001f; // todo: increment this by the actual dt, not just some const
+	t += 0.1f*timeManager->getDt();
 	if(t > 15.7f)
 	{
 		t = 0.0f;
@@ -182,7 +182,7 @@ void Mars::preDraw()
 
 	renderer->setColor(Color());
 	//renderer->drawTexturedQuad(-2.0f,-2.0f,40.0f,40.0f,"stars");
-	renderer->drawTexturedQuad(0.0f,0.0f,m_game->mapWidth,m_game->mapHeight,1.7f,"dirt");
+	renderer->drawTexturedQuad(0.0f,0.0f,m_game->mapWidth,m_game->mapHeight,1.7f,"dirt"); // 1.7
 
 	drawGrid();
     RenderHUD();
