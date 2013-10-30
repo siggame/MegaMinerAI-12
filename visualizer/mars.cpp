@@ -162,14 +162,19 @@ void Mars::preDraw()
 
 	//============== todo: fix this interesting code:
 	static float t = 0.0f;
+	static float tile = 4.0f;
 
-	t += 0.1f*timeManager->getDt();
-	if(t > 15.7f)
+	if(options->getNumber("Enable Star Animation") > 0)
 	{
-		t = 0.0f;
+		t += 0.1f*timeManager->getDt();
+		if(t > 15.7f)
+		{
+			t = 0.0f;
+		}
+
+		tile = 2.0f*sin(0.4f*t) + 4.0f;
 	}
 
-	float tile = 2.0f*sin(0.4f*t) + 4.0f;
 	//============== todo: fix this interesting code ^
 
 	renderer->push();
