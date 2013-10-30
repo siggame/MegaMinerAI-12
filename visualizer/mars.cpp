@@ -109,7 +109,7 @@ void Mars::ProccessInput()
 
 glm::vec3 Mars::GetTeamColor(int owner) const
 {
-	return owner == 1 ? glm::vec3(1.0f,0.5f,0.5f) : glm::vec3(0.5f,0.5f,1.0f);
+	return owner == 1 ? glm::vec3(0.5f,1.0f,0.5f) : glm::vec3(0.5f,0.5f,1.0f);
 }
 
 void Mars::drawObjectSelection() const
@@ -349,34 +349,34 @@ void Mars::RenderHUD()
 
     float lengthRed = barWidth - lengthBlue;
 
+	// Render the back of the tank
+	renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
+	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,"tank_back");
+
 	// Render player #0 info
-	renderer->setColor( Color(0.5f, 0.5f, 1.0f, 1.0f));
+	glm::vec3 playerColor = GetTeamColor(0);
+	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
 	renderer->drawText(0.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[0]->playerName, 3.0f, IRenderer::Left);
 
     waterInfo << "Water Amount: " << m_game->states[turn].players[0]->waterStored;
     renderer->drawText(1.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
     waterInfo.str("");
 
+	renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2.0f), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
+
     // Render player #1
-    renderer->setColor(Color(1.0f, 0.5f, 0.5f, 1.0f));
+	playerColor = GetTeamColor(1);
+	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
 	renderer->drawText(40.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
 
     waterInfo << "Water Amount: " << m_game->states[turn].players[1]->waterStored;
     renderer->drawText(35.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
 
-    // Render the back of the tank
-    renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-    renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,"tank_back");
+	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
 
-    // Render the Bar
-    renderer->setColor(Color(0.5f, 0.5f, 1.0f, 0.3f));
-    renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2.0f), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
-
-    renderer->setColor(Color(1.0f, 0.5f, 0.5f, 0.3f));
-    renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
-
-    renderer->setColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
-    renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue - 0.1f, m_game->mapHeight + 1.2f, 0.2f, 2.0f);
+	// Render the divider between the players progress bar
+	renderer->setColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
+	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue - 0.1f, m_game->mapHeight + 1.2f, 0.2f, 2.0f);
 
     // Render the front of the tank
     renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
