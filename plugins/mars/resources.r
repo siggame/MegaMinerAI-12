@@ -1,5 +1,4 @@
-font DroidSansMono fonts/DroidSansMono.png DroidSansMono.dat
-font Roboto fonts/Roboto.png Roboto.dat
+font Roboto fonts/Roboto.png fonts/Roboto.dat
 texture digger textures/digger.png
 texture filler textures/filler.png
 texture water textures/water.png
