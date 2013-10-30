@@ -18,3 +18,4 @@ texture tank_back hud/Water_Tank_Back.png
 texture background hud/background.png
 animation pump animations/pump.png
 animation death animations/death.png
+animation tile textures/tile_ground.png

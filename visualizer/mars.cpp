@@ -17,6 +17,8 @@ Mars::Mars()
 {
 	m_game = 0;
 	m_suicide=false;
+
+	srand((unsigned int)time(0));
 } // Mars::Mars()
 
 Mars::~Mars()
@@ -316,16 +318,15 @@ void Mars::loadGamelog( std::string gamelog )
 	m_game = new Game(game);
 
 	delete game;
-	// END: Initial Setup
-
-	// Setup the renderer as a 4 x 4 map by default
-	// TODO: Change board size to something useful
 
 
 	renderer->setCamera( 0, 0, m_game->mapWidth + GRID_OFFSET*2, m_game->mapHeight + 4 + GRID_OFFSET*2);
 	renderer->setGridDimensions( m_game->mapWidth + GRID_OFFSET*2, m_game->mapHeight + 4 + GRID_OFFSET*2);
 
 	m_selectedUnitIDs.clear();
+
+	m_rand[0] = rand() % 10;
+	m_rand[1] = rand() % 10;
 
 	start();
 } // Mars::loadGamelog()
@@ -441,8 +442,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		{
 			if(pumpStations.insert(tileIter->pumpID).second)
 			{
-				int& counterValue = counter[tileIter->id];
-
 				auto& pumps = m_game->states[state].pump;
 				auto pumpIter = pumps.find(tileIter->pumpID);
 
@@ -464,6 +463,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				}
 
 
+				int& counterValue = counter[tileIter->id];
 				SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(2.0f), "pump", counterValue);
 				pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(GetTeamColor(tileIter->owner),1.0f)));
 
@@ -483,13 +483,26 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				}
 			}
 		}
+		else if(tileIter->owner == 0 || tileIter->owner == 1)
+		{
+			texture = "tile";
+		}
 
 
 		if(!texture.empty())
 		{
-			SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), texture);
-			pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
-			turn.addAnimatable(pTile);
+			if(texture == "tile")
+			{
+				SmartPointer<AnimatedSprite> pTile = new AnimatedSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), texture,m_rand[tileIter->owner]);
+				pTile->addKeyFrame(new DrawAnimatedSprite(pTile, glm::vec4(GetTeamColor(tileIter->owner),0.8f)));
+				turn.addAnimatable(pTile);
+			}
+			else
+			{
+				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), texture);
+				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
+				turn.addAnimatable(pTile);
+			}
 
 			// Canal Overlays
 			if(tileIter->isTrench == true && tileIter->owner != 3)
