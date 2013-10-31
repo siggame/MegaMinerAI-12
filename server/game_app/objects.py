@@ -1,4 +1,8 @@
+import networking.config.config
 import math
+
+# Load unit types
+cfgTypes = networking.config.config.readConfig("config/unitStats.cfg")
 
 class Player(object):
   game_state_attributes = ['id', 'playerName', 'time', 'waterStored', 'oxygen', 'maxOxygen']
@@ -288,15 +292,10 @@ class Unit(Mappable):
     elif len(self.game.grid[x][y]) > 1:
       return 'Turn {}: Your {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     
-<<<<<<< HEAD
-    #Add one to the depth
-    tile.depth += self.digPower
-    tile.turnsUntilDeposition = self.game.depositionRate
-=======
     # Increase the depth of the trench
     tile.depth += self.digPower
-    # Unit can no longer move
->>>>>>> d99d78b0fa3bbcfecd021e6acf49b3b5a8e724ee
+    tile.turnsUntilDeposition = self.game.depositionRate
+
     self.movementLeft = 0
     
     self.hasDug = 1
@@ -311,8 +310,8 @@ class Unit(Mappable):
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
-    elif abs(self.x-x) + abs(self.y-y) != 1:
-      return 'Turn {}: Your {} can only attack adjacent Units. ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif abs(self.x-x) + abs(self.y-y) > self.range:
+      return 'Turn {}: Your {} can only attack Units within range. ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.hasAttacked == 1:
       return 'Turn {}: Your {} has already attacked this turn.'.format(self.game.turnNumber, self.id)
     elif not isinstance(target, Unit):
@@ -388,8 +387,8 @@ class Tile(Mappable):
 
     player.oxygen -= unittype.cost
 
-    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower']
-    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower]
+    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower', 'attackPower']
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower, unittype.attackPower]
     player.spawnQueue.append(newUnitStats)
     player.totalUnits += 1
 

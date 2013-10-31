@@ -96,6 +96,12 @@ class Match(DefaultGameWorld):
     # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth']
     self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
 
+    statList = ["name", "type", "cost", "attackPower", "digPower", "fillPower", "maxHealth", "maxMovement", "offensePower", "defensePower", "range"]
+    unitTypes = cfgTypes.values()
+    unitTypes.sort(key=lambda unitType: unitType['type'])
+    for t in unitTypes:
+      self.addObject(UnitType, [t[value] for value in statList])
+    
     self.create_ice()
     self.create_spawns()
     self.create_pumps()
