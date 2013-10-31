@@ -370,7 +370,7 @@ void Mars::RenderHUD()
 
 	// Render the back of the tank
 	renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"tank_back");
+	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"water_tank_back");
 
 	// Render player #0 info
 	glm::vec3 playerColor = GetTeamColor(0);
@@ -399,7 +399,7 @@ void Mars::RenderHUD()
 
     // Render the front of the tank
     renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"tank");
+	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"water_tank");
 }
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
@@ -850,10 +850,11 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		std::string texture;
 
 		if(unitIter->type == 0)
-			texture = "digger";
-		else
-			texture = "filler";
-
+			texture = "worker";
+		else if (unitIter->type == 1)
+			texture = "scout";
+		else if (unitIter->type == 2)
+			texture = "tank";
 
 		SmartPointer<MoveableSprite> pUnit = new MoveableSprite(texture);
 
