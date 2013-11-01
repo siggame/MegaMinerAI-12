@@ -311,7 +311,7 @@ class Unit(Mappable):
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) > self.range:
-      return 'Turn {}: Your {} can only attack Units within range. ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+      return 'Turn {}: Your {} can only attack Units within range ({}). ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.range, self.x, self.y, x, y)
     elif self.hasAttacked == 1:
       return 'Turn {}: Your {} has already attacked this turn.'.format(self.game.turnNumber, self.id)
     elif not isinstance(target, Unit):

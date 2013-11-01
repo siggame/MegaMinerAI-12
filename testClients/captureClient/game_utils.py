@@ -93,41 +93,37 @@ class game_history:
 
       #PUMPS
       if tile.pumpID != -1:
-        tempGrid[tile.x][tile.y].append(self.colorText(str(tile.owner), self.WHITE, self.GREEN))
+        tempGrid[tile.x][tile.y].append([str(tile.owner), self.WHITE, self.GREEN])
+        #tempGrid[tile.x][tile.y].append(self.colorText(str(tile.owner), self.WHITE, self.GREEN))
 
       #SPAWNS
       if tile.owner == 0:
-        tempGrid[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.RED))
+        tempGrid[tile.x][tile.y].append(['S', self.WHITE, self.RED])
       elif tile.owner == 1:
-        tempGrid[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.BLUE))
+        tempGrid[tile.x][tile.y].append(['S', self.WHITE, self.MAGENTA])
 
       #GLACIERS
       if tile.owner == 3 and tile.waterAmount > 0:
-        tempGrid[tile.x][tile.y].append(self.colorText('I', self.WHITE, self.CYAN))
+        tempGrid[tile.x][tile.y].append(['I', self.WHITE, self.CYAN])
 
       #WATER
       elif tile.waterAmount > 0:
-        tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.BLUE))
+        tempGrid[tile.x][tile.y].append([' ', self.WHITE, self.BLUE])
 
       #TRENCH
       elif tile.depth > 0:
-        tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.YELLOW))
+        tempGrid[tile.x][tile.y].append([' ', self.WHITE, self.YELLOW])
 
     for unit in self.ai.units:
-      if unit.owner == 0:
-        if unit.type == 0:
-          tempGrid[unit.x][unit.y].append(self.colorText('W', self.RED, self.BLACK))
-        elif unit.type == 1:
-          tempGrid[unit.x][unit.y].append(self.colorText('S', self.RED, self.BLACK))
-        elif unit.type == 2:
-          tempGrid[unit.x][unit.y].append(self.colorText('T', self.RED, self.BLACK))
-      elif unit.owner == 1:
-        if unit.type == 0:
-          tempGrid[unit.x][unit.y].append(self.colorText('W', self.BLUE, self.BLACK))
-        elif unit.type == 1:
-          tempGrid[unit.x][unit.y].append(self.colorText('S', self.BLUE, self.BLACK))
-        elif unit.type == 2:
-          tempGrid[unit.x][unit.y].append(self.colorText('T', self.BLUE, self.BLACK))
+      symbol = ['W','S','T'][unit.type]
+      color = [self.RED, self.MAGENTA][unit.owner]
+      cell = tempGrid[unit.x][unit.y]
+      if cell:
+        cell[0][0] = symbol
+        if cell[0][2] != color:
+          cell[0][1] = color
+      else:
+        cell.append([symbol, color, self.BLACK])
 
     #self.print_snapshot(tempGrid)
     self.history.append(tempGrid)
@@ -137,9 +133,10 @@ class game_history:
     print('--' * self.ai.mapWidth)
     for y in range(self.ai.mapHeight):
       for x in range(self.ai.mapWidth):
-        if len(snapshot[x][y]) > 0:
-          sys.stdout.write(snapshot[x][y][0])
-          sys.stdout.write(snapshot[x][y][0])
+        if snapshot[x][y]:
+          str = self.colorText(snapshot[x][y][0][0], snapshot[x][y][0][1], snapshot[x][y][0][2])
+          sys.stdout.write(str)
+          sys.stdout.write(str)
         else:
           sys.stdout.write('  ')
       print
