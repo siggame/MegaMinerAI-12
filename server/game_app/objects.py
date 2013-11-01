@@ -28,22 +28,28 @@ class Player(object):
   
   def nextTurn(self):
     if self.id == self.game.playerID:
-      #GET OXYGEN
       unitWorth = [0, 0]
       for unit in self.game.objects.units:
-        unitWorth[unit.owner] += self.game.unitCost
+        unitWorth[unit.owner] += self.game.unitTypeDict[unit.species].cost
 
       # Get value of fish in spawnQueue
-      inSpawnQueue = len(self.spawnQueue) * self.game.unitCost
+      #inSpawnQueue = sum(self.spawnQueue)
+      inSpawnQueue = 0
+      for tospawn in self.spawnQueue:
+        inSpawnQueue += inSpawnQueue[0]
       #self.spawnQueue = []
+
+      # Calculate currentPlayer's net worth by adding value of owned fish and spawning fish to available spawn food
       netWorth = unitWorth[self.id] + self.oxygen + inSpawnQueue
-      oxyYouShouldHave = self.maxOxygen
-      oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.oxygenRate)
+      # How much your net worth should be if you have not lost any units
+      oxyYouShouldHave = self.game.maxFood
+      # How much spawn food you get
+      oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.foodRate)
       self.oxygen += oxyYouGet
 
       #SPAWN UNITS
       for newUnitStats in self.spawnQueue:
-        newUnit = self.game.addObject(Unit, newUnitStats)
+        newUnit = self.game.addObject(Unit, newUnitStats[1:])
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
       self.spawnQueue = []
 
@@ -388,7 +394,7 @@ class Tile(Mappable):
     player.oxygen -= unittype.cost
 
     #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower', 'attackPower']
-    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower, unittype.attackPower]
+    newUnitStats = [unittype.cost, self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower, unittype.attackPower]
     player.spawnQueue.append(newUnitStats)
     player.totalUnits += 1
 
