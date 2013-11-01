@@ -378,7 +378,7 @@ void Mars::RenderHUD()
 	renderer->drawText(0.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[0]->playerName, 3.0f, IRenderer::Left);
 
     waterInfo << "Water Amount: " << m_game->states[turn].players[0]->waterStored;
-    renderer->drawText(1.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
+    renderer->drawText(0.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
     waterInfo.str("");
 
 	renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2.0f), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
@@ -389,7 +389,7 @@ void Mars::RenderHUD()
 	renderer->drawText(40.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
 
     waterInfo << "Water Amount: " << m_game->states[turn].players[1]->waterStored;
-    renderer->drawText(35.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
+    renderer->drawText(40.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Right);
 
 	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
 
@@ -400,6 +400,7 @@ void Mars::RenderHUD()
     // Render the front of the tank
     renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
 	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"water_tank");
+
 }
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
