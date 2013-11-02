@@ -1,4 +1,8 @@
+import networking.config.config
 import math
+
+# Load unit types
+cfgTypes = networking.config.config.readConfig("config/unitStats.cfg")
 
 class Player(object):
   game_state_attributes = ['id', 'playerName', 'time', 'waterStored', 'oxygen', 'maxOxygen']
@@ -24,22 +28,28 @@ class Player(object):
   
   def nextTurn(self):
     if self.id == self.game.playerID:
-      #GET OXYGEN
       unitWorth = [0, 0]
       for unit in self.game.objects.units:
-        unitWorth[unit.owner] += self.game.unitCost
+        unitWorth[unit.owner] += self.game.unitTypesDict[unit.type].cost
 
       # Get value of fish in spawnQueue
-      inSpawnQueue = len(self.spawnQueue) * self.game.unitCost
+      #inSpawnQueue = sum(self.spawnQueue)
+      inSpawnQueue = 0
+      for tospawn in self.spawnQueue:
+        inSpawnQueue += tospawn[0]
       #self.spawnQueue = []
+
+      # Calculate currentPlayer's net worth by adding value of owned fish and spawning fish to available spawn food
       netWorth = unitWorth[self.id] + self.oxygen + inSpawnQueue
+      # How much your net worth should be if you have not lost any units
       oxyYouShouldHave = self.maxOxygen
+      # How much spawn food you get
       oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.oxygenRate)
       self.oxygen += oxyYouGet
 
       #SPAWN UNITS
       for newUnitStats in self.spawnQueue:
-        newUnit = self.game.addObject(Unit, newUnitStats)
+        newUnit = self.game.addObject(Unit, newUnitStats[1:])
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
       self.spawnQueue = []
 
@@ -115,9 +125,9 @@ class PumpStation(object):
 
       #Defending
       if unit.owner == self.owner:
-        self.siegeAmount -= self.game.defensePower
+        self.siegeAmount -= unit.defensePower
       elif unit.owner == self.owner^1:
-        self.siegeAmount += self.game.offensePower
+        self.siegeAmount += unit.offensePower
       else:
         print('Unit owner not 0 or 1: {}'.format(self.owner))
 
@@ -138,8 +148,8 @@ class PumpStation(object):
       object.__setattr__(self, name, value)
 
 class Unit(Mappable):
-  game_state_attributes = ['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
-  def __init__(self, game, id, x, y, owner, type, hasAttacked, hasDug, hasFilled, healthLeft, maxHealth, movementLeft, maxMovement):
+  game_state_attributes = ['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digPower', 'fillPower', 'attackPower']
+  def __init__(self, game, id, x, y, owner, type, hasAttacked, hasDug, hasFilled, healthLeft, maxHealth, movementLeft, maxMovement, range, offensePower, defensePower, digPower, fillPower, attackPower):
     self.game = game
     self.id = id
     self.x = x
@@ -153,14 +163,20 @@ class Unit(Mappable):
     self.maxHealth = maxHealth
     self.movementLeft = movementLeft
     self.maxMovement = maxMovement
+    self.range = range
+    self.offensePower = offensePower
+    self.defensePower = defensePower
+    self.digPower = digPower
+    self.fillPower = fillPower
+    self.attackPower = attackPower
     self.updatedAt = game.turnNumber
 
   def toList(self):
-    return [self.id, self.x, self.y, self.owner, self.type, self.hasAttacked, self.hasDug, self.hasFilled, self.healthLeft, self.maxHealth, self.movementLeft, self.maxMovement, ]
+    return [self.id, self.x, self.y, self.owner, self.type, self.hasAttacked, self.hasDug, self.hasFilled, self.healthLeft, self.maxHealth, self.movementLeft, self.maxMovement, self.range, self.offensePower, self.defensePower, self.digPower, self.fillPower, self.attackPower, ]
   
   # This will not work if the object has variables other than primitives
   def toJson(self):
-    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDug = self.hasDug, hasFilled = self.hasFilled, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, )
+    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDug = self.hasDug, hasFilled = self.hasFilled, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, range = self.range, offensePower = self.offensePower, defensePower = self.defensePower, digPower = self.digPower, fillPower = self.fillPower, attackPower = self.attackPower, )
 
   @staticmethod
   def handleDeath(unit):
@@ -171,11 +187,10 @@ class Unit(Mappable):
 
       unit.game.addAnimation(DeathAnimation(unit.id))
 
-
   def nextTurn(self):
     tile = self.game.getTile(self.x, self.y)
     # Damage for standing in water
-    if tile.isTrench and tile.waterAmount > 0:
+    if tile.depth > 0 and tile.waterAmount > 0:
       self.healthLeft -= self.game.waterDamage
 
     # Reset flags if it is unit owner's turn
@@ -215,16 +230,16 @@ class Unit(Mappable):
     
     # Apply damage for moving into a trench
     tile = self.game.getTile(x, y)
-    if tile.isTrench:
+    if tile.depth > 0:
       # Damage for moving through water
       if tile.waterAmount > 0:
         self.healthLeft -= self.game.waterDamage + self.game.trenchDamage
       # Damage for moving into a trench
-      elif not prevTile.isTrench:
+      elif not prevTile.depth > 0:
         self.healthLeft -= self.game.trenchDamage
       self.handleDeath(self)
     # Damage for coming out of a trench
-    elif prevTile.isTrench:
+    elif prevTile.depth > 0:
       self.healthLeft -= self.game.trenchDamage
       self.handleDeath(self)
 
@@ -234,25 +249,25 @@ class Unit(Mappable):
     x = tile.x
     y = tile.y
 
-    #FILLERS ARE OF TYPE 1
-    
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
-    elif self.type != 1:
-      return 'Turn {}: Your digger unit {} cannot fill.'.format(self.game.turnNumber, self.id)
+    elif self.fillPower <= 0:
+      return 'Turn {}: Your unit {} cannot fill.'.format(self.game.turnNumber, self.id)
     elif self.hasFilled == 1:
       return 'Turn {}: Your unit {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) != 1:
       return 'Turn {}: Your unit {} can only fill adjacent Tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.isTrench == 0:
+    elif tile.depth <= 0:
       return 'Turn {}: Your unit {} cannot fill something that is not a trench. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.waterAmount > 0:
       return 'Turn {}: Your unit {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
-    elif len(self.game.grid[x][y]) > 1:
+    elif len(self.game.grid[x][y]) > 1 and self not in self.game.grid[x][y]:
       return 'Turn {}: Your unit {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
-    
-    # Set the Tile to not be a trench
-    tile.isTrench = 0
+
+    # Decrease the trenches depth
+    tile.depth -= self.fillPower
+    if tile.depth < 0:
+      tile.depth = 0
     # Unit can no longer move
     self.movementLeft = 0
     
@@ -265,19 +280,15 @@ class Unit(Mappable):
   def dig(self, tile):
     x = tile.x
     y = tile.y
-
-    # DIGGERS ARE TYPE 0
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
-    elif self.type != 0:
-      return 'Turn {}: Your filler {} cannot dig.'.format(self.game.turnNumber, self.id)
+    elif self.digPower <= 0:
+      return 'Turn {}: Your unit {} cannot dig.'.format(self.game.turnNumber, self.id)
     elif self.hasDug == 1:
       return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) > 1:
       return 'Turn {}: Your {} can only dig adjacent or same tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.isTrench == 1:
-      return 'Turn {}: Your {} cannot dig a trench in a trench. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.pumpID != -1:
       return 'Turn {}: Your {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.owner == 3:
@@ -287,9 +298,10 @@ class Unit(Mappable):
     elif len(self.game.grid[x][y]) > 1:
       return 'Turn {}: Your {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     
-    # Set the Tile to be a trench
-    tile.isTrench = 1
-    # Unit can no longer move
+    # Increase the depth of the trench
+    tile.depth += self.digPower
+    tile.turnsUntilDeposition = self.game.depositionRate
+
     self.movementLeft = 0
     
     self.hasDug = 1
@@ -304,8 +316,8 @@ class Unit(Mappable):
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
-    elif abs(self.x-x) + abs(self.y-y) != 1:
-      return 'Turn {}: Your {} can only attack adjacent Units. ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif abs(self.x-x) + abs(self.y-y) > self.range:
+      return 'Turn {}: Your {} can only attack Units within range ({}). ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.range, self.x, self.y, x, y)
     elif self.hasAttacked == 1:
       return 'Turn {}: Your {} has already attacked this turn.'.format(self.game.turnNumber, self.id)
     elif not isinstance(target, Unit):
@@ -321,7 +333,7 @@ class Unit(Mappable):
     self.game.addAnimation(AttackAnimation(self.id, target.id))
     
     # Deal damage
-    target.healthLeft -= self.game.attackDamage
+    target.healthLeft -= self.attackPower
 
     self.handleDeath(target)
     
@@ -333,8 +345,8 @@ class Unit(Mappable):
       object.__setattr__(self, name, value)
 
 class Tile(Mappable):
-  game_state_attributes = ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'isTrench']
-  def __init__(self, game, id, x, y, owner, pumpID, waterAmount, isTrench):
+  game_state_attributes = ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth', 'turnsUntilDeposit']
+  def __init__(self, game, id, x, y, owner, pumpID, waterAmount, depth, turnsUntilDeposit):
     self.game = game
     self.id = id
     self.x = x
@@ -342,18 +354,25 @@ class Tile(Mappable):
     self.owner = owner
     self.pumpID = pumpID
     self.waterAmount = waterAmount
-    self.isTrench = isTrench
+    self.depth = depth
+    self.turnsUntilDeposit = turnsUntilDeposit
     self.updatedAt = game.turnNumber
 
   def toList(self):
-    return [self.id, self.x, self.y, self.owner, self.pumpID, self.waterAmount, self.isTrench, ]
+    return [self.id, self.x, self.y, self.owner, self.pumpID, self.waterAmount, self.depth, self.turnsUntilDeposit, ]
   
   # This will not work if the object has variables other than primitives
   def toJson(self):
-    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, pumpID = self.pumpID, waterAmount = self.waterAmount, isTrench = self.isTrench, )
+    return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, pumpID = self.pumpID, waterAmount = self.waterAmount, depth = self.depth, turnsUntilDeposit = self.turnsUntilDeposit, )
+
   def nextTurn(self):
-    #TODO: Tile Next Turn (Possible Flow Logic?)
-    pass
+    if self.depth > 0:
+      if self.turnsUntilDeposit <= 0:
+        self.turnsUntilDeposit = self.game.depositionRate
+        self.depth -= 1
+    else:
+      self.turnsUntilDeposit -= 1
+    return
 
   def spawn(self, type):
     player = self.game.objects.players[self.game.playerID]
@@ -362,17 +381,20 @@ class Tile(Mappable):
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.oxygen < self.game.unitCost:
       return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, self.x, self.y)
-    if type not in [0,1]:
-      return 'Turn {}: You cannot spawn a unit with type {}. ({},{})'.format(self.game.turnNumber, type, self.x, self.y)
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.totalUnits >= self.game.maxUnits:
       return 'Turn {} You cannot spawn a unit because you already have the maximum amount of units ({})'.format(self.game.turnNumber, self.game.maxUnits)
 
-    player.oxygen -= self.game.unitCost
 
-    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement']
-    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, self.game.maxHealth, self.game.maxHealth, 1, 1 ]
+    unittype = self.game.typeToUnitType(type)
+    if unittype is None:
+      return 'Turn {}: You cannot spawn a unit with this type.'.format(self.game.turnNumber)
+
+    player.oxygen -= unittype.cost
+
+    #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower', 'attackPower']
+    newUnitStats = [unittype.cost, self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower, unittype.attackPower]
     player.spawnQueue.append(newUnitStats)
     player.totalUnits += 1
 
@@ -385,18 +407,84 @@ class Tile(Mappable):
         object.__setattr__(self, 'updatedAt', self.game.turnNumber)
       object.__setattr__(self, name, value)
 
-
-# The following are animations and do not need to have any logic added
-class SpawnAnimation:
-  def __init__(self, sourceID, unitID):
-    self.sourceID = sourceID
-    self.unitID = unitID
+class UnitType(object):
+  game_state_attributes = ['id', 'name', 'type', 'cost', 'attackPower', 'digPower', 'fillPower', 'maxHealth', 'maxMovement', 'offensePower', 'defensePower', 'range']
+  def __init__(self, game, id, name, type, cost, attackPower, digPower, fillPower, maxHealth, maxMovement, offensePower, defensePower, range):
+    self.game = game
+    self.id = id
+    self.name = name
+    self.type = type
+    self.cost = cost
+    self.attackPower = attackPower
+    self.digPower = digPower
+    self.fillPower = fillPower
+    self.maxHealth = maxHealth
+    self.maxMovement = maxMovement
+    self.offensePower = offensePower
+    self.defensePower = defensePower
+    self.range = range
+    self.updatedAt = game.turnNumber
 
   def toList(self):
-    return ["spawn", self.sourceID, self.unitID, ]
+    return [self.id, self.name, self.type, self.cost, self.attackPower, self.digPower, self.fillPower, self.maxHealth, self.maxMovement, self.offensePower, self.defensePower, self.range, ]
+  
+  # This will not work if the object has variables other than primitives
+  def toJson(self):
+    return dict(id = self.id, name = self.name, type = self.type, cost = self.cost, attackPower = self.attackPower, digPower = self.digPower, fillPower = self.fillPower, maxHealth = self.maxHealth, maxMovement = self.maxMovement, offensePower = self.offensePower, defensePower = self.defensePower, range = self.range, )
+  
+  def nextTurn(self):
+    pass
+
+  def __setattr__(self, name, value):
+      if name in self.game_state_attributes:
+        object.__setattr__(self, 'updatedAt', self.game.turnNumber)
+      object.__setattr__(self, name, value)
+
+
+# The following are animations and do not need to have any logic added
+class FlowAnimation:
+  def __init__(self, sourceID, destID, waterAmount):
+    self.sourceID = sourceID
+    self.destID = destID
+    self.waterAmount = waterAmount
+
+  def toList(self):
+    return ["flow", self.sourceID, self.destID, self.waterAmount, ]
 
   def toJson(self):
-    return dict(type = "spawn", sourceID = self.sourceID, unitID = self.unitID)
+    return dict(type = "flow", sourceID = self.sourceID, destID = self.destID, waterAmount = self.waterAmount)
+
+class DigAnimation:
+  def __init__(self, actingID, tileID):
+    self.actingID = actingID
+    self.tileID = tileID
+
+  def toList(self):
+    return ["dig", self.actingID, self.tileID, ]
+
+  def toJson(self):
+    return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
+
+class AttackAnimation:
+  def __init__(self, actingID, targetID):
+    self.actingID = actingID
+    self.targetID = targetID
+
+  def toList(self):
+    return ["attack", self.actingID, self.targetID, ]
+
+  def toJson(self):
+    return dict(type = "attack", actingID = self.actingID, targetID = self.targetID)
+
+class DeathAnimation:
+  def __init__(self, sourceID):
+    self.sourceID = sourceID
+
+  def toList(self):
+    return ["death", self.sourceID, ]
+
+  def toJson(self):
+    return dict(type = "death", sourceID = self.sourceID)
 
 class MoveAnimation:
   def __init__(self, actingID, fromX, fromY, toX, toY):
@@ -423,46 +511,14 @@ class FillAnimation:
   def toJson(self):
     return dict(type = "fill", actingID = self.actingID, tileID = self.tileID)
 
-class DeathAnimation:
-  def __init__(self, sourceID):
+class SpawnAnimation:
+  def __init__(self, sourceID, unitID):
     self.sourceID = sourceID
+    self.unitID = unitID
 
   def toList(self):
-    return ["death", self.sourceID, ]
+    return ["spawn", self.sourceID, self.unitID, ]
 
   def toJson(self):
-    return dict(type = "death", sourceID = self.sourceID)
+    return dict(type = "spawn", sourceID = self.sourceID, unitID = self.unitID)
 
-class DigAnimation:
-  def __init__(self, actingID, tileID):
-    self.actingID = actingID
-    self.tileID = tileID
-
-  def toList(self):
-    return ["dig", self.actingID, self.tileID, ]
-
-  def toJson(self):
-    return dict(type = "dig", actingID = self.actingID, tileID = self.tileID)
-
-class FlowAnimation:
-  def __init__(self, sourceID, destID, waterAmount):
-    self.sourceID = sourceID
-    self.destID = destID
-    self.waterAmount = waterAmount
-
-  def toList(self):
-    return ["flow", self.sourceID, self.destID, self.waterAmount, ]
-
-  def toJson(self):
-    return dict(type = "flow", sourceID = self.sourceID, destID = self.destID, waterAmount = self.waterAmount)
-
-class AttackAnimation:
-  def __init__(self, actingID, targetID):
-    self.actingID = actingID
-    self.targetID = targetID
-
-  def toList(self):
-    return ["attack", self.actingID, self.targetID, ]
-
-  def toJson(self):
-    return dict(type = "attack", actingID = self.actingID, targetID = self.targetID)

@@ -33,19 +33,15 @@ struct Connection
   
   int mapWidth;
   int mapHeight;
-  int maxHealth;
   int trenchDamage;
   int waterDamage;
   int turnNumber;
-  int attackDamage;
-  int offensePower;
-  int defensePower;
   int maxUnits;
-  int unitCost;
   int playerID;
   int gameNumber;
   int maxSiege;
   float oxygenRate;
+  int depositionRate;
 
   _Player* Players;
   int PlayerCount;
@@ -57,6 +53,8 @@ struct Connection
   int UnitCount;
   _Tile* Tiles;
   int TileCount;
+  _UnitType* UnitTypes;
+  int UnitTypeCount;
 };
 
 #ifdef __cplusplus
@@ -98,19 +96,15 @@ extern "C"
 
 DLLEXPORT int getMapWidth(Connection* c);
 DLLEXPORT int getMapHeight(Connection* c);
-DLLEXPORT int getMaxHealth(Connection* c);
 DLLEXPORT int getTrenchDamage(Connection* c);
 DLLEXPORT int getWaterDamage(Connection* c);
 DLLEXPORT int getTurnNumber(Connection* c);
-DLLEXPORT int getAttackDamage(Connection* c);
-DLLEXPORT int getOffensePower(Connection* c);
-DLLEXPORT int getDefensePower(Connection* c);
 DLLEXPORT int getMaxUnits(Connection* c);
-DLLEXPORT int getUnitCost(Connection* c);
 DLLEXPORT int getPlayerID(Connection* c);
 DLLEXPORT int getGameNumber(Connection* c);
 DLLEXPORT int getMaxSiege(Connection* c);
 DLLEXPORT float getOxygenRate(Connection* c);
+DLLEXPORT int getDepositionRate(Connection* c);
 
 DLLEXPORT _Player* getPlayer(Connection* c, int num);
 DLLEXPORT int getPlayerCount(Connection* c);
@@ -126,6 +120,9 @@ DLLEXPORT int getUnitCount(Connection* c);
 
 DLLEXPORT _Tile* getTile(Connection* c, int num);
 DLLEXPORT int getTileCount(Connection* c);
+
+DLLEXPORT _UnitType* getUnitType(Connection* c, int num);
+DLLEXPORT int getUnitTypeCount(Connection* c);
 
 
 

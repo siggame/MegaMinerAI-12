@@ -13,10 +13,6 @@ int BaseAI::mapHeight()
 {
   return getMapHeight(c);
 }
-int BaseAI::maxHealth()
-{
-  return getMaxHealth(c);
-}
 int BaseAI::trenchDamage()
 {
   return getTrenchDamage(c);
@@ -29,25 +25,9 @@ int BaseAI::turnNumber()
 {
   return getTurnNumber(c);
 }
-int BaseAI::attackDamage()
-{
-  return getAttackDamage(c);
-}
-int BaseAI::offensePower()
-{
-  return getOffensePower(c);
-}
-int BaseAI::defensePower()
-{
-  return getDefensePower(c);
-}
 int BaseAI::maxUnits()
 {
   return getMaxUnits(c);
-}
-int BaseAI::unitCost()
-{
-  return getUnitCost(c);
 }
 int BaseAI::playerID()
 {
@@ -64,6 +44,10 @@ int BaseAI::maxSiege()
 float BaseAI::oxygenRate()
 {
   return getOxygenRate(c);
+}
+int BaseAI::depositionRate()
+{
+  return getDepositionRate(c);
 }
 
 bool BaseAI::startTurn()
@@ -108,6 +92,14 @@ bool BaseAI::startTurn()
   for(int i = 0; i < count; i++)
   {
     tiles[i] = Tile(getTile(c, i));
+  }
+
+  count = getUnitTypeCount(c);
+  unitTypes.clear();
+  unitTypes.resize(count);
+  for(int i = 0; i < count; i++)
+  {
+    unitTypes[i] = UnitType(getUnitType(c, i));
   }
 
   if(!initialized)

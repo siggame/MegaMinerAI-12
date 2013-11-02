@@ -43,6 +43,12 @@ DLLEXPORT int unitGetHealthLeft(_Unit* ptr);
 DLLEXPORT int unitGetMaxHealth(_Unit* ptr);
 DLLEXPORT int unitGetMovementLeft(_Unit* ptr);
 DLLEXPORT int unitGetMaxMovement(_Unit* ptr);
+DLLEXPORT int unitGetRange(_Unit* ptr);
+DLLEXPORT int unitGetOffensePower(_Unit* ptr);
+DLLEXPORT int unitGetDefensePower(_Unit* ptr);
+DLLEXPORT int unitGetDigPower(_Unit* ptr);
+DLLEXPORT int unitGetFillPower(_Unit* ptr);
+DLLEXPORT int unitGetAttackPower(_Unit* ptr);
 
 
 DLLEXPORT int tileGetId(_Tile* ptr);
@@ -51,7 +57,22 @@ DLLEXPORT int tileGetY(_Tile* ptr);
 DLLEXPORT int tileGetOwner(_Tile* ptr);
 DLLEXPORT int tileGetPumpID(_Tile* ptr);
 DLLEXPORT int tileGetWaterAmount(_Tile* ptr);
-DLLEXPORT int tileGetIsTrench(_Tile* ptr);
+DLLEXPORT int tileGetDepth(_Tile* ptr);
+DLLEXPORT int tileGetTurnsUntilDeposit(_Tile* ptr);
+
+
+DLLEXPORT int unitTypeGetId(_UnitType* ptr);
+DLLEXPORT char* unitTypeGetName(_UnitType* ptr);
+DLLEXPORT int unitTypeGetType(_UnitType* ptr);
+DLLEXPORT int unitTypeGetCost(_UnitType* ptr);
+DLLEXPORT int unitTypeGetAttackPower(_UnitType* ptr);
+DLLEXPORT int unitTypeGetDigPower(_UnitType* ptr);
+DLLEXPORT int unitTypeGetFillPower(_UnitType* ptr);
+DLLEXPORT int unitTypeGetMaxHealth(_UnitType* ptr);
+DLLEXPORT int unitTypeGetMaxMovement(_UnitType* ptr);
+DLLEXPORT int unitTypeGetOffensePower(_UnitType* ptr);
+DLLEXPORT int unitTypeGetDefensePower(_UnitType* ptr);
+DLLEXPORT int unitTypeGetRange(_UnitType* ptr);
 
 
 

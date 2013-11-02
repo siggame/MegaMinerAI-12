@@ -59,7 +59,7 @@ class game_history:
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.BLUE))
 
       #TRENCH
-      elif tile.isTrench == 1:
+      elif tile.depth > 0:
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.YELLOW))
 
     for unit in self.ai.units:

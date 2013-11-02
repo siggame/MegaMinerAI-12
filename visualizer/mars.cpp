@@ -95,7 +95,7 @@ void Mars::ProccessInput()
 				const auto& tile = iter.second;
 
 				if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y &&
-				  (tile->isTrench == true || tile->owner == 3 || tile->pumpID != -1))
+				  (tile->depth >= 1 || tile->owner == 3 || tile->pumpID != -1))
 				{
 					m_selectedUnitIDs.push_back(tile->id);
 				}
@@ -269,6 +269,7 @@ void Mars::pruneSelection()
 	bool changed = false;
 	int focus = gui->getCurrentUnitFocus();
 
+
     if(turn < m_game->states.size())
     {
         auto iter = m_selectedUnitIDs.begin();
@@ -421,7 +422,11 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 		if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
 		{
 			const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
+<<<<<<< HEAD
+			if((pTile->owner == 3) || (pTile->depth > 0))
+=======
 			if((pTile->owner == 3) || (pTile->waterAmount > 0))
+>>>>>>> origin/master
 			{
 				return true;
 			}
@@ -454,7 +459,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		{
 			texture = "water";
 		}
-		else if(tileIter->isTrench == true) // if there is no water, but a trench then render a trench
+		else if(tileIter->depth > 0) // if there is no water, but a trench then render a trench
 		{
 			texture = "trench";
 		}
@@ -525,7 +530,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 			}
 
 			// Canal Overlays
-			if(tileIter->isTrench == true && tileIter->owner != 3)
+			if(tileIter->depth > 0 && tileIter->owner != 3)
 			{
 				int surroundingTrenches = 0;
 				bool North = false, South = false, East = false, West = false;
@@ -538,7 +543,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				//         If they are are directly adjacent, (not diagonal) AND also a
 				//         trench, then you will need a trench overlay with one less channel.
 				if(tileIter->y > 0 &&
-				  (m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->isTrench == true ||
+				  (m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->depth > 0 ||
 				   m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->owner == 3))
 				{
 					surroundingTrenches++;
@@ -546,7 +551,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				}
 
 				if(tileIter->y < m_game->mapHeight - 1 &&
-				  (m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->isTrench == true ||
+				  (m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->depth > 0 ||
 				   m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->owner == 3))
 				{
 					surroundingTrenches++;
@@ -554,7 +559,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				}
 
 				if(tileIter->x > 0 &&
-				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->isTrench == true ||
+				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->depth > 0 ||
 				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->owner == 3))
 				{
 					surroundingTrenches++;
@@ -562,7 +567,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				}
 
 				if(tileIter->x < m_game->mapWidth - 1 &&
-				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->isTrench == true ||
+				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->depth > 0 ||
 				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->owner == 3))
 				{
 					surroundingTrenches++;
@@ -570,28 +575,28 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				}
 
 				if(tileIter->x > 0 && tileIter->y > 0 &&
-				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->isTrench == true  ||
+				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->depth > 0  ||
 				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->owner == 3))
 				{
 					NorthWest = true;
 				}
 
 				if(tileIter->x < m_game->mapWidth - 1 && tileIter->y > 0 &&
-				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->isTrench == true ||
+				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->depth > 0 ||
 				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->owner == 3))
 				{
 					NorthEast = true;
 				}
 
 				if(tileIter->x > 0 && tileIter->y < m_game->mapHeight - 1 &&
-				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->isTrench == true ||
+				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->depth > 0 ||
 				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->owner == 3))
 				{
 					SouthWest = true;
 				}
 
 				if(tileIter->x < m_game->mapWidth - 1 && tileIter->y < m_game->mapHeight - 1 &&
-				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->isTrench == true ||
+				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->depth > 0 ||
 				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->owner == 3))
 				{
 					SouthEast = true;
@@ -804,7 +809,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		turn[tileIter->id]["owner"] = tileIter->owner;
 		turn[tileIter->id]["pumpID"] = tileIter->pumpID;
 		turn[tileIter->id]["waterAmount"] = tileIter->waterAmount;
-		turn[tileIter->id]["isTrench"] = tileIter->isTrench;
+		turn[tileIter->id]["depth"] = tileIter->depth;
 		turn[tileIter->id]["x"] = tileIter->x;
 		turn[tileIter->id]["y"] = tileIter->y;
 		turn[tileIter->id]["id"] = tileIter->id;

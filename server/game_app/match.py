@@ -35,7 +35,6 @@ class Match(DefaultGameWorld):
 
     self.mapWidth = self.mapWidth
     self.mapHeight = self.mapHeight
-    self.maxHealth = self.maxHealth
     self.trenchDamage = self.trenchDamage
     self.waterDamage = self.waterDamage
     self.turnNumber = -1
@@ -49,6 +48,7 @@ class Match(DefaultGameWorld):
     self.turnLimit = self.turnLimit
     self.maxSiege = self.maxSiege
     self.oxygenRate = self.oxygenRate
+    self.depositionRate = self.depositionRate
 
     self.ice = []
 
@@ -92,16 +92,24 @@ class Match(DefaultGameWorld):
 
     self.turn = self.players[-1]
     self.turnNumber = -1
+    # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth', 'turnsUntilDeposit']
+    # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth']
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
 
-    # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'isTrench']
-    self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
-
+    statList = ["name", "type", "cost", "attackPower", "digPower", "fillPower", "maxHealth", "maxMovement", "offensePower", "defensePower", "range"]
+    unitTypes = cfgTypes.values()
+    unitTypes.sort(key=lambda unitType: unitType['type'])
+    for t in unitTypes:
+      self.addObject(UnitType, [t[value] for value in statList])
+    
     self.create_ice()
     self.create_spawns()
     self.create_pumps()
 
     for pump in self.objects.pumpStations:
       pump.create_siegeTiles()
+
+    self.unitTypesDict = {units.type:units for units in self.objects.unitTypes}
 
     self.nextTurn()
 
@@ -213,8 +221,8 @@ class Match(DefaultGameWorld):
       for tile in path:
         if tile.owner == 2:
           otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
-          tile.isTrench = 1
-          otherTile.isTrench = 1
+          tile.depth = 100000
+          otherTile.depth = 100000
           # TODO: add large dugness value to trench
 
   def create_ice(self):
@@ -234,6 +242,12 @@ class Match(DefaultGameWorld):
       otherTile.owner = 3
       tile.waterAmount = randWaterAmount
       otherTile.waterAmount = randWaterAmount
+
+  def typeToUnitType(self, type):
+    for unittype in self.objects.unitTypes:
+      if unittype.type == type:
+        return unittype
+    return None
 
   def create_spawns(self):
     # Create spawn point in back of base
@@ -298,7 +312,7 @@ class Match(DefaultGameWorld):
             if neighbor != None:
               if neighbor not in closed and neighbor not in open:
                 # Trench
-                if neighbor.isTrench:
+                if neighbor.depth > 0:
                   if neighbor.waterAmount > 0:
                     open.append(neighbor)
                   else:
@@ -370,24 +384,21 @@ class Match(DefaultGameWorld):
         dict(
           mapWidth = self.mapWidth,
           mapHeight = self.mapHeight,
-          maxHealth = self.maxHealth,
           trenchDamage = self.trenchDamage,
           waterDamage = self.waterDamage,
           turnNumber = self.turnNumber,
-          attackDamage = self.attackDamage,
-          offensePower = self.offensePower,
-          defensePower = self.defensePower,
           maxUnits = self.maxUnits,
-          unitCost = self.unitCost,
           playerID = self.playerID,
           gameNumber = self.gameNumber,
           maxSiege = self.maxSiege,
           oxygenRate = self.oxygenRate,
+          depositionRate = self.depositionRate,
           Players = [i.toJson() for i in self.objects.values() if i.__class__ is Player],
           Mappables = [i.toJson() for i in self.objects.values() if i.__class__ is Mappable],
           PumpStations = [i.toJson() for i in self.objects.values() if i.__class__ is PumpStation],
           Units = [i.toJson() for i in self.objects.values() if i.__class__ is Unit],
           Tiles = [i.toJson() for i in self.objects.values() if i.__class__ is Tile],
+          UnitTypes = [i.toJson() for i in self.objects.values() if i.__class__ is UnitType],
           animations = self.jsonAnimations
         )
       )
@@ -555,7 +566,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.maxHealth, self.trenchDamage, self.waterDamage, self.turnNumber, self.attackDamage, self.offensePower, self.defensePower, self.maxUnits, self.unitCost, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.trenchDamage, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate, self.depositionRate])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])
@@ -567,6 +578,9 @@ class Match(DefaultGameWorld):
     updated = [i for i in self.objects.values() if i.__class__ is Tile and i.updatedAt > self.turnNumber-3]
     if updated:
       typeLists.append(["Tile"] + [i.toList() for i in updated])
+    updated = [i for i in self.objects.values() if i.__class__ is UnitType and i.updatedAt > self.turnNumber-3]
+    if updated:
+      typeLists.append(["UnitType"] + [i.toList() for i in updated])
 
     msg.extend(typeLists)
 

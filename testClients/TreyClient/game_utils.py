@@ -116,7 +116,7 @@ def isOnMap(ai, x, y):
 
 def validMove(ai, tile, healthLeft):
   if tile.pumpID == -1 and tile.owner != (ai.getPlayerID()^1) and (tile.x, tile.y) not in ai.unitAt:
-    if tile.isTrench:
+    if tile.depth > 0:
       if (tile.waterAmount > 0):
         return healthLeft > ai.getWaterDamage()
       else:
@@ -127,7 +127,7 @@ def validMove(ai, tile, healthLeft):
     return 0
 
 def costOfMove(ai, tile, healthLeft):
-  if (tile.isTrench):
+  if (tile.depth > 0):
     if (tile.waterAmount > 0):
       return float(ai.getWaterDamage()) / healthLeft
     else:
@@ -141,7 +141,7 @@ def validTrench(ai, tile):
   return 0
     
 def costOfTrenchPath(ai, tile):
-  if tile.isTrench:
+  if tile.depth > 0:
     return 0.5 / (ai.dfes[tile]**2)
   return 1.0 / (ai.dfes[tile]**2)
   
@@ -292,7 +292,7 @@ class game_history:
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.BLUE))
 
       #TRENCH
-      elif tile.isTrench == 1:
+      elif tile.depth > 0:
         tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.YELLOW))
 
     for unit in self.ai.units:

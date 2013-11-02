@@ -3,8 +3,8 @@
 #include "Unit.h"
 #include "game.h"
 
-#include "Tile.h"
 #include "Unit.h"
+#include "Tile.h"
 
 namespace client
 {
@@ -74,6 +74,36 @@ int Unit::maxMovement()
   return ((_Unit*)ptr)->maxMovement;
 }
 
+int Unit::range()
+{
+  return ((_Unit*)ptr)->range;
+}
+
+int Unit::offensePower()
+{
+  return ((_Unit*)ptr)->offensePower;
+}
+
+int Unit::defensePower()
+{
+  return ((_Unit*)ptr)->defensePower;
+}
+
+int Unit::digPower()
+{
+  return ((_Unit*)ptr)->digPower;
+}
+
+int Unit::fillPower()
+{
+  return ((_Unit*)ptr)->fillPower;
+}
+
+int Unit::attackPower()
+{
+  return ((_Unit*)ptr)->attackPower;
+}
+
 
 int Unit::move(int x, int y)
 {
@@ -111,6 +141,12 @@ std::ostream& operator<<(std::ostream& stream,Unit ob)
   stream << "maxHealth: " << ((_Unit*)ob.ptr)->maxHealth  <<'\n';
   stream << "movementLeft: " << ((_Unit*)ob.ptr)->movementLeft  <<'\n';
   stream << "maxMovement: " << ((_Unit*)ob.ptr)->maxMovement  <<'\n';
+  stream << "range: " << ((_Unit*)ob.ptr)->range  <<'\n';
+  stream << "offensePower: " << ((_Unit*)ob.ptr)->offensePower  <<'\n';
+  stream << "defensePower: " << ((_Unit*)ob.ptr)->defensePower  <<'\n';
+  stream << "digPower: " << ((_Unit*)ob.ptr)->digPower  <<'\n';
+  stream << "fillPower: " << ((_Unit*)ob.ptr)->fillPower  <<'\n';
+  stream << "attackPower: " << ((_Unit*)ob.ptr)->attackPower  <<'\n';
   return stream;
 }
 
