@@ -109,6 +109,8 @@ class Match(DefaultGameWorld):
     for pump in self.objects.pumpStations:
       pump.create_siegeTiles()
 
+    self.unitTypesDict = {units.type:units for units in self.objects.unitTypes}
+
     self.nextTurn()
 
     return True

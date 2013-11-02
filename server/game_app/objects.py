@@ -30,21 +30,21 @@ class Player(object):
     if self.id == self.game.playerID:
       unitWorth = [0, 0]
       for unit in self.game.objects.units:
-        unitWorth[unit.owner] += self.game.unitTypeDict[unit.species].cost
+        unitWorth[unit.owner] += self.game.unitTypesDict[unit.type].cost
 
       # Get value of fish in spawnQueue
       #inSpawnQueue = sum(self.spawnQueue)
       inSpawnQueue = 0
       for tospawn in self.spawnQueue:
-        inSpawnQueue += inSpawnQueue[0]
+        inSpawnQueue += tospawn[0]
       #self.spawnQueue = []
 
       # Calculate currentPlayer's net worth by adding value of owned fish and spawning fish to available spawn food
       netWorth = unitWorth[self.id] + self.oxygen + inSpawnQueue
       # How much your net worth should be if you have not lost any units
-      oxyYouShouldHave = self.game.maxFood
+      oxyYouShouldHave = self.maxOxygen
       # How much spawn food you get
-      oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.foodRate)
+      oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.oxygenRate)
       self.oxygen += oxyYouGet
 
       #SPAWN UNITS
