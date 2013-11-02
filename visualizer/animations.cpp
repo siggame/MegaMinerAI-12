@@ -63,14 +63,14 @@ namespace visualizer
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
         ColorSprite::animate(t,d,game);
-		game->renderer->drawTexturedQuad(m_sprite->pos.x, m_sprite->pos.y, m_sprite->scale.x, m_sprite->scale.y,m_sprite->m_sprite);
+		game->renderer->drawTexturedQuad(m_sprite->pos.x, m_sprite->pos.y, m_sprite->scale.x, m_sprite->scale.y,1.0f,m_sprite->m_sprite);
 	}
 
 	void DrawRotatedSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
         ColorSprite::animate(t,d,game);
         game->renderer->drawRotatedTexturedQuad(m_sprite->pos.x, m_sprite->pos.y,
-				  m_sprite->scale.x, m_sprite->scale.y, m_rot, m_sprite->m_sprite);
+				  m_sprite->scale.x, m_sprite->scale.y, 1.0f, m_rot, m_sprite->m_sprite);
 	}
 
 	void DrawSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
@@ -84,7 +84,7 @@ namespace visualizer
 		m_pos = thisMove.from + diff * subT;
 
         ColorSprite::animate(t, d, game);
-		game->renderer->drawTexturedQuad(m_pos.x, m_pos.y, 1.0f, 1.0f,
+		game->renderer->drawTexturedQuad(m_pos.x, m_pos.y, 1.0f, 1.0f,1.0f,
 										 m_Sprite->m_SpriteName, m_Flipped);
 
 	}

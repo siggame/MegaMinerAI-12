@@ -2,6 +2,10 @@
 #define AI_H
 
 #include "BaseAI.h"
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
 
 ///The class implementing gameplay logic.
 class AI: public BaseAI
@@ -13,6 +17,12 @@ public:
   virtual void init();
   virtual bool run();
   virtual void end();
+  std::vector<Tile*> spawnTiles;
+  Tile* getTile(const int x, const int y);
+  
+  void getSpawnTiles();
+  void spawnUnits();
+  void moveUnits();
 };
 
 #endif

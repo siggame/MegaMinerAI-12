@@ -140,7 +140,7 @@ namespace visualizer
             bool m_suicide;
 			list<int> m_selectedUnitIDs;
             std::map<std::string, bool> m_renderTagState;
-
+			int m_rand[2]; // two random numbers
 
 			static const unsigned int GRID_OFFSET = 1;
 
