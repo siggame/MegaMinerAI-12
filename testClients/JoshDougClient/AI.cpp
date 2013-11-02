@@ -18,6 +18,7 @@ void AI::init()
 {
   srand(time(NULL));
   getSpawnTiles();
+  getPumpTiles();
 }
 
 //This function is called each time it is your turn.
@@ -51,6 +52,18 @@ void AI::getSpawnTiles()
         }
     }
     return;
+}
+
+void AI::getPumpTiles()
+{
+  spawnTiles.clear();
+  for(int i = 0; i < tiles.size(); i++)
+  {
+    if(tiles[i].pumpID() == -1)
+    {
+      pumpTiles.push_back(& tiles[i]);
+    }
+  }
 }
 
 void AI::spawnUnits()
