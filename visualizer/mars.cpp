@@ -465,7 +465,7 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 	return false;
 }
 
-void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& trailMap, Frame& turn)
+void Mars::RenderWorld(int state, Frame& turn)
 {
 	// todo: this could be moved elsewhere, it should be
 	static std::map<int,int> counter;
@@ -845,32 +845,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 
 	}
 
-	// todo: clean this up
-	for(auto iter = trail.begin(); iter != trail.end();)
-	{
-		ColorSprite::Fade fade = ColorSprite::None;
-		if(trailMap[iter->y][iter->x] == 0)
-		{
-			fade = ColorSprite::FadeOut;
-		}
-
-		// First Draw trail at iter->second
-		SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->x, iter->y), glm::vec2(1.0f, 1.0f), "trail", "footprints");
-		pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.3f),fade));
-		turn.addAnimatable(pTile);
-
-		// Then pop them if turnDiff > n
-		if(trailMap[iter->y][iter->x] == 0)
-		{
-			iter = trail.erase(iter);
-		}
-		else
-		{
-			--trailMap[iter->y][iter->x];
-			++iter;
-		}
-	}
-
 
 	while(!deathList.empty())
 	{
@@ -899,15 +873,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 			{
 				parser::move& move = (parser::move&)*animationIter;
 				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
-
-				if(trailMap[move.toY][move.toX] == 0)
-				{
-					//trail.push_back(glm::ivec2(move.fromX, move.fromY));
-					trail.push_back(glm::ivec2(move.toX, move.toY));
-				}
-
-				// todo: move the path length var into a const
-				trailMap[move.toY][move.toX] = 4;
 			}
 		}
 
@@ -925,12 +890,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		if(pUnit->m_Moves.empty())
 		{
 			pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter->x, unitIter->y), glm::vec2(unitIter->x, unitIter->y)));
-			if(trailMap[unitIter->y][unitIter->x] == 0)
-			{
-				trail.push_back(glm::ivec2(unitIter->x, unitIter->y));
-			}
-			trailMap[unitIter->y][unitIter->x] = 4;
-
 
 			if(state > 0 &&
 			   m_game->states[state - 1].units.find(unitIter->id) != m_game->states[state - 1].units.end() &&
@@ -989,21 +948,12 @@ void Mars::run()
 
 	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
 
-	std::deque<glm::ivec2> trail;
-
-	// todo: maybe flip this so that x is first, then y
-	std::vector<std::vector<int>> trailMap(m_game->mapHeight);
-	for(auto& idMapiter : trailMap)
-	{
-		idMapiter.resize(m_game->mapWidth,0);
-	}
-
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
 	{
 		Frame turn;  // The frame that will be drawn
 
-		RenderWorld(state, trail, trailMap, turn);
+		RenderWorld(state, turn);
 
 		if(state >= (int)(m_game->states.size() - 10))
 		{
