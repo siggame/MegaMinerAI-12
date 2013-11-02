@@ -39,13 +39,19 @@ class Player(object):
         inSpawnQueue += tospawn[0]
       #self.spawnQueue = []
 
-      # Calculate currentPlayer's net worth by adding value of owned fish and spawning fish to available spawn food
+      # Calculate currentPlayer's net worth by adding value of owned units and spawning units to available oxygen
       netWorth = unitWorth[self.id] + self.oxygen + inSpawnQueue
       # How much your net worth should be if you have not lost any units
       oxyYouShouldHave = self.maxOxygen
       # How much spawn food you get
       oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.oxygenRate)
       self.oxygen += oxyYouGet
+
+      #Make sure oxygen is never over the max oxygen.
+      if self.oxygen > self.maxOxygen:
+        self.oxygen = self.maxOxygen
+      elif self.oxygen < 0:
+        self.oxygen = 0
 
       #SPAWN UNITS
       for newUnitStats in self.spawnQueue:
@@ -379,8 +385,6 @@ class Tile(Mappable):
 
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
-    if player.oxygen < self.game.unitCost:
-      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, self.x, self.y)
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.totalUnits >= self.game.maxUnits:
@@ -390,6 +394,8 @@ class Tile(Mappable):
     unittype = self.game.typeToUnitType(type)
     if unittype is None:
       return 'Turn {}: You cannot spawn a unit with this type.'.format(self.game.turnNumber)
+    if player.oxygen < unittype.cost:
+      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, unittype.cost, self.x, self.y)
 
     player.oxygen -= unittype.cost
 

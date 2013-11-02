@@ -42,12 +42,12 @@ class Match(DefaultGameWorld):
     self.offensePower = self.offensePower
     self.defensePower = self.defensePower
     self.maxUnits = self.maxUnits
-    self.unitCost = self.unitCost
     self.playerID = -1
     self.gameNumber = id
     self.turnLimit = self.turnLimit
     self.maxSiege = self.maxSiege
     self.oxygenRate = self.oxygenRate
+    self.maxOxygen = self.maxOxygen
     self.depositionRate = self.depositionRate
 
     self.ice = []
@@ -63,7 +63,7 @@ class Match(DefaultGameWorld):
     if type == "player":
       self.players.append(connection)
       try:
-        #['id', 'playerName', 'time', 'waterStored', 'oxygen']
+        #['id', 'playerName', 'time', 'waterStored', 'oxygen', 'maxOxygen']
         startingResources = 1000
         self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources, self.maxOxygen])
       except TypeError:
