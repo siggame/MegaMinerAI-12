@@ -88,15 +88,10 @@ namespace visualizer
 
 				int mapWidth;
 				int mapHeight;
-				int maxHealth;
 				int trenchDamage;
 				int waterDamage;
 				int turnNumber;
-				int attackDamage;
-				int offensePower;
-				int defensePower;
 				int maxUnits;
-				int unitCost;
 				int playerID;
 				int gameNumber;
 				int maxSiege;

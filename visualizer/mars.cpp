@@ -278,7 +278,7 @@ void Mars::pruneSelection()
             // if it doesn't exist anymore, remove it from the selection.
             if(m_game->states[turn].units.find(*iter) == m_game->states[turn].units.end() &&
               (m_game->states[turn].tiles.find(*iter) == m_game->states[turn].tiles.end() ||
-              (m_game->states[turn].tiles.at(*iter)->isTrench == false &&
+			  (m_game->states[turn].tiles.at(*iter)->depth > 0 &&
                m_game->states[turn].tiles.at(*iter)->owner != 3 &&
                m_game->states[turn].tiles.at(*iter)->pumpID == -1)))
             {
@@ -422,11 +422,7 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 		if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
 		{
 			const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
-<<<<<<< HEAD
-			if((pTile->owner == 3) || (pTile->depth > 0))
-=======
 			if((pTile->owner == 3) || (pTile->waterAmount > 0))
->>>>>>> origin/master
 			{
 				return true;
 			}
@@ -1017,15 +1013,10 @@ void Mars::run()
 Mars::Game::Game(parser::Game* game) :
 	mapWidth(game->states[0].mapWidth),
 	mapHeight(game->states[0].mapHeight),
-	maxHealth(game->states[0].maxHealth),
 	trenchDamage(game->states[0].trenchDamage),
 	waterDamage(game->states[0].waterDamage),
 	turnNumber(game->states[0].turnNumber),
-	attackDamage(game->states[0].attackDamage),
-	offensePower(game->states[0].offensePower),
-	defensePower(game->states[0].defensePower),
 	maxUnits(game->states[0].maxUnits),
-	unitCost(game->states[0].unitCost),
 	playerID(game->states[0].playerID),
 	gameNumber(game->states[0].gameNumber),
 	maxSiege(game->states[0].maxSiege),
