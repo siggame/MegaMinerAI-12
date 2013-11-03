@@ -251,23 +251,32 @@ class Unit(Mappable):
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.fillPower <= 0:
       return 'Turn {}: Your unit {} cannot fill.'.format(self.game.turnNumber, self.id)
+    elif self.owner != 2:
+      return 'Turn {}: Your unit {} can only fill normal tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.hasFilled == 1:
       return 'Turn {}: Your unit {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
-    elif abs(self.x-x) + abs(self.y-y) != 1:
+    elif abs(self.x-x) + abs(self.y-y) > 1:
       return 'Turn {}: Your unit {} can only fill adjacent Tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.depth <= 0:
       return 'Turn {}: Your unit {} cannot fill something that is not a trench. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.waterAmount > 0:
-      return 'Turn {}: Your unit {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
     elif len(self.game.grid[x][y]) > 1 and self not in self.game.grid[x][y]:
-      return 'Turn {}: Your unit {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} cannot fill trenches with other units in them.'.format(self.game.turnNumber, self.id)
+    elif len(self.game.grid[x][y]) > 2:
+      return 'Turn {}: Your unit {} cannot fill trenches with other objects in them.'.format(self.game.turnNumber, self.id)
 
     # Decrease the trenches depth
     tile.depth -= self.fillPower
-    if tile.depth < 0:
+    if tile.depth <= 0:
+      tile.waterAmount = 0
       tile.depth = 0
+
+
     # Unit can no longer move
     self.movementLeft = 0
+
+    #reset deposition rate
+    tile.turnsUntilDeposition = self.game.depositionRate
+
     
     self.hasFilled = 1
     
@@ -284,17 +293,17 @@ class Unit(Mappable):
     elif self.digPower <= 0:
       return 'Turn {}: Your unit {} cannot dig.'.format(self.game.turnNumber, self.id)
     elif self.hasDug == 1:
-      return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) > 1:
-      return 'Turn {}: Your {} can only dig adjacent or same tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+      return 'Turn {}: Your unit {} can only dig adjacent or same tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.pumpID != -1:
-      return 'Turn {}: Your {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.owner == 3:
-      return 'Turn {}: Your {} can not dig trenches on ice tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.owner == 0 or tile.owner == 1:
-      return 'Turn {}: Your {} can not dig trenches on spawn tiles. ({},{}) digs ({},{})'.format(self.game.turn, self.id, self.x, self.y, x, y)
-    elif len(self.game.grid[x][y]) > 1:
-      return 'Turn {}: Your {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+      return 'Turn {}: Your unit {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.owner != 2:
+      return 'Turn {}: Your unit {} can only dig trenches on normal tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif len(self.game.grid[x][y]) > 1 and self not in self.game.grid[x][y]:
+        return 'Turn {}: Your unit {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif len(self.game.grid[x][y]) > 2:
+      return 'Turn {}: Your unit {} cannot dig under multiple objects. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     
     # Increase the depth of the trench
     tile.depth += self.digPower

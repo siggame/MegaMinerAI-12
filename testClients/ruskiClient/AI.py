@@ -30,7 +30,17 @@ class AI(BaseAI):
     return "password"
 
   def spawn_units(self):
-    types = [0,1,2]
+    heavynum = 0
+    for unit in self.cache.my_units.values():
+      if unit.type == self.TANK:
+        heavynum += 2
+
+    if heavynum < len(self.cache.my_pump_tiles.values())/2:
+      types = [self.SCOUT, self.TANK, self.WORKER]
+    else:
+      types = [self.SCOUT, self.WORKER]
+
+
     for tile in self.cache.my_pump_tiles.values():
       tile.spawn(random.choice(types))
     for tile in self.cache.my_spawn_tiles.values():
@@ -142,7 +152,16 @@ class AI(BaseAI):
       elif unit.type == self.WORKER:
         #friendly_pump = self.nearest_friendly_pump_tile(unit.x, unit.y)
         #ice_tile = self.nearest_ice_tile(unit.x, unit.y)
-        pass
+        true_offsets = [(1,0),(0,1),(-1,0),(0,-1)]
+        offsets = [(1,0),(0,1),(-1,0),(0,-1)]
+        while unit.movementLeft > 0 and len(offsets) > 0:
+          offset = random.choice(offsets)
+
+          if unit.move(unit.x + offset[0], unit.y + offset[1]) == True:
+            offsets = true_offsets
+          else:
+            offsets.remove(offset)
+        unit.dig(game_utils.get_tile(self, unit.x, unit.y))
 
 
     return 1
