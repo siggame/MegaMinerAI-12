@@ -15,8 +15,9 @@ class Player(object):
     self.oxygen = oxygen
     self.maxOxygen = maxOxygen
     self.updatedAt = game.turnNumber
-    self.spawnQueue = []
 
+    self.spawnQueue = []
+    self.spawnCostQueue = []
     self.totalUnits = 0
 
   def toList(self):
@@ -31,19 +32,10 @@ class Player(object):
       unitWorth = [0, 0]
       for unit in self.game.objects.units:
         unitWorth[unit.owner] += self.game.unitTypesDict[unit.type].cost
-
-      # Get value of fish in spawnQueue
-      #inSpawnQueue = sum(self.spawnQueue)
-      inSpawnQueue = 0
-      for tospawn in self.spawnQueue:
-        inSpawnQueue += tospawn[0]
-      #self.spawnQueue = []
-
-      # Calculate currentPlayer's net worth by adding value of owned units and spawning units to available oxygen
+      inSpawnQueue = sum(self.spawnCostQueue)
+      self.spawnCostQueue = []
       netWorth = unitWorth[self.id] + self.oxygen + inSpawnQueue
-      # How much your net worth should be if you have not lost any units
       oxyYouShouldHave = self.maxOxygen
-      # How much spawn food you get
       oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.oxygenRate)
       self.oxygen += oxyYouGet
 
@@ -55,7 +47,7 @@ class Player(object):
 
       #SPAWN UNITS
       for newUnitStats in self.spawnQueue:
-        newUnit = self.game.addObject(Unit, newUnitStats[1:])
+        newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
       self.spawnQueue = []
 
@@ -161,7 +153,7 @@ class Unit(Mappable):
     self.x = x
     self.y = y
     self.owner = owner
-    self.type = type # 0 - Digger , 1 - Filler
+    self.type = type
     self.hasAttacked = hasAttacked
     self.hasDug = hasDug
     self.hasFilled = hasFilled
@@ -402,8 +394,9 @@ class Tile(Mappable):
     player.oxygen -= unittype.cost
 
     #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower', 'attackPower']
-    newUnitStats = [unittype.cost, self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower, unittype.attackPower]
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower, unittype.attackPower]
     player.spawnQueue.append(newUnitStats)
+    player.spawnCostQueue.append(unittype.cost)
     player.totalUnits += 1
 
     #TODO: Add spawning animation
