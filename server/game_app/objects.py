@@ -376,8 +376,10 @@ class Tile(Mappable):
       if self.turnsUntilDeposit <= 0:
         self.turnsUntilDeposit = self.game.depositionRate
         self.depth -= 1
-    else:
-      self.turnsUntilDeposit -= 1
+        if self.depth <= 0 and self.waterAmount > 0:
+          self.waterAmount = 0
+      else:
+        self.turnsUntilDeposit -= 1
     return
 
   def spawn(self, type):
