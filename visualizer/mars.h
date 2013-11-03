@@ -147,7 +147,7 @@ namespace visualizer
             void UpdateWorld(int state);
             void RenderHUD();
 
-			void RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& turnMap, Frame& turn);
+			void RenderWorld(int state, Frame& turn);
 
 			void ProccessInput();
 

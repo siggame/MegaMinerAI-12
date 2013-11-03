@@ -82,20 +82,40 @@ namespace visualizer
         public ColorSprite
 	{
 	public:
-		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, bool flipped = false, Fade f = None) : ColorSprite(c,f),
-			m_Sprite(sprite),
-			m_Flipped(flipped)
-			{}
+		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, Fade f = None) : ColorSprite(c,f), m_Sprite(sprite) {}
 
 		void animate( const float& t, AnimData* d, IGame* game );
 
 	protected:
 
 		glm::vec2 m_pos;
+		MoveableSprite * m_Sprite;
+
+	};
+
+	class DrawFlippedSmoothMoveSprite : public DrawSmoothMoveSprite
+	{
+	public:
+		DrawFlippedSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, bool flipped, Fade f = None) : DrawSmoothMoveSprite(sprite,c,f), m_Flipped(flipped) {}
+
+		void animate( const float& t, AnimData* d, IGame* game );
 
 	private:
-		MoveableSprite * m_Sprite;
+
 		bool m_Flipped;
+	};
+
+	class DrawRotatedSmoothMoveSprite : public DrawSmoothMoveSprite
+	{
+	public:
+		DrawRotatedSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, float angle, Fade f = None) :
+			DrawSmoothMoveSprite(sprite,c,f), m_angle(angle)  {}
+
+		void animate( const float& t, AnimData* d, IGame* game );
+
+	private:
+
+		float m_angle;
 	};
 
 	class DrawProgressBar : public Anim
@@ -118,12 +138,12 @@ namespace visualizer
 
 	};
 
-	class DrawSmoothSpriteProgressBar : public DrawSmoothMoveSprite
+	class DrawSmoothSpriteProgressBar : public DrawFlippedSmoothMoveSprite
 	{
 	public:
 
 		DrawSmoothSpriteProgressBar(MoveableSprite * sprite, DrawProgressBar* pBar, const glm::vec4& c, bool flipped = false, Fade f = None) :
-			DrawSmoothMoveSprite(sprite,c,flipped,f), m_pProgressBar(pBar)  {}
+			DrawFlippedSmoothMoveSprite(sprite,c,flipped,f), m_pProgressBar(pBar)  {}
 
 
 		void animate( const float& t, AnimData* d, IGame* game );
