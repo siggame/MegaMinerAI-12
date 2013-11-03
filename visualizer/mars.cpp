@@ -828,7 +828,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 				waterAmountString << tileIter->waterAmount;
 				DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
 														glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
-														glm::vec4(0.3f,0.0f,1.0f,1.0f),
+														glm::vec4(0.0f,0.0f,0.0f,1.0f),
 														3.0f);
 
 				pText->addKeyFrame(textBox);
@@ -877,25 +877,27 @@ void Mars::RenderWorld(int state, Frame& turn)
 			}
 			else if(animationIter->type == parser::ATTACK)
 			{
-				parser::attack& attack = (parser::attack&)*animationIter;
-
-				auto attackerIter = m_game->states[state].units.find(attack.actingID);
-				auto targetIter = m_game->states[state].units.find(attack.targetID);
-
-				if(attackerIter != m_game->states[state].units.end() && targetIter != m_game->states[state].units.end())
+				if(state != 0)
 				{
-					glm::vec2 from(attackerIter->second->x,attackerIter->second->y);
-					glm::vec2 to(targetIter->second->x,targetIter->second->y);
-					glm::vec2 diff = to - from;
-					float angle = glm::degrees(std::atan2(diff.y,diff.x));
+					parser::attack& attack = (parser::attack&)*animationIter;
+					auto attackerIter = m_game->states[state - 1].units.find(attack.actingID);
+					auto targetIter = m_game->states[state].units.find(attack.targetID);
 
-					SmartPointer<MoveableSprite> pLaser = new MoveableSprite("laser");
-					pLaser->m_Moves.push_back(MoveableSprite::Move(to,from));
-					pLaser->addKeyFrame(new DrawRotatedSmoothMoveSprite(pLaser, glm::vec4(1.0f,1.0f,1.0f,0.7f),angle));
-					//turn.addAnimatable(pLaser);
+					if(attackerIter != m_game->states[state].units.end() && targetIter != m_game->states[state].units.end())
+					{
+						glm::vec2 from(attackerIter->second->x,attackerIter->second->y);
+						glm::vec2 to(targetIter->second->x,targetIter->second->y);
+						glm::vec2 diff = to - from;
+						float angle = glm::degrees(std::atan2(diff.y,diff.x));
 
-					animList.push(pLaser);
+						SmartPointer<MoveableSprite> pLaser = new MoveableSprite("laser");
+						pLaser->m_Moves.push_back(MoveableSprite::Move(to,from));
+						pLaser->addKeyFrame(new DrawRotatedSmoothMoveSprite(pLaser, glm::vec4(1.0f,1.0f,1.0f,0.7f),angle));
+						//turn.addAnimatable(pLaser);
 
+						animList.push(pLaser);
+
+					}
 				}
 			}
 		}
