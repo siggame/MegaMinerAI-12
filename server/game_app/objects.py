@@ -225,21 +225,14 @@ class Unit(Mappable):
     self.y = y
     self.movementLeft -= 1
     self.game.grid[self.x][self.y].append(self)
-    
-    # Apply damage for moving into a trench
+
     tile = self.game.getTile(x, y)
-    if tile.depth > 0:
-      # Damage for moving through water
-      if tile.waterAmount > 0:
-        self.healthLeft -= self.game.waterDamage + self.game.trenchDamage
-      # Damage for moving into a trench
-      elif not prevTile.depth > 0:
-        self.healthLeft -= self.game.trenchDamage
-      self.handleDeath(self)
-    # Damage for coming out of a trench
-    elif prevTile.depth > 0:
+
+    if tile.depth > 0 ^ prevTile.depth > 0:
       self.healthLeft -= self.game.trenchDamage
-      self.handleDeath(self)
+    if tile.waterAmount > 0:
+      self.healthLeft -= self.game.waterDamage
+    self.handleDeath(self)
 
     return True
 
@@ -251,7 +244,7 @@ class Unit(Mappable):
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.fillPower <= 0:
       return 'Turn {}: Your unit {} cannot fill.'.format(self.game.turnNumber, self.id)
-    elif self.owner != 2:
+    elif tile.owner != 2:
       return 'Turn {}: Your unit {} can only fill normal tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.hasFilled == 1:
       return 'Turn {}: Your unit {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
@@ -275,7 +268,7 @@ class Unit(Mappable):
     self.movementLeft = 0
 
     #reset deposition rate
-    tile.turnsUntilDeposition = self.game.depositionRate
+    tile.turnsUntilDeposit = self.game.depositionRate
 
     
     self.hasFilled = 1
@@ -307,7 +300,7 @@ class Unit(Mappable):
     
     # Increase the depth of the trench
     tile.depth += self.digPower
-    tile.turnsUntilDeposition = self.game.depositionRate
+    tile.turnsUntilDeposit = self.game.depositionRate
 
     self.movementLeft = 0
     

@@ -301,22 +301,16 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   
   // Decrement movement
   object->movementLeft -= 1;
-  
-  // Apply damage for moving in trenches
-  if (tile->depth > 0)
-  {
-    // Moving through water
-    if (tile->waterAmount > 0)
-      object->healthLeft -= getWaterDamage(c);
-    // Into trench
-    else if (prevTile->depth == 0)
-      object->healthLeft -= getTrenchDamage(c);
-  }
-  // Moving out of trench
-  else if (prevTile->depth > 0)
+
+
+  if( (tile->depth > 0) ^ (prevTile->depth > 0))
     object->healthLeft -= getTrenchDamage(c);
-  
-  // Don't do any client-side object deletion?
+  if( tile->waterAmount > 0 )
+    object->healthLeft -= getWaterDamage(c);
+
+  //Make sure not less than 0
+  if(object->healthLeft < 0)
+    object->healthLeft = 0;
   
   return 1;
 }
@@ -339,7 +333,7 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   if (object->owner != getPlayerID(c))
     return 0;
   // Only workers can fill
-  if (object->type != 0)
+  if (object->fillPower <= 0)
     return 0;
   // Can only fill once per turn
   if (object->hasFilled == 1)
@@ -348,11 +342,15 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   if (abs(object->x - x) + abs(object->y - y) > 1)
     return 0;
   // Must fill in trenches
-  if (tile->depth == 0)
+  if (tile->depth <= 0)
+    return 0;
+  // Only dig on normal tiles
+  if (tile->owner != 2)
     return 0;
   // Can't fill in a trench with a unit on it
   for (int i = 0; i < getUnitCount(c); ++i)
   {
+    //Look for units that are not itself, and have same x, and y
     if (getUnit(c, i)->id != object->id && getUnit(c, i)->x == x && getUnit(c, i)->y == y)
       return 0;
   }
@@ -365,6 +363,9 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   object->movementLeft = 0;
   
   object->hasFilled = 1;
+
+  //Reset deposition
+  tile->turnsUntilDeposit = getDepositionRate(c);
   
   return 1;
 }
@@ -387,7 +388,7 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   if (object->owner != getPlayerID(c))
     return 0;
   // Only diggers can dig
-  if (object->type != 0)
+  if (object->digPower <= 0)
     return 0;
   // Can only dig once per turn
   if (object->hasDug == 1)
@@ -395,23 +396,20 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   // Can only dig adjacent tiles and the tile underneath the digger
   if (abs(object->x - x) + abs(object->y - y) > 1)
     return 0;
-  // Can't dig a trench on a trench
-  if (tile->depth >= 1)
-    return 0;
-  // Can't dig on pumps
-  // Can't dig on ice tiles
-  // Can't dig on spawn tiles
+  // Can only dig on normal tiles
   if (tile->owner != 2)
     return 0;
   // Can't dig a trench under another unit
   for (int i = 0; i < getUnitCount(c); ++i)
   {
+    //Check for units that are not itself, and have same x and y
     if (getUnit(c, i)->id != object->id && getUnit(c, i)->x == x && getUnit(c, i)->y == y)
       return 0;
   }
   
   // Increase the tiles depth
   tile->depth += object->digPower;
+  tile->turnsUntilDeposit = getDepositionRate(c);
   // Unit can no longer move
   object->movementLeft = 0;
   
@@ -453,6 +451,8 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   object->movementLeft = 0;
   
   target->healthLeft -= object->attackPower;
+  if(target->healthLeft < 0)
+    target->healthLeft = 0;
   
   return 1;
 }
