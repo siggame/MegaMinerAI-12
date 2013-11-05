@@ -900,9 +900,24 @@ void Mars::RenderWorld(int state, Frame& turn)
 					}
 				}
 			}
+			else if(animationIter->type == parser::DEATH)
+			{
+				glm::vec2 deathPos(unitIter->x, unitIter->y);
+
+				if(!pUnit->m_Moves.empty())
+				{
+					deathPos = pUnit->m_Moves.back().to;
+				}
+
+				SmartPointer<AnimatedSprite> pDeathAnimation = new AnimatedSprite(deathPos, glm::vec2(1.0f), "death", 7,true);
+				pDeathAnimation->addKeyFrame(new DrawAnimatedSprite(pDeathAnimation,glm::vec4(GetTeamColor(unitIter->owner),1.0f)));
+
+				deathList.push(pDeathAnimation);
+				//animList.push(pDeathAnimation);
+			}
 		}
 
-		if((state + 1) < (int)m_game->states.size())
+		/*if((state + 1) < (int)m_game->states.size())
 		{
 			if(m_game->states[state + 1].units.find(unitIter->id) == m_game->states[state + 1].units.end())
 			{
@@ -911,7 +926,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				deathList.push(pDeathAnimation);
 			}
-		}
+		}*/
 
 		if(pUnit->m_Moves.empty())
 		{
@@ -1067,7 +1082,17 @@ Mars::Game::Game(parser::Game* game) :
 			states[i].players[player.second.id] = SmartPointer<parser::Player>(new parser::Player(player.second));
 
 		for(auto& unit : game->states[i].units)
+		{
+			if((i + 1) < (int)game->states.size())
+			{
+				if(game->states[i + 1].units.find(unit.second.id) == game->states[i + 1].units.end())
+				{
+					states[i + 1].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i + 1], unit.second));
+				}
+			}
+
 			states[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
+		}
 
 		// set all pointer this frame to the one before
 		for(auto& tileBefore : states[i-1].tiles)
