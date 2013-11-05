@@ -123,18 +123,28 @@ namespace visualizer
 
 	};
 
-	void DrawSplashScreen::animate(const float &, AnimData*, IGame *game)
+	void DrawSplashScreen::animate(const float &t, AnimData*, IGame *game)
 	{
-		game->renderer->setColor(Color(1.0f,1.0f,1.0f,0.5f));
+		if(game->options->getNumber("Enable Victory Screen") > 0.0f)
+		{
+			//game->timeManager->setSpeed(1 - t);
 
-		game->renderer->drawQuad(0.0f,0.0f,m_SplashScreen->width,m_SplashScreen->height);
+			game->renderer->setColor(Color(1.0f,1.0f,1.0f,0.8f * t));
 
-		game->renderer->setColor(Color(0.2f,1.0f,1.0f,1.0f));
-		game->renderer->drawText(m_SplashScreen->width / 2.0f,
-								 m_SplashScreen->height / 2.0f,
-								 "Roboto",
-								 m_SplashScreen->winReason,8.0f,
-								 IRenderer::Center);
+			game->renderer->drawQuad(0.0f,0.0f,m_SplashScreen->width,m_SplashScreen->height);
+
+			game->renderer->setColor(Color(0.2f,1.0f,1.0f,1.0f));
+			game->renderer->drawText(m_SplashScreen->width / 2.0f,
+									 m_SplashScreen->height / 2.0f,
+									 "Roboto",
+									 m_SplashScreen->winReason,8.0f,
+									 IRenderer::Center);
+
+			/*if(game->timeManager->getSpeed() >= 0.0f && game->timeManager->getSpeed() <= 0.01f )
+			{
+				game->timeManager->setSpeed(1.0f);
+			}*/
+		}
 	}
 
 }

@@ -954,7 +954,7 @@ void Mars::run()
 
 		RenderWorld(state, turn);
 
-		if(state >= (int)(m_game->states.size() - 10))
+		if(state >= (int)(m_game->states.size() - 1))
 		{
 			turn.addAnimatable(splashScreen);
 		}
