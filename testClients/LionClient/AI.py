@@ -34,10 +34,11 @@ class AI(BaseAI):
         unitAt [(unit.x, unit.y)] = unit
     for unit in self.units:
         if unit.owner == self.playerID:
-            enemy = min(enemyUnits, key = lambda lionsTarget: abs(lionsTarget.x - unit.x) + abs(lionsTarget.y - unit.y))
-            if taxiDis(enemy.x, enemy.y, unit.x , unit.y) <= unit.range:
-                unit.attack(enemy)
-                print ("Lion has mauled the enemy aka trey")
+            if enemyUnits:
+                enemy = min(enemyUnits, key = lambda lionsTarget: abs(lionsTarget.x - unit.x) + abs(lionsTarget.y - unit.y))
+                if taxiDis(enemy.x, enemy.y, unit.x , unit.y) <= unit.range:
+                    unit.attack(enemy)
+                    print ("Lion has mauled the enemy aka trey")
     for tile in myPumpStation:
         if (tile.x, tile.y) not in unitAt:
             tile.spawn (2)
