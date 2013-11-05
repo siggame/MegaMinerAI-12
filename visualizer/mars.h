@@ -5,6 +5,7 @@
 #include <QThread>
 #include "igame.h"
 #include "animsequence.h"
+#include "animations.h"
 #include <map>
 #include <string>
 #include <list>

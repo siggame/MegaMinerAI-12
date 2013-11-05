@@ -15,29 +15,6 @@
 namespace visualizer
 {
 
-void RenderProgressBar(const IRenderer& renderer,
-						   float xPos, float yPos,
-						   float width, float height,
-						   float percent, const Color& col, bool bDrawText)
-{
-	// Render the health bars
-	renderer.setColor(Color(0.4f,0.4f,0.4f,1.0f));
-	renderer.drawQuad(xPos + width,yPos, -(1.0f - percent) * width, height); // height
-
-	renderer.setColor(col);
-	renderer.drawQuad(xPos,yPos, percent * width, height);
-
-	if(bDrawText)
-	{
-		ostringstream stream;
-		stream << fixed << setprecision(2) << percent * 100 << '%';
-
-		float middle = (xPos + (width / 2.0f));
-		renderer.setColor(Color(1.0f,1.0f,1.0f,1.0f));
-		renderer.drawText(middle,yPos - 0.1f,"Roboto",stream.str(),5.0f*height,IRenderer::Center);
-	}
-}
-
 Mars::Mars()
 {
 	m_game = 0;
@@ -407,7 +384,7 @@ void Mars::RenderHUD()
 
 	renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2.0f), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
 
-	RenderProgressBar(*renderer,0.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),true);
+	RenderProgressBar(*renderer,0.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
 
 	// Render player #1
 	oxygenLevel = m_game->states[turn].players[1]->oxygen / (float)m_game->states[turn].players[1]->maxOxygen;
@@ -421,7 +398,7 @@ void Mars::RenderHUD()
 
 	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
 
-	RenderProgressBar(*renderer,36.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),true);
+	RenderProgressBar(*renderer,36.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
 
 	// Render the divider between the players progress bar
 	renderer->setColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
