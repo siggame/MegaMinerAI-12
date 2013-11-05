@@ -27,10 +27,17 @@ class AI(BaseAI):
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
     self.history.save_snapshot()
-    myPumpStation = [tile for tile in self.tiles if tile.owner==self.playerID and tile.pumpID != -1]
+    myPumpStation = [tile for tile in self.tiles if tile.owner == self.playerID and tile.pumpID != -1]
+    enemyUnits = [unit for unit in self.units if unit.owner != self.playerID]
     unitAt = dict()
     for unit in self.units:
         unitAt [(unit.x, unit.y)] = unit
+    for unit in self.units:
+        if unit.owner == self.playerID:
+            enemy = min(enemyUnits, key = lambda lionsTarget: abs(lionsTarget.x - unit.x) + abs(lionsTarget.y - unit.y))
+            if taxiDis(enemy.x, enemy.y, unit.x , unit.y) <= unit.range:
+                unit.attack(enemy)
+                print ("Lion has mauled the enemy aka trey")
     for tile in myPumpStation:
         if (tile.x, tile.y) not in unitAt:
             tile.spawn (2)
