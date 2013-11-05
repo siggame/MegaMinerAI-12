@@ -18,9 +18,11 @@ public:
   virtual bool run();
   virtual void end();
   std::vector<Tile*> spawnTiles;
+  std::vector<Tile*> pumpTiles;
   Tile* getTile(const int x, const int y);
   
   void getSpawnTiles();
+  void getPumpTiles();
   void spawnUnits();
   void moveUnits();
 };
