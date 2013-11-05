@@ -280,7 +280,7 @@ list<IGUI::DebugOption> Mars::getDebugOptions()
 {
 	return std::list<IGUI::DebugOption>({{"Units Selectable", true},
 										 {"Tiles Selectable", true},
-										 {"Render Footprints", true}});
+										});
 }
 
 std::map<std::string, bool> Mars::getRenderTagState()
@@ -293,7 +293,6 @@ void Mars::pruneSelection()
 	int turn = timeManager->getTurn();
 	bool changed = false;
 	int focus = gui->getCurrentUnitFocus();
-
 
 	if(turn < m_game->states.size())
 	{
@@ -327,12 +326,7 @@ void Mars::pruneSelection()
 
 void Mars::optionStateChanged()
 {
-	int footprints = gui->getDebugOptionState("Render Footprints");
-
-	std::cout << "options state changed\n";
-
-	if(footprints > -1)
-		m_renderTagState["footprints"] = footprints;
+	cout << "options state changed" << endl;
 }
 
 void Mars::loadGamelog( std::string gamelog )
@@ -893,7 +887,6 @@ void Mars::RenderWorld(int state, Frame& turn)
 						SmartPointer<MoveableSprite> pLaser = new MoveableSprite("laser");
 						pLaser->m_Moves.push_back(MoveableSprite::Move(to,from));
 						pLaser->addKeyFrame(new DrawRotatedSmoothMoveSprite(pLaser, glm::vec4(1.0f,1.0f,1.0f,0.7f),angle));
-						//turn.addAnimatable(pLaser);
 
 						animList.push(pLaser);
 
@@ -913,20 +906,8 @@ void Mars::RenderWorld(int state, Frame& turn)
 				pDeathAnimation->addKeyFrame(new DrawAnimatedSprite(pDeathAnimation,glm::vec4(GetTeamColor(unitIter->owner),1.0f)));
 
 				deathList.push(pDeathAnimation);
-				//animList.push(pDeathAnimation);
 			}
 		}
-
-		/*if((state + 1) < (int)m_game->states.size())
-		{
-			if(m_game->states[state + 1].units.find(unitIter->id) == m_game->states[state + 1].units.end())
-			{
-				SmartPointer<AnimatedSprite> pDeathAnimation = new AnimatedSprite(glm::vec2(unitIter->x, unitIter->y), glm::vec2(1.0f), "death", 7,true);
-				pDeathAnimation->addKeyFrame(new DrawAnimatedSprite(pDeathAnimation,glm::vec4(GetTeamColor(unitIter->owner),1.0f)));
-
-				deathList.push(pDeathAnimation);
-			}
-		}*/
 
 		if(pUnit->m_Moves.empty())
 		{
