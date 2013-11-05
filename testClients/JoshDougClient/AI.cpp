@@ -1,5 +1,7 @@
 #include "AI.h"
 #include "util.h"
+#include <iostream>
+using namespace std;
 
 AI::AI(Connection* conn) : BaseAI(conn) {}
 
@@ -56,7 +58,7 @@ void AI::getSpawnTiles()
 
 void AI::getPumpTiles()
 {
-  spawnTiles.clear();
+  pumpTiles.clear();
   for(int i = 0; i < tiles.size(); i++)
   {
     if(tiles[i].pumpID() == -1)
@@ -70,7 +72,7 @@ void AI::spawnUnits()
 {
   for(int i = 0; i < spawnTiles.size(); i++)
     {
-        spawnTiles[i]->spawn(rand()%2);
+        spawnTiles[i]->spawn(rand()%3);
     }
   return;
 }
@@ -79,14 +81,18 @@ void AI::moveUnits()
 {
   int xDir[] = {0,0,-1,1};  //up,down,left,right
   int yDir[] = {-1,1,0,0};
+  int newX, newY;
   int randomDir;
   for (int i = 0; i < units.size(); i++)
   {
     if (units[i].owner() == playerID() )
     {
       randomDir=rand()%4;
-      units[i].move(units[i].x()+xDir[randomDir], units[i].y()+ yDir[randomDir]);
-      
+      int newX=units[i].x()+xDir[randomDir];
+      int newY=units[i].y()+ yDir[randomDir];
+      Tile* moveTile = getTile(newX, newY);
+      if(moveTile != NULL && (moveTile->waterAmount()==0))
+        units[i].move(newX, newY);
       randomDir = rand()%4;
       int digfillx = units[i].x()+xDir[randomDir];
       int digfilly = units[i].y()+yDir[randomDir];
