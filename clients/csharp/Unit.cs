@@ -120,13 +120,46 @@ public class Unit: Mappable
     }
   }
 
-  ///The current amount health this unit has remaining.
-  public int CurHealth
+  ///Whether current unit has attacked or not.
+  public int HasAttacked
   {
     get
     {
       validify();
-      int value = Client.unitGetCurHealth(ptr);
+      int value = Client.unitGetHasAttacked(ptr);
+      return value;
+    }
+  }
+
+  ///Whether the current unit has dug or not.
+  public int HasDug
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetHasDug(ptr);
+      return value;
+    }
+  }
+
+  ///Whether the current unit has filled or not.
+  public int HasFilled
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetHasFilled(ptr);
+      return value;
+    }
+  }
+
+  ///The current amount health this unit has remaining.
+  public int HealthLeft
+  {
+    get
+    {
+      validify();
+      int value = Client.unitGetHealthLeft(ptr);
       return value;
     }
   }
@@ -143,12 +176,12 @@ public class Unit: Mappable
   }
 
   ///The number of moves this unit has remaining.
-  public int CurMovement
+  public int MovementLeft
   {
     get
     {
       validify();
-      int value = Client.unitGetCurMovement(ptr);
+      int value = Client.unitGetMovementLeft(ptr);
       return value;
     }
   }

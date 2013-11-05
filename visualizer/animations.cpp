@@ -3,16 +3,79 @@
 
 namespace visualizer
 {
-  void StartAnim::animate( const float& /* t */, AnimData * /* d */, IGame* /*game*/ )
-  {
-  }
+	void ColorSprite::animate(const float &t, AnimData*, IGame *game)
+    {
+		float alpha = m_color.a;
+		if(m_fade != None)
+		{
+			alpha *= t;
 
-  void DrawSomething::animate( const float& /*t*/, AnimData * /*d*/, IGame* game )
-  {
-    // Set the color to red
-    game->renderer->setColor( Color( 1, 0, 0, 1 ) );
-    // Draw a 2x2 rectangle at (1,1), with the top left corner of the screen being the origin 
-    game->renderer->drawQuad( 1, 1, 2, 2 );
-  }
+			if(m_fade == FadeOut)
+			{
+				alpha = m_color.a - alpha;
+			}
+		}
+
+		game->renderer->setColor( Color(m_color.r, m_color.g, m_color.b, alpha) );
+    }
+
+	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)
+	{
+        ColorSprite::animate(t,d,game);
+		game->renderer->drawTexturedQuad(m_sprite->pos.x, m_sprite->pos.y, m_sprite->scale.x, m_sprite->scale.y,m_sprite->m_sprite);
+	}
+
+	void DrawRotatedSprite::animate(const float &t, AnimData *d, IGame *game)
+	{
+        ColorSprite::animate(t,d,game);
+        game->renderer->drawRotatedTexturedQuad(m_sprite->pos.x, m_sprite->pos.y,
+                  m_sprite->scale.x, m_sprite->scale.y, m_rot, m_sprite->m_sprite);
+	}
+
+	void DrawSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
+	{
+		unsigned int index = (unsigned int)(m_Sprite->m_Moves.size() * t);
+		float subT = m_Sprite->m_Moves.size() * t - index;
+		MoveableSprite::Move& thisMove = m_Sprite->m_Moves[index];
+
+
+		glm::vec2 diff = thisMove.to - thisMove.from;
+		glm::vec2 pos = thisMove.from + diff * subT;
+
+        ColorSprite::animate(t, d, game);
+		game->renderer->drawTexturedQuad(pos.x, pos.y, 1.0f, 1.0f,
+										 m_Sprite->m_SpriteName, m_Flipped);
+
+	}
+
+    void DrawAnimatedSprite::animate(const float &t, AnimData*d, IGame* game)
+    {
+        ColorSprite::animate(t, d, game);
+
+        float animTime = m_Sprite->m_SingleFrame ? t : 1.0f;
+        game->renderer->drawAnimQuad( m_Sprite->pos.x, m_Sprite->pos.y, m_Sprite->scale.x, m_Sprite->scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * animTime));
+    }
+
+	void DrawTextBox::animate(const float &, AnimData*, IGame* game)
+	{
+        game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
+
+        game->renderer->drawText(m_Pos.x, m_Pos.y, "Roboto", m_Text, m_Size, m_Alignment);
+
+	};
+
+	void DrawSplashScreen::animate(const float &, AnimData*, IGame *game)
+	{
+		game->renderer->setColor(Color(1.0f,1.0f,1.0f,0.5f));
+
+		game->renderer->drawQuad(0.0f,0.0f,m_SplashScreen->width,m_SplashScreen->height);
+
+		game->renderer->setColor(Color(0.2f,1.0f,1.0f,1.0f));
+		game->renderer->drawText(m_SplashScreen->width / 2.0f,
+								 m_SplashScreen->height / 2.0f,
+								 "Roboto",
+								 m_SplashScreen->winReason,8.0f,
+								 IRenderer::Center);
+	}
 
 }

@@ -10,6 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
+#include <cmath>
 
 #include "game.h"
 #include "network.h"
@@ -54,25 +55,31 @@ DLLEXPORT Connection* createConnection()
   pthread_mutex_init(&c->mutex, NULL);
   #endif
 
+  c->mapWidth = 0;
+  c->mapHeight = 0;
   c->maxHealth = 0;
   c->trenchDamage = 0;
   c->waterDamage = 0;
   c->turnNumber = 0;
   c->attackDamage = 0;
-  c->offenseCount = 0;
-  c->defenseCount = 0;
+  c->offensePower = 0;
+  c->defensePower = 0;
   c->maxUnits = 0;
   c->unitCost = 0;
-  c->Mappables = NULL;
-  c->MappableCount = 0;
-  c->Units = NULL;
-  c->UnitCount = 0;
+  c->playerID = 0;
+  c->gameNumber = 0;
+  c->maxSiege = 0;
+  c->oxygenRate = 0;
   c->Players = NULL;
   c->PlayerCount = 0;
-  c->Tiles = NULL;
-  c->TileCount = 0;
+  c->Mappables = NULL;
+  c->MappableCount = 0;
   c->PumpStations = NULL;
   c->PumpStationCount = 0;
+  c->Units = NULL;
+  c->UnitCount = 0;
+  c->Tiles = NULL;
+  c->TileCount = 0;
   return c;
 }
 
@@ -81,20 +88,6 @@ DLLEXPORT void destroyConnection(Connection* c)
   #ifdef ENABLE_THREADS
   pthread_mutex_destroy(&c->mutex);
   #endif
-  if(c->Mappables)
-  {
-    for(int i = 0; i < c->MappableCount; i++)
-    {
-    }
-    delete[] c->Mappables;
-  }
-  if(c->Units)
-  {
-    for(int i = 0; i < c->UnitCount; i++)
-    {
-    }
-    delete[] c->Units;
-  }
   if(c->Players)
   {
     for(int i = 0; i < c->PlayerCount; i++)
@@ -103,12 +96,12 @@ DLLEXPORT void destroyConnection(Connection* c)
     }
     delete[] c->Players;
   }
-  if(c->Tiles)
+  if(c->Mappables)
   {
-    for(int i = 0; i < c->TileCount; i++)
+    for(int i = 0; i < c->MappableCount; i++)
     {
     }
-    delete[] c->Tiles;
+    delete[] c->Mappables;
   }
   if(c->PumpStations)
   {
@@ -116,6 +109,20 @@ DLLEXPORT void destroyConnection(Connection* c)
     {
     }
     delete[] c->PumpStations;
+  }
+  if(c->Units)
+  {
+    for(int i = 0; i < c->UnitCount; i++)
+    {
+    }
+    delete[] c->Units;
+  }
+  if(c->Tiles)
+  {
+    for(int i = 0; i < c->TileCount; i++)
+    {
+    }
+    delete[] c->Tiles;
   }
   delete c;
 }
@@ -224,58 +231,7 @@ DLLEXPORT void getStatus(Connection* c)
   UNLOCK( &c->mutex );
 }
 
-
-
-DLLEXPORT int unitMove(_Unit* object, int x, int y)
-{
-  stringstream expr;
-  expr << "(game-move " << object->id
-       << " " << x
-       << " " << y
-       << ")";
-  LOCK( &object->_c->mutex);
-  send_string(object->_c->socket, expr.str().c_str());
-  UNLOCK( &object->_c->mutex);
-  return 1;
-}
-
-DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
-{
-  stringstream expr;
-  expr << "(game-fill " << object->id
-      << " " << tile->id
-       << ")";
-  LOCK( &object->_c->mutex);
-  send_string(object->_c->socket, expr.str().c_str());
-  UNLOCK( &object->_c->mutex);
-  return 1;
-}
-
-DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
-{
-  stringstream expr;
-  expr << "(game-dig " << object->id
-      << " " << tile->id
-       << ")";
-  LOCK( &object->_c->mutex);
-  send_string(object->_c->socket, expr.str().c_str());
-  UNLOCK( &object->_c->mutex);
-  return 1;
-}
-
-DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
-{
-  stringstream expr;
-  expr << "(game-attack " << object->id
-      << " " << target->id
-       << ")";
-  LOCK( &object->_c->mutex);
-  send_string(object->_c->socket, expr.str().c_str());
-  UNLOCK( &object->_c->mutex);
-  return 1;
-}
-
-
+//#TODO: Are we going to do something about playerTalk?
 DLLEXPORT int playerTalk(_Player* object, char* message)
 {
   stringstream expr;
@@ -289,6 +245,212 @@ DLLEXPORT int playerTalk(_Player* object, char* message)
 }
 
 
+
+
+DLLEXPORT int unitMove(_Unit* object, int x, int y)
+{
+  stringstream expr;
+  expr << "(game-move " << object->id
+       << " " << x
+       << " " << y
+       << ")";
+  LOCK( &object->_c->mutex);
+  send_string(object->_c->socket, expr.str().c_str());
+  UNLOCK( &object->_c->mutex);
+ 
+  Connection* c = object->_c;
+ 
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Must have moves left
+  if (object->movementLeft <= 0)
+    return 0;
+  // Cannot move outside map
+  if (0 < x || x >= getMapWidth(c) || 0 < y || y >= getMapHeight(c))
+    return 0;
+  
+  // Get the tile we're trying to get to
+  _Tile* tile = getTile(c, x * getMapHeight(c) + y);
+    
+  // Cannot move onto another unit
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+      return 0;
+  }
+  // Cannot move onto enemy spawn tiles
+  if (tile->pumpID == -1 && tile->owner == getPlayerID(c)^1)
+    return 0;
+  // Can only move to adjacent coords
+  if (abs(object->x - x) + abs(object->y - y) != 1)
+    return 0;
+    
+  // Move the unit
+  object->x = x;
+  object->y = y;
+  
+  // Decrement movement
+  object->movementLeft -= 1;
+  
+  // Apply damage for moving into trenches
+  if (tile->isTrench)
+  {
+    if (tile->waterAmount > 0)
+      object->healthLeft -= getWaterDamage(c);
+    else
+      object->healthLeft -= getTrenchDamage(c);
+  }
+  
+  // Don't do any client-side object deletion?
+  
+  return 1;
+}
+
+DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
+{
+  stringstream expr;
+  expr << "(game-fill " << object->id
+      << " " << tile->id
+       << ")";
+  LOCK( &object->_c->mutex);
+  send_string(object->_c->socket, expr.str().c_str());
+  UNLOCK( &object->_c->mutex);
+  
+  Connection* c = object->_c;
+  int& x = tile->x;
+  int& y = tile->y;
+  
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Only fillers can fill
+  if (object->type != 1)
+    return 0;
+  // Can only fill once per turn
+  if (object->hasFilled == 1)
+    return 0;
+  // Can only fill adjacent tiles
+  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
+    return 0;
+  
+  // Must fill in trenches
+  if (tile->isTrench == 0)
+    return 0;
+  // Can't fill in trenches with water
+  if (tile->waterAmount > 0)
+    return 0;
+  // Can't fill in a trench with a unit on it
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+      return 0;
+  }
+  
+  // Set the tile to not be a trench
+  tile->isTrench = 0;
+  // Unit can no longer move
+  object->movementLeft = 0;
+  
+  object->hasFilled = 1;
+  
+  return 1;
+}
+
+DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
+{
+  stringstream expr;
+  expr << "(game-dig " << object->id
+      << " " << tile->id
+       << ")";
+  LOCK( &object->_c->mutex);
+  send_string(object->_c->socket, expr.str().c_str());
+  UNLOCK( &object->_c->mutex);
+  
+  Connection* c = object->_c;
+  int& x = tile->x;
+  int& y = tile->y;
+  
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Only diggers can dig
+  if (object->type != 0)
+    return 0;
+  // Can only dig once per turn
+  if (object->hasDug == 1)
+    return 0;
+  // Can only dig adjacent tiles and the tile underneath the digger
+  if (abs(object->x - x) + abs(object->y - y) > 1)
+    return 0;
+  
+  // Can't dig a trench on a trench
+  if (tile->isTrench == 1)
+    return 0;
+  // Can't dig a trenches on pumps
+  if (tile->pumpID != -1)
+    return 0;
+  // Can't dig on ice tiles
+  if (tile->owner == 3)
+    return 0;
+  // Can't dig on spawn tiles
+  if (tile->owner == 0 || tile->owner == 1)
+    return 0;
+  // Can't dig a trench under another unit
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+      return 0;
+  }
+  
+  // Set the tile to be a trench
+  tile->isTrench = 1;
+  // Unit can no longer move
+  object->movementLeft = 0;
+  
+  object->hasDug = 1;
+  
+  return 1;
+}
+
+DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
+{
+  stringstream expr;
+  expr << "(game-attack " << object->id
+      << " " << target->id
+       << ")";
+  LOCK( &object->_c->mutex);
+  send_string(object->_c->socket, expr.str().c_str());
+  UNLOCK( &object->_c->mutex);
+  
+  Connection *c = object->_c;
+  int& x = target->x;
+  int& y = target->y;
+  
+  // Only owner can control unit
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Target must be adjacent
+  if (abs(object->x - x) + abs(object->y - y) != 1)
+    return 0;
+  // Can only attack once per turn
+  if (object->hasAttacked == 1)
+    return 0;
+  // Can only attack enemy units
+  if (object->owner == target->owner)
+    return 0;
+    
+  object->hasAttacked = 1;
+  
+  // Unit can no longer move
+  object->movementLeft = 0;
+  
+  target->healthLeft -= getAttackDamage(c);
+  
+  return 1;
+}
+
+
 DLLEXPORT int tileSpawn(_Tile* object, int type)
 {
   stringstream expr;
@@ -298,12 +460,64 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   LOCK( &object->_c->mutex);
   send_string(object->_c->socket, expr.str().c_str());
   UNLOCK( &object->_c->mutex);
+  
+  Connection* c = object->_c;
+  
+  // Can only spawn on current player's spawn tiles
+  if (object->owner != getPlayerID(c))
+    return 0;
+  // Only spawn if player has enough resources
+  if (getPlayer(c, object->owner)->oxygen < getUnitCost(c))
+    return 0;
+  // Can only spawn Fillers and Diggers
+  if (type != 0 && type != 1)
+    return 0;
+  
+  int count = 0;
+  
+  // Cannot spawn unit on top of another unit
+  for (int i = 0; i < getUnitCount(c); ++i)
+  {
+    if (getUnit(c, i)->owner == getPlayerID(c))
+      count++;
+    if (getUnit(c, i)->x == object->x && getUnit(c, i)->y == object->y)
+      return 0;
+  }
+  
+  // Cannot spawn more than MaxUnits units
+  if (count >= getMaxUnits(c))
+    return 0;
+  
+  getPlayer(c, getPlayerID(c))->oxygen -= getUnitCost(c);
+  
   return 1;
 }
 
 
-
 //Utility functions for parsing data
+void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
+{
+  sexp_t* sub;
+  sub = expression->list;
+
+  object->_c = c;
+
+  object->id = atoi(sub->val);
+  sub = sub->next;
+  object->playerName = new char[strlen(sub->val)+1];
+  strncpy(object->playerName, sub->val, strlen(sub->val));
+  object->playerName[strlen(sub->val)] = 0;
+  sub = sub->next;
+  object->time = atof(sub->val);
+  sub = sub->next;
+  object->waterStored = atoi(sub->val);
+  sub = sub->next;
+  object->oxygen = atoi(sub->val);
+  sub = sub->next;
+  object->maxOxygen = atoi(sub->val);
+  sub = sub->next;
+
+}
 void parseMappable(Connection* c, _Mappable* object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -316,6 +530,23 @@ void parseMappable(Connection* c, _Mappable* object, sexp_t* expression)
   object->x = atoi(sub->val);
   sub = sub->next;
   object->y = atoi(sub->val);
+  sub = sub->next;
+
+}
+void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
+{
+  sexp_t* sub;
+  sub = expression->list;
+
+  object->_c = c;
+
+  object->id = atoi(sub->val);
+  sub = sub->next;
+  object->owner = atoi(sub->val);
+  sub = sub->next;
+  object->waterAmount = atoi(sub->val);
+  sub = sub->next;
+  object->siegeAmount = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -336,34 +567,19 @@ void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
   sub = sub->next;
   object->type = atoi(sub->val);
   sub = sub->next;
-  object->curHealth = atoi(sub->val);
+  object->hasAttacked = atoi(sub->val);
+  sub = sub->next;
+  object->hasDug = atoi(sub->val);
+  sub = sub->next;
+  object->hasFilled = atoi(sub->val);
+  sub = sub->next;
+  object->healthLeft = atoi(sub->val);
   sub = sub->next;
   object->maxHealth = atoi(sub->val);
   sub = sub->next;
-  object->curMovement = atoi(sub->val);
+  object->movementLeft = atoi(sub->val);
   sub = sub->next;
   object->maxMovement = atoi(sub->val);
-  sub = sub->next;
-
-}
-void parsePlayer(Connection* c, _Player* object, sexp_t* expression)
-{
-  sexp_t* sub;
-  sub = expression->list;
-
-  object->_c = c;
-
-  object->id = atoi(sub->val);
-  sub = sub->next;
-  object->playerName = new char[strlen(sub->val)+1];
-  strncpy(object->playerName, sub->val, strlen(sub->val));
-  object->playerName[strlen(sub->val)] = 0;
-  sub = sub->next;
-  object->time = atof(sub->val);
-  sub = sub->next;
-  object->waterStored = atoi(sub->val);
-  sub = sub->next;
-  object->spawnResources = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -382,30 +598,11 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   sub = sub->next;
   object->owner = atoi(sub->val);
   sub = sub->next;
-  object->type = atoi(sub->val);
-  sub = sub->next;
   object->pumpID = atoi(sub->val);
   sub = sub->next;
   object->waterAmount = atoi(sub->val);
   sub = sub->next;
   object->isTrench = atoi(sub->val);
-  sub = sub->next;
-
-}
-void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
-{
-  sexp_t* sub;
-  sub = expression->list;
-
-  object->_c = c;
-
-  object->id = atoi(sub->val);
-  sub = sub->next;
-  object->owner = atoi(sub->val);
-  sub = sub->next;
-  object->waterAmount = atoi(sub->val);
-  sub = sub->next;
-  object->siegeCount = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -478,6 +675,12 @@ DLLEXPORT int networkLoop(Connection* c)
         if(string(sub->val) == "game")
         {
           sub = sub->next;
+          c->mapWidth = atoi(sub->val);
+          sub = sub->next;
+
+          c->mapHeight = atoi(sub->val);
+          sub = sub->next;
+
           c->maxHealth = atoi(sub->val);
           sub = sub->next;
 
@@ -493,10 +696,10 @@ DLLEXPORT int networkLoop(Connection* c)
           c->attackDamage = atoi(sub->val);
           sub = sub->next;
 
-          c->offenseCount = atoi(sub->val);
+          c->offensePower = atoi(sub->val);
           sub = sub->next;
 
-          c->defenseCount = atoi(sub->val);
+          c->defensePower = atoi(sub->val);
           sub = sub->next;
 
           c->maxUnits = atoi(sub->val);
@@ -505,40 +708,18 @@ DLLEXPORT int networkLoop(Connection* c)
           c->unitCost = atoi(sub->val);
           sub = sub->next;
 
-        }
-        else if(string(sub->val) == "Mappable")
-        {
-          if(c->Mappables)
-          {
-            for(int i = 0; i < c->MappableCount; i++)
-            {
-            }
-            delete[] c->Mappables;
-          }
-          c->MappableCount =  sexp_list_length(expression)-1; //-1 for the header
-          c->Mappables = new _Mappable[c->MappableCount];
-          for(int i = 0; i < c->MappableCount; i++)
-          {
-            sub = sub->next;
-            parseMappable(c, c->Mappables+i, sub);
-          }
-        }
-        else if(string(sub->val) == "Unit")
-        {
-          if(c->Units)
-          {
-            for(int i = 0; i < c->UnitCount; i++)
-            {
-            }
-            delete[] c->Units;
-          }
-          c->UnitCount =  sexp_list_length(expression)-1; //-1 for the header
-          c->Units = new _Unit[c->UnitCount];
-          for(int i = 0; i < c->UnitCount; i++)
-          {
-            sub = sub->next;
-            parseUnit(c, c->Units+i, sub);
-          }
+          c->playerID = atoi(sub->val);
+          sub = sub->next;
+
+          c->gameNumber = atoi(sub->val);
+          sub = sub->next;
+
+          c->maxSiege = atoi(sub->val);
+          sub = sub->next;
+
+          c->oxygenRate = atof(sub->val);
+          sub = sub->next;
+
         }
         else if(string(sub->val) == "Player")
         {
@@ -558,34 +739,21 @@ DLLEXPORT int networkLoop(Connection* c)
             parsePlayer(c, c->Players+i, sub);
           }
         }
-        else if(string(sub->val) == "Tile")
+        else if(string(sub->val) == "Mappable")
         {
-          if(c->Tiles)
+          if(c->Mappables)
+          {
+            for(int i = 0; i < c->MappableCount; i++)
+            {
+            }
+            delete[] c->Mappables;
+          }
+          c->MappableCount =  sexp_list_length(expression)-1; //-1 for the header
+          c->Mappables = new _Mappable[c->MappableCount];
+          for(int i = 0; i < c->MappableCount; i++)
           {
             sub = sub->next;
-            for(int i = 0; i < c->TileCount; i++)
-            {
-              if(!sub)
-              {
-                break;
-              }
-              int id = atoi(sub->list->val);
-              if(id == c->Tiles[i].id)
-              {
-                parseTile(c, c->Tiles+i, sub);
-                sub = sub->next;
-              }
-            }
-          }
-          else
-          {
-            c->TileCount =  sexp_list_length(expression)-1; //-1 for the header
-            c->Tiles = new _Tile[c->TileCount];
-            for(int i = 0; i < c->TileCount; i++)
-            {
-              sub = sub->next;
-              parseTile(c, c->Tiles+i, sub);
-            }
+            parseMappable(c, c->Mappables+i, sub);
           }
         }
         else if(string(sub->val) == "PumpStation")
@@ -618,6 +786,53 @@ DLLEXPORT int networkLoop(Connection* c)
             }
           }
         }
+        else if(string(sub->val) == "Unit")
+        {
+          if(c->Units)
+          {
+            for(int i = 0; i < c->UnitCount; i++)
+            {
+            }
+            delete[] c->Units;
+          }
+          c->UnitCount =  sexp_list_length(expression)-1; //-1 for the header
+          c->Units = new _Unit[c->UnitCount];
+          for(int i = 0; i < c->UnitCount; i++)
+          {
+            sub = sub->next;
+            parseUnit(c, c->Units+i, sub);
+          }
+        }
+        else if(string(sub->val) == "Tile")
+        {
+          if(c->Tiles)
+          {
+            sub = sub->next;
+            for(int i = 0; i < c->TileCount; i++)
+            {
+              if(!sub)
+              {
+                break;
+              }
+              int id = atoi(sub->list->val);
+              if(id == c->Tiles[i].id)
+              {
+                parseTile(c, c->Tiles+i, sub);
+                sub = sub->next;
+              }
+            }
+          }
+          else
+          {
+            c->TileCount =  sexp_list_length(expression)-1; //-1 for the header
+            c->Tiles = new _Tile[c->TileCount];
+            for(int i = 0; i < c->TileCount; i++)
+            {
+              sub = sub->next;
+              parseTile(c, c->Tiles+i, sub);
+            }
+          }
+        }
       }
       destroy_sexp(base);
       return 1;
@@ -632,24 +847,6 @@ DLLEXPORT int networkLoop(Connection* c)
   }
 }
 
-DLLEXPORT _Mappable* getMappable(Connection* c, int num)
-{
-  return c->Mappables + num;
-}
-DLLEXPORT int getMappableCount(Connection* c)
-{
-  return c->MappableCount;
-}
-
-DLLEXPORT _Unit* getUnit(Connection* c, int num)
-{
-  return c->Units + num;
-}
-DLLEXPORT int getUnitCount(Connection* c)
-{
-  return c->UnitCount;
-}
-
 DLLEXPORT _Player* getPlayer(Connection* c, int num)
 {
   return c->Players + num;
@@ -659,13 +856,13 @@ DLLEXPORT int getPlayerCount(Connection* c)
   return c->PlayerCount;
 }
 
-DLLEXPORT _Tile* getTile(Connection* c, int num)
+DLLEXPORT _Mappable* getMappable(Connection* c, int num)
 {
-  return c->Tiles + num;
+  return c->Mappables + num;
 }
-DLLEXPORT int getTileCount(Connection* c)
+DLLEXPORT int getMappableCount(Connection* c)
 {
-  return c->TileCount;
+  return c->MappableCount;
 }
 
 DLLEXPORT _PumpStation* getPumpStation(Connection* c, int num)
@@ -677,7 +874,33 @@ DLLEXPORT int getPumpStationCount(Connection* c)
   return c->PumpStationCount;
 }
 
+DLLEXPORT _Unit* getUnit(Connection* c, int num)
+{
+  return c->Units + num;
+}
+DLLEXPORT int getUnitCount(Connection* c)
+{
+  return c->UnitCount;
+}
 
+DLLEXPORT _Tile* getTile(Connection* c, int num)
+{
+  return c->Tiles + num;
+}
+DLLEXPORT int getTileCount(Connection* c)
+{
+  return c->TileCount;
+}
+
+
+DLLEXPORT int getMapWidth(Connection* c)
+{
+  return c->mapWidth;
+}
+DLLEXPORT int getMapHeight(Connection* c)
+{
+  return c->mapHeight;
+}
 DLLEXPORT int getMaxHealth(Connection* c)
 {
   return c->maxHealth;
@@ -698,13 +921,13 @@ DLLEXPORT int getAttackDamage(Connection* c)
 {
   return c->attackDamage;
 }
-DLLEXPORT int getOffenseCount(Connection* c)
+DLLEXPORT int getOffensePower(Connection* c)
 {
-  return c->offenseCount;
+  return c->offensePower;
 }
-DLLEXPORT int getDefenseCount(Connection* c)
+DLLEXPORT int getDefensePower(Connection* c)
 {
-  return c->defenseCount;
+  return c->defensePower;
 }
 DLLEXPORT int getMaxUnits(Connection* c)
 {
@@ -713,4 +936,20 @@ DLLEXPORT int getMaxUnits(Connection* c)
 DLLEXPORT int getUnitCost(Connection* c)
 {
   return c->unitCost;
+}
+DLLEXPORT int getPlayerID(Connection* c)
+{
+  return c->playerID;
+}
+DLLEXPORT int getGameNumber(Connection* c)
+{
+  return c->gameNumber;
+}
+DLLEXPORT int getMaxSiege(Connection* c)
+{
+  return c->maxSiege;
+}
+DLLEXPORT float getOxygenRate(Connection* c)
+{
+  return c->oxygenRate;
 }

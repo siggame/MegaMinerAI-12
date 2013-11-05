@@ -84,11 +84,29 @@ class Unit extends Mappable
     validify();
     return Client.INSTANCE.unitGetType(ptr);
   }
-  ///The current amount health this unit has remaining.
-  public int getCurHealth()
+  ///Whether current unit has attacked or not.
+  public int getHasAttacked()
   {
     validify();
-    return Client.INSTANCE.unitGetCurHealth(ptr);
+    return Client.INSTANCE.unitGetHasAttacked(ptr);
+  }
+  ///Whether the current unit has dug or not.
+  public int getHasDug()
+  {
+    validify();
+    return Client.INSTANCE.unitGetHasDug(ptr);
+  }
+  ///Whether the current unit has filled or not.
+  public int getHasFilled()
+  {
+    validify();
+    return Client.INSTANCE.unitGetHasFilled(ptr);
+  }
+  ///The current amount health this unit has remaining.
+  public int getHealthLeft()
+  {
+    validify();
+    return Client.INSTANCE.unitGetHealthLeft(ptr);
   }
   ///The maximum amount of this health this unit can have
   public int getMaxHealth()
@@ -97,10 +115,10 @@ class Unit extends Mappable
     return Client.INSTANCE.unitGetMaxHealth(ptr);
   }
   ///The number of moves this unit has remaining.
-  public int getCurMovement()
+  public int getMovementLeft()
   {
     validify();
-    return Client.INSTANCE.unitGetCurMovement(ptr);
+    return Client.INSTANCE.unitGetMovementLeft(ptr);
   }
   ///The maximum number of moves this unit can move.
   public int getMaxMovement()

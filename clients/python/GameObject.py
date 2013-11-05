@@ -11,6 +11,93 @@ class GameObject(object):
     self._iteration = BaseAI.iteration
 
 
+##
+class Player(GameObject):
+  def __init__(self, ptr):
+    from BaseAI import BaseAI
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.playerGetId(ptr)
+
+  #\cond
+  def validify(self):
+    from BaseAI import BaseAI
+    #if this class is pointing to an object from before the current turn it's probably
+    #somewhere else in memory now
+    if self._iteration == BaseAI.iteration:
+      return True
+    for i in BaseAI.players:
+      if i._id == self._id:
+        self._ptr = i._ptr
+        self._iteration = BaseAI.iteration
+        return True
+    raise ExistentialError()
+  #\endcond
+  ##Allows a player to display messages on the screen
+  def talk(self, message):
+    self.validify()
+    return library.playerTalk(self._ptr, message)
+
+  #\cond
+  def getId(self):
+    self.validify()
+    return library.playerGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
+
+  #\cond
+  def getPlayerName(self):
+    self.validify()
+    return library.playerGetPlayerName(self._ptr)
+  #\endcond
+  ##Player's Name
+  playerName = property(getPlayerName)
+
+  #\cond
+  def getTime(self):
+    self.validify()
+    return library.playerGetTime(self._ptr)
+  #\endcond
+  ##Time remaining, updated at start of turn
+  time = property(getTime)
+
+  #\cond
+  def getWaterStored(self):
+    self.validify()
+    return library.playerGetWaterStored(self._ptr)
+  #\endcond
+  ##The amount of water a player has.
+  waterStored = property(getWaterStored)
+
+  #\cond
+  def getOxygen(self):
+    self.validify()
+    return library.playerGetOxygen(self._ptr)
+  #\endcond
+  ##Resource used to spawn in units.
+  oxygen = property(getOxygen)
+
+  #\cond
+  def getMaxOxygen(self):
+    self.validify()
+    return library.playerGetMaxOxygen(self._ptr)
+  #\endcond
+  ##The player's oxygen cap.
+  maxOxygen = property(getMaxOxygen)
+
+
+  def __str__(self):
+    self.validify()
+    ret = ""
+    ret += "id: %s\n" % self.getId()
+    ret += "playerName: %s\n" % self.getPlayerName()
+    ret += "time: %s\n" % self.getTime()
+    ret += "waterStored: %s\n" % self.getWaterStored()
+    ret += "oxygen: %s\n" % self.getOxygen()
+    ret += "maxOxygen: %s\n" % self.getMaxOxygen()
+    return ret
+
 ##A mappable object!
 class Mappable(GameObject):
   def __init__(self, ptr):
@@ -64,6 +151,70 @@ class Mappable(GameObject):
     ret += "id: %s\n" % self.getId()
     ret += "x: %s\n" % self.getX()
     ret += "y: %s\n" % self.getY()
+    return ret
+
+##Represents a base to which you want to lead water.
+class PumpStation(GameObject):
+  def __init__(self, ptr):
+    from BaseAI import BaseAI
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.pumpStationGetId(ptr)
+
+  #\cond
+  def validify(self):
+    from BaseAI import BaseAI
+    #if this class is pointing to an object from before the current turn it's probably
+    #somewhere else in memory now
+    if self._iteration == BaseAI.iteration:
+      return True
+    for i in BaseAI.pumpStations:
+      if i._id == self._id:
+        self._ptr = i._ptr
+        self._iteration = BaseAI.iteration
+        return True
+    raise ExistentialError()
+  #\endcond
+  #\cond
+  def getId(self):
+    self.validify()
+    return library.pumpStationGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
+
+  #\cond
+  def getOwner(self):
+    self.validify()
+    return library.pumpStationGetOwner(self._ptr)
+  #\endcond
+  ##The owner of the PumpStation.
+  owner = property(getOwner)
+
+  #\cond
+  def getWaterAmount(self):
+    self.validify()
+    return library.pumpStationGetWaterAmount(self._ptr)
+  #\endcond
+  ##The amount of water the PumpStation pumps.
+  waterAmount = property(getWaterAmount)
+
+  #\cond
+  def getSiegeAmount(self):
+    self.validify()
+    return library.pumpStationGetSiegeAmount(self._ptr)
+  #\endcond
+  ##The amount the PumpStation has been sieged.
+  siegeAmount = property(getSiegeAmount)
+
+
+  def __str__(self):
+    self.validify()
+    ret = ""
+    ret += "id: %s\n" % self.getId()
+    ret += "owner: %s\n" % self.getOwner()
+    ret += "waterAmount: %s\n" % self.getWaterAmount()
+    ret += "siegeAmount: %s\n" % self.getSiegeAmount()
     return ret
 
 ##Represents a single unit on the map.
@@ -158,12 +309,36 @@ class Unit(Mappable):
   type = property(getType)
 
   #\cond
-  def getCurHealth(self):
+  def getHasAttacked(self):
     self.validify()
-    return library.unitGetCurHealth(self._ptr)
+    return library.unitGetHasAttacked(self._ptr)
+  #\endcond
+  ##Whether current unit has attacked or not.
+  hasAttacked = property(getHasAttacked)
+
+  #\cond
+  def getHasDug(self):
+    self.validify()
+    return library.unitGetHasDug(self._ptr)
+  #\endcond
+  ##Whether the current unit has dug or not.
+  hasDug = property(getHasDug)
+
+  #\cond
+  def getHasFilled(self):
+    self.validify()
+    return library.unitGetHasFilled(self._ptr)
+  #\endcond
+  ##Whether the current unit has filled or not.
+  hasFilled = property(getHasFilled)
+
+  #\cond
+  def getHealthLeft(self):
+    self.validify()
+    return library.unitGetHealthLeft(self._ptr)
   #\endcond
   ##The current amount health this unit has remaining.
-  curHealth = property(getCurHealth)
+  healthLeft = property(getHealthLeft)
 
   #\cond
   def getMaxHealth(self):
@@ -174,12 +349,12 @@ class Unit(Mappable):
   maxHealth = property(getMaxHealth)
 
   #\cond
-  def getCurMovement(self):
+  def getMovementLeft(self):
     self.validify()
-    return library.unitGetCurMovement(self._ptr)
+    return library.unitGetMovementLeft(self._ptr)
   #\endcond
   ##The number of moves this unit has remaining.
-  curMovement = property(getCurMovement)
+  movementLeft = property(getMovementLeft)
 
   #\cond
   def getMaxMovement(self):
@@ -198,88 +373,13 @@ class Unit(Mappable):
     ret += "y: %s\n" % self.getY()
     ret += "owner: %s\n" % self.getOwner()
     ret += "type: %s\n" % self.getType()
-    ret += "curHealth: %s\n" % self.getCurHealth()
+    ret += "hasAttacked: %s\n" % self.getHasAttacked()
+    ret += "hasDug: %s\n" % self.getHasDug()
+    ret += "hasFilled: %s\n" % self.getHasFilled()
+    ret += "healthLeft: %s\n" % self.getHealthLeft()
     ret += "maxHealth: %s\n" % self.getMaxHealth()
-    ret += "curMovement: %s\n" % self.getCurMovement()
+    ret += "movementLeft: %s\n" % self.getMovementLeft()
     ret += "maxMovement: %s\n" % self.getMaxMovement()
-    return ret
-
-##
-class Player(GameObject):
-  def __init__(self, ptr):
-    from BaseAI import BaseAI
-    self._ptr = ptr
-    self._iteration = BaseAI.iteration
-    self._id = library.playerGetId(ptr)
-
-  #\cond
-  def validify(self):
-    from BaseAI import BaseAI
-    #if this class is pointing to an object from before the current turn it's probably
-    #somewhere else in memory now
-    if self._iteration == BaseAI.iteration:
-      return True
-    for i in BaseAI.players:
-      if i._id == self._id:
-        self._ptr = i._ptr
-        self._iteration = BaseAI.iteration
-        return True
-    raise ExistentialError()
-  #\endcond
-  ##Allows a player to display messages on the screen
-  def talk(self, message):
-    self.validify()
-    return library.playerTalk(self._ptr, message)
-
-  #\cond
-  def getId(self):
-    self.validify()
-    return library.playerGetId(self._ptr)
-  #\endcond
-  ##Unique Identifier
-  id = property(getId)
-
-  #\cond
-  def getPlayerName(self):
-    self.validify()
-    return library.playerGetPlayerName(self._ptr)
-  #\endcond
-  ##Player's Name
-  playerName = property(getPlayerName)
-
-  #\cond
-  def getTime(self):
-    self.validify()
-    return library.playerGetTime(self._ptr)
-  #\endcond
-  ##Time remaining, updated at start of turn
-  time = property(getTime)
-
-  #\cond
-  def getWaterStored(self):
-    self.validify()
-    return library.playerGetWaterStored(self._ptr)
-  #\endcond
-  ##The amount of water a player has.
-  waterStored = property(getWaterStored)
-
-  #\cond
-  def getSpawnResources(self):
-    self.validify()
-    return library.playerGetSpawnResources(self._ptr)
-  #\endcond
-  ##Resource used to spawn in units
-  spawnResources = property(getSpawnResources)
-
-
-  def __str__(self):
-    self.validify()
-    ret = ""
-    ret += "id: %s\n" % self.getId()
-    ret += "playerName: %s\n" % self.getPlayerName()
-    ret += "time: %s\n" % self.getTime()
-    ret += "waterStored: %s\n" % self.getWaterStored()
-    ret += "spawnResources: %s\n" % self.getSpawnResources()
     return ret
 
 ##Represents a single tile on the map, can contain some amount of water.
@@ -342,14 +442,6 @@ class Tile(Mappable):
   owner = property(getOwner)
 
   #\cond
-  def getType(self):
-    self.validify()
-    return library.tileGetType(self._ptr)
-  #\endcond
-  ##The type of tile this tile represents.
-  type = property(getType)
-
-  #\cond
   def getPumpID(self):
     self.validify()
     return library.tileGetPumpID(self._ptr)
@@ -381,72 +473,7 @@ class Tile(Mappable):
     ret += "x: %s\n" % self.getX()
     ret += "y: %s\n" % self.getY()
     ret += "owner: %s\n" % self.getOwner()
-    ret += "type: %s\n" % self.getType()
     ret += "pumpID: %s\n" % self.getPumpID()
     ret += "waterAmount: %s\n" % self.getWaterAmount()
     ret += "isTrench: %s\n" % self.getIsTrench()
-    return ret
-
-##Represents a base to which you want to lead water, and a spawn location for new units.
-class PumpStation(GameObject):
-  def __init__(self, ptr):
-    from BaseAI import BaseAI
-    self._ptr = ptr
-    self._iteration = BaseAI.iteration
-    self._id = library.pumpStationGetId(ptr)
-
-  #\cond
-  def validify(self):
-    from BaseAI import BaseAI
-    #if this class is pointing to an object from before the current turn it's probably
-    #somewhere else in memory now
-    if self._iteration == BaseAI.iteration:
-      return True
-    for i in BaseAI.pumpStations:
-      if i._id == self._id:
-        self._ptr = i._ptr
-        self._iteration = BaseAI.iteration
-        return True
-    raise ExistentialError()
-  #\endcond
-  #\cond
-  def getId(self):
-    self.validify()
-    return library.pumpStationGetId(self._ptr)
-  #\endcond
-  ##Unique Identifier
-  id = property(getId)
-
-  #\cond
-  def getOwner(self):
-    self.validify()
-    return library.pumpStationGetOwner(self._ptr)
-  #\endcond
-  ##The owner of the PumpStation.
-  owner = property(getOwner)
-
-  #\cond
-  def getWaterAmount(self):
-    self.validify()
-    return library.pumpStationGetWaterAmount(self._ptr)
-  #\endcond
-  ##The amount of water the PumpStation pumps.
-  waterAmount = property(getWaterAmount)
-
-  #\cond
-  def getSiegeCount(self):
-    self.validify()
-    return library.pumpStationGetSiegeCount(self._ptr)
-  #\endcond
-  ##The length of time it takes to capture the PumpStation.
-  siegeCount = property(getSiegeCount)
-
-
-  def __str__(self):
-    self.validify()
-    ret = ""
-    ret += "id: %s\n" % self.getId()
-    ret += "owner: %s\n" % self.getOwner()
-    ret += "waterAmount: %s\n" % self.getWaterAmount()
-    ret += "siegeCount: %s\n" % self.getSiegeCount()
     return ret

@@ -8,21 +8,30 @@ gameName = "Mars"
 constants = [
   ]
 
+modelOrder = ['Player', 'Mappable', 'PumpStation', 'Unit', 'Tile']
+
 globals = [
+  Variable('mapWidth', int, 'The width of the total map.'),
+  Variable('mapHeight', int, 'The height of the total map.'),
   Variable('maxHealth', int, 'The maximum amount of health a unit will have.'),
   Variable('trenchDamage', int, 'The amount of damage walking over a trench.'),
   Variable('waterDamage', int, 'The amount of damage walking over water.'),
   Variable('turnNumber', int, 'The current turn number.'),
   Variable('attackDamage', int, 'The amount of damage a unit will deal.'),
-  Variable('offenseCount', int, 'How quickly a unit will siege a base.'),
-  Variable('defenseCount', int, 'The much a unit will slow a  siege.'),
+  Variable('offensePower', int, 'How quickly a unit will siege a PumpStation.'),
+  Variable('defensePower', int, 'How much a unit will slow a siege.'),
   Variable('maxUnits', int, 'The maximum number of units allowed per player.'),
-  Variable('unitCost', int, 'THe cost of spawning in a new unit'),
+  Variable('unitCost', int, 'The cost of spawning in a new unit'),
+  Variable('playerID', int, 'The id of the current player.'),
+  Variable('gameNumber', int, 'What number game this is for the server'),
+  Variable('maxSiege', int, 'The maximum siege value before the PumpStation is sieged.'),
+  Variable('oxygenRate', float, 'The rate at which missing oxygen is regained.'),
 ]
 
 playerData = [
   Variable('waterStored', int, 'The amount of water a player has.'),
-  Variable('spawnResources', int, 'Resource used to spawn in units'),
+  Variable('oxygen', int, 'Resource used to spawn in units.'),
+  Variable('maxOxygen', int, "The player's oxygen cap."),
   ]
 
 playerFunctions = [
@@ -42,7 +51,6 @@ Tile = Model('Tile',
   parent = Mappable,
   data = [
     Variable('owner', int, 'The owner of the tile.'),
-    Variable('type', int, 'The type of tile this tile represents.'),
     Variable('pumpID', int, 'Determines if this tile is a part of a Pump Station.'),
     Variable('waterAmount', int, 'The amount of water contained on the tile.'),
     Variable('isTrench', int, 'Whether the tile is a trench or not.'),
@@ -61,9 +69,12 @@ Unit = Model('Unit',
   data = [
     Variable('owner', int, 'The owner of this unit.'),
     Variable('type', int, 'The type of this unit (digger/filler).'),
-    Variable('curHealth', int, 'The current amount health this unit has remaining.'),
+    Variable('hasAttacked', int, 'Whether current unit has attacked or not.'),
+    Variable('hasDug', int, 'Whether the current unit has dug or not.'),
+    Variable('hasFilled', int, 'Whether the current unit has filled or not.'),
+    Variable('healthLeft', int, 'The current amount health this unit has remaining.'),
     Variable('maxHealth', int, 'The maximum amount of this health this unit can have'),
-    Variable('curMovement', int, 'The number of moves this unit has remaining.'),
+    Variable('movementLeft', int, 'The number of moves this unit has remaining.'),
     Variable('maxMovement', int, 'The maximum number of moves this unit can move.'),
 
     ],
@@ -86,11 +97,11 @@ PumpStation = Model('PumpStation',
   data = [
     Variable('owner', int, 'The owner of the PumpStation.'),
     Variable('waterAmount', int, 'The amount of water the PumpStation pumps.'),
-    Variable('siegeCount', int, 'The length of time it takes to capture the PumpStation.'),
+    Variable('siegeAmount', int, 'The amount the PumpStation has been sieged.'),
     ],
   functions=[
   ],
-  doc='Represents a base to which you want to lead water, and a spawn location for new units.',
+  doc='Represents a base to which you want to lead water.',
   permanent = True,
   )
 
@@ -137,5 +148,11 @@ spawn = Animation('spawn',
   data=[
     Variable('sourceID', int),
     Variable('unitID', int),
+  ],
+  )
+
+death = Animation('death',
+  data=[
+    Variable('sourceID', int),
   ],
   )

@@ -1,6 +1,10 @@
 ## PyCharm Stuff
 .idea/
 
+# Gamelogs
+*.glog
+*.gamelog
+
 ## Python Stuff
 *.pyc
 
@@ -22,5 +26,5 @@
 *.pro.user.*
 moc_*.cpp
 qrc_*.cpp
-Makefile
+#Makefile
 *-build-*

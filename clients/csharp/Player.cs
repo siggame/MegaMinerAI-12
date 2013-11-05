@@ -91,13 +91,24 @@ public class Player
     }
   }
 
-  ///Resource used to spawn in units
-  public int SpawnResources
+  ///Resource used to spawn in units.
+  public int Oxygen
   {
     get
     {
       validify();
-      int value = Client.playerGetSpawnResources(ptr);
+      int value = Client.playerGetOxygen(ptr);
+      return value;
+    }
+  }
+
+  ///The player's oxygen cap.
+  public int MaxOxygen
+  {
+    get
+    {
+      validify();
+      int value = Client.playerGetMaxOxygen(ptr);
       return value;
     }
   }

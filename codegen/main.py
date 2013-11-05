@@ -32,6 +32,8 @@ def parseData(data):
       insertModel(models, i)
     elif isinstance(i, structures.Animation):
       animations.append(i)
+  if 'modelOrder' in data:
+    models = [data[i] for i in data['modelOrder']]
   return {'models':models, 'globals':globals, 'constants':constants, 'animations':animations, 'aspects':aspects, 'gameName':gameName}
 
 
