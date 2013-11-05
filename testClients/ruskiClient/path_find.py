@@ -2,13 +2,9 @@ import heapq
 import GameObject
 
 class path_finder:
-  def __init__(self, ai):
+  def __init__(self, ai, cache):
     self.__ai = ai
-    self.__obst = dict()
-
-  def update_obstacles(self):
-    for unit in self.__ai.units:
-      self.__obst[(unit.x, unit.y)] = unit
+    self.__cache = cache
 
   def __get_tile(self, x, y):
     if (0 <= x < self.__ai.mapWidth) and (0 <= y < self.__ai.mapHeight):
@@ -16,17 +12,37 @@ class path_finder:
     else:
       return None
 
-  def __get_neighbors(self, tile):
+  def __isvalid(self, neighbor, start, goal):
+    if neighbor is None:
+      return False
+
+    if neighbor.x == start.x and neighbor.y == start.y:
+      return True
+    if neighbor.x == goal.x and neighbor.y == goal.y:
+      return True
+
+    coord = (neighbor.x, neighbor.y)
+
+    if coord in self.__cache.enemy_units:
+      return False
+    if coord in self.__cache.my_units:
+      return False
+    if coord in self.__cache.enemy_spawn_tiles:
+      return False
+    #if coord in self.__cache.wet_trenches:
+    #  return False
+    if coord in self.__cache.ice:
+      return False
+
+    return True
+
+  def __get_neighbors(self, tile, start, goal):
     neighbors = []
     offsets = [(0,1),(1,0),(0,-1),(-1,0)]
     for offset in offsets:
       neighbor = self.__get_tile(tile.x+offset[0], tile.y+offset[1])
-      if neighbor is None:
-        continue
-      if (neighbor.x, neighbor.y) in self.__obst:
-        continue
-      neighbors.append(neighbor)
-
+      if self.__isvalid(neighbor, start, goal):
+        neighbors.append(neighbor)
     return neighbors
 
   @staticmethod
@@ -66,7 +82,7 @@ class path_finder:
 
       closed_set.append(current)
 
-      for neighbor in self.__get_neighbors(current):
+      for neighbor in self.__get_neighbors(current, start, goal):
         if f_scores[current] > 100:
           print('PARTIAL PATH')
           return self.__reconstruct_path(parents, current)

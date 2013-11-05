@@ -8,16 +8,17 @@ import random
 import game_utils
 from game_utils import get_tile
 import path_find
+import object_cache
 
 
 class AI(BaseAI):
+  WORKER, SCOUT, TANK = range(3)
 
   WAYTOOBIG = 100000
 
-  history = None
   pf = None
+  cache = None
 
-  spawn_tiles = []
 
   """The class implementing gameplay logic."""
   @staticmethod
@@ -28,12 +29,23 @@ class AI(BaseAI):
   def password():
     return "password"
 
-  def get_spawn_tiles(self):
-    self.spawn_tiles = [tile for tile in self.tiles if tile.owner == self.playerID]
-
   def spawn_units(self):
-    for tile in self.spawn_tiles:
-      tile.spawn(random.choice([game_utils.DIGGER, game_utils.FILLER]))
+    heavynum = 0
+    for unit in self.cache.my_units.values():
+      if unit.type == self.TANK:
+        heavynum += 2
+
+    if heavynum < len(self.cache.my_pump_tiles.values())/2:
+      types = [self.SCOUT, self.TANK, self.WORKER]
+    else:
+      types = [self.SCOUT, self.WORKER]
+
+
+    for tile in self.cache.my_pump_tiles.values():
+      tile.spawn(random.choice(types))
+    for tile in self.cache.my_spawn_tiles.values():
+      tile.spawn(random.choice(types))
+    return True
 
   def move_unit_to(self, unit, x, y):
     unit_tile = get_tile(self, unit.x, unit.y)
@@ -61,14 +73,12 @@ class AI(BaseAI):
 
   ##This function is called once, before your first turn
   def init(self):
-    self.get_spawn_tiles()
-    self.history = game_utils.game_history(self, True)
-    self.pf = path_find.path_finder(self)
+    self.cache = object_cache.object_cache(self)
+    self.pf = path_find.path_finder(self, self.cache)
     return
 
   ##This function is called once, after your last turn
   def end(self):
-    self.history.print_history()
     return
 
   @staticmethod
@@ -76,67 +86,84 @@ class AI(BaseAI):
     return abs(x2-x1) + abs(y2-y1)
 
   def nearest_enemy_pump_tile(self, x, y):
-    pump, dist = None, self.WAYTOOBIG
-    for tile in self.tiles:
-      if tile.owner != self.playerID and tile.pumpID != -1:
-        cur_dist = self.man_dist(x, y, tile.x, tile.y)
-        if cur_dist < dist:
-          pump, dist = tile, cur_dist
-    return pump
-  def greedy_enemy_pump_tile(self):
-    for tile in self.tiles:
-      if tile.owner != self.playerID and tile.pumpID != -1:
-        return tile
-    return None
+    min_dist, min_enemy = self.WAYTOOBIG, None
+    for cur_enemy in self.cache.enemy_pump_tiles.values():
+      cur_dist = self.man_dist(x, y, cur_enemy.x, cur_enemy.y)
+      if cur_dist < min_dist:
+        min_dist, min_enemy = cur_dist, cur_enemy
+    return min_enemy
 
   def nearest_friendly_pump_tile(self, x, y):
-    pump, dist = None, self.WAYTOOBIG
-    for tile in self.tiles:
-      if tile.owner == self.playerID and tile.pumpID != -1:
-        cur_dist = self.man_dist(x, y, tile.x, tile.y)
-        if cur_dist < dist:
-          pump, dist = tile, cur_dist
-    return pump
-  def greedy_friendly_pump_tile(self):
-    for tile in self.tiles:
-      if tile.owner == self.playerID and tile.pumpID != -1:
-        return tile
-    return None
+    min_dist, min_friendly = self.WAYTOOBIG, None
+    for cur_friendly in self.cache.my_pump_tiles.values():
+      cur_dist = self.man_dist(x, y, cur_friendly.x, cur_friendly.y)
+      if cur_dist < min_dist:
+        min_dist, min_friendly = cur_dist, cur_friendly
+    return min_friendly
+
+  def nearest_ice_tile(self, x, y):
+    min_dist, min_ice = self.WAYTOOBIG, None
+    for cur_ice in self.cache.enemy_units.values():
+      cur_dist = self.man_dist(x, y, cur_ice.x, cur_ice.y)
+      if cur_dist < min_dist:
+        min_dist, min_ice = cur_dist, cur_ice
+    return min_ice
 
   def nearest_enemy_unit(self, x, y):
-    enemy, dist = None, self.WAYTOOBIG
-    for unit in self.units:
-      if unit.owner != self.playerID:
-        cur_dist = self.man_dist(x, y, unit.x, unit.y)
-        if cur_dist < dist:
-          enemy, dist = unit, cur_dist
-    return enemy
-  def greedy_enemy_unit(self):
-    for unit in self.units:
-      if unit.owner != self.playerID:
-        return unit
-    return None
-
+    min_dist, min_enemy = self.WAYTOOBIG, None
+    for cur_enemy in self.cache.enemy_units.values():
+      cur_dist = self.man_dist(x, y, cur_enemy.x, cur_enemy.y)
+      if cur_dist < min_dist:
+        min_dist, min_enemy = cur_dist, cur_enemy
+    return min_enemy
 
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
-    print(self.turnNumber)
-    #SNAPSHOT AT BEGINNING
-    #self.history.save_snapshot()
-    print('START UPDATE')
-    self.pf.update_obstacles()
-    print('END UPDATE')
+    print('Turn Number: {}'.format(self.turnNumber))
+    print('Water Stored: P1: {} || P2: {}'.format(self.players[0].waterStored, self.players[1].waterStored))
+    print('Oxygen: P1: {} || P2: {}'.format(self.players[0].oxygen, self.players[1].oxygen))
+    self.cache.update_all()
     self.spawn_units()
 
-    for unit in self.units:
-      if unit.owner == self.playerID:
+    for unit in self.cache.my_units.values():
+      if unit.type == self.SCOUT:
         enemy_pump = self.nearest_enemy_pump_tile(unit.x, unit.y)
         if enemy_pump is not None:
           self.move_unit_to(unit, enemy_pump.x, enemy_pump.y)
 
-    #SNAPSHOT AT END
-    #self.history.save_snapshot()
+        #ATTEMPT TO ATTACK
+        enemy_unit = self.nearest_enemy_unit(unit.x, unit.y)
+        if enemy_unit is not None:
+          if self.man_dist(unit.x, unit.y, enemy_unit.x, enemy_unit.y) <= unit.range:
+            unit.attack(enemy_unit)
+
+      elif unit.type == self.TANK:
+        friendly_pump = self.nearest_friendly_pump_tile(unit.x, unit.y)
+        if friendly_pump is not None:
+          self.move_unit_to(unit, friendly_pump.x, friendly_pump.y)
+
+        #ATTEMPT TO ATTACK
+        enemy_unit = self.nearest_enemy_unit(unit.x, unit.y)
+        if enemy_unit is not None:
+          if self.man_dist(unit.x, unit.y, enemy_unit.x, enemy_unit.y) <= unit.range:
+            unit.attack(enemy_unit)
+
+      elif unit.type == self.WORKER:
+        #friendly_pump = self.nearest_friendly_pump_tile(unit.x, unit.y)
+        #ice_tile = self.nearest_ice_tile(unit.x, unit.y)
+        true_offsets = [(1,0),(0,1),(-1,0),(0,-1)]
+        offsets = [(1,0),(0,1),(-1,0),(0,-1)]
+        while unit.movementLeft > 0 and len(offsets) > 0:
+          offset = random.choice(offsets)
+
+          if unit.move(unit.x + offset[0], unit.y + offset[1]) == True:
+            offsets = true_offsets
+          else:
+            offsets.remove(offset)
+        unit.dig(game_utils.get_tile(self, unit.x, unit.y))
+
+
     return 1
 
   def __init__(self, conn):

@@ -15,8 +15,9 @@ class Player(object):
     self.oxygen = oxygen
     self.maxOxygen = maxOxygen
     self.updatedAt = game.turnNumber
-    self.spawnQueue = []
 
+    self.spawnQueue = []
+    self.spawnCostQueue = []
     self.totalUnits = 0
 
   def toList(self):
@@ -31,25 +32,22 @@ class Player(object):
       unitWorth = [0, 0]
       for unit in self.game.objects.units:
         unitWorth[unit.owner] += self.game.unitTypesDict[unit.type].cost
-
-      # Get value of fish in spawnQueue
-      #inSpawnQueue = sum(self.spawnQueue)
-      inSpawnQueue = 0
-      for tospawn in self.spawnQueue:
-        inSpawnQueue += tospawn[0]
-      #self.spawnQueue = []
-
-      # Calculate currentPlayer's net worth by adding value of owned fish and spawning fish to available spawn food
+      inSpawnQueue = sum(self.spawnCostQueue)
+      self.spawnCostQueue = []
       netWorth = unitWorth[self.id] + self.oxygen + inSpawnQueue
-      # How much your net worth should be if you have not lost any units
       oxyYouShouldHave = self.maxOxygen
-      # How much spawn food you get
       oxyYouGet = math.ceil((oxyYouShouldHave - netWorth) * self.game.oxygenRate)
       self.oxygen += oxyYouGet
 
+      #Make sure oxygen is never over the max oxygen.
+      if self.oxygen > self.maxOxygen:
+        self.oxygen = self.maxOxygen
+      elif self.oxygen < 0:
+        self.oxygen = 0
+
       #SPAWN UNITS
       for newUnitStats in self.spawnQueue:
-        newUnit = self.game.addObject(Unit, newUnitStats[1:])
+        newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
       self.spawnQueue = []
 
@@ -155,7 +153,7 @@ class Unit(Mappable):
     self.x = x
     self.y = y
     self.owner = owner
-    self.type = type # 0 - Digger , 1 - Filler
+    self.type = type
     self.hasAttacked = hasAttacked
     self.hasDug = hasDug
     self.hasFilled = hasFilled
@@ -227,21 +225,14 @@ class Unit(Mappable):
     self.y = y
     self.movementLeft -= 1
     self.game.grid[self.x][self.y].append(self)
-    
-    # Apply damage for moving into a trench
+
     tile = self.game.getTile(x, y)
-    if tile.depth > 0:
-      # Damage for moving through water
-      if tile.waterAmount > 0:
-        self.healthLeft -= self.game.waterDamage + self.game.trenchDamage
-      # Damage for moving into a trench
-      elif not prevTile.depth > 0:
-        self.healthLeft -= self.game.trenchDamage
-      self.handleDeath(self)
-    # Damage for coming out of a trench
-    elif prevTile.depth > 0:
+
+    if tile.depth > 0 ^ prevTile.depth > 0:
       self.healthLeft -= self.game.trenchDamage
-      self.handleDeath(self)
+    if tile.waterAmount > 0 and tile.depth > 0:
+      self.healthLeft -= self.game.waterDamage
+    self.handleDeath(self)
 
     return True
 
@@ -253,23 +244,32 @@ class Unit(Mappable):
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.fillPower <= 0:
       return 'Turn {}: Your unit {} cannot fill.'.format(self.game.turnNumber, self.id)
+    elif tile.owner != 2:
+      return 'Turn {}: Your unit {} can only fill normal tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.hasFilled == 1:
       return 'Turn {}: Your unit {} has already filled in a trench this turn.'.format(self.game.turnNumber, self.id)
-    elif abs(self.x-x) + abs(self.y-y) != 1:
+    elif abs(self.x-x) + abs(self.y-y) > 1:
       return 'Turn {}: Your unit {} can only fill adjacent Tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.depth <= 0:
       return 'Turn {}: Your unit {} cannot fill something that is not a trench. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.waterAmount > 0:
-      return 'Turn {}: Your unit {} cannot fill trenches with water in them."'.format(self.game.turnNumber, self.id)
     elif len(self.game.grid[x][y]) > 1 and self not in self.game.grid[x][y]:
-      return 'Turn {}: Your unit {} cannot fill trenches with units in them.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} cannot fill trenches with other units in them.'.format(self.game.turnNumber, self.id)
+    elif len(self.game.grid[x][y]) > 2:
+      return 'Turn {}: Your unit {} cannot fill trenches with other objects in them.'.format(self.game.turnNumber, self.id)
 
     # Decrease the trenches depth
     tile.depth -= self.fillPower
-    if tile.depth < 0:
+    if tile.depth <= 0:
+      tile.waterAmount = 0
       tile.depth = 0
+
+
     # Unit can no longer move
     self.movementLeft = 0
+
+    #reset deposition rate
+    tile.turnsUntilDeposit = self.game.depositionRate
+
     
     self.hasFilled = 1
     
@@ -286,21 +286,21 @@ class Unit(Mappable):
     elif self.digPower <= 0:
       return 'Turn {}: Your unit {} cannot dig.'.format(self.game.turnNumber, self.id)
     elif self.hasDug == 1:
-      return 'Turn {}: Your {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
+      return 'Turn {}: Your unit {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) > 1:
-      return 'Turn {}: Your {} can only dig adjacent or same tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+      return 'Turn {}: Your unit {} can only dig adjacent or same tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.pumpID != -1:
-      return 'Turn {}: Your {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.owner == 3:
-      return 'Turn {}: Your {} can not dig trenches on ice tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
-    elif tile.owner == 0 or tile.owner == 1:
-      return 'Turn {}: Your {} can not dig trenches on spawn tiles. ({},{}) digs ({},{})'.format(self.game.turn, self.id, self.x, self.y, x, y)
-    elif len(self.game.grid[x][y]) > 1:
-      return 'Turn {}: Your {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+      return 'Turn {}: Your unit {} can not dig trenches on pump tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif tile.owner != 2:
+      return 'Turn {}: Your unit {} can only dig trenches on normal tiles. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif len(self.game.grid[x][y]) > 1 and self not in self.game.grid[x][y]:
+        return 'Turn {}: Your unit {} cannot dig under other units. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif len(self.game.grid[x][y]) > 2:
+      return 'Turn {}: Your unit {} cannot dig under multiple objects. ({},{}) digs ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     
     # Increase the depth of the trench
     tile.depth += self.digPower
-    tile.turnsUntilDeposition = self.game.depositionRate
+    tile.turnsUntilDeposit = self.game.depositionRate
 
     self.movementLeft = 0
     
@@ -370,8 +370,10 @@ class Tile(Mappable):
       if self.turnsUntilDeposit <= 0:
         self.turnsUntilDeposit = self.game.depositionRate
         self.depth -= 1
-    else:
-      self.turnsUntilDeposit -= 1
+        if self.depth <= 0 and self.waterAmount > 0:
+          self.waterAmount = 0
+      else:
+        self.turnsUntilDeposit -= 1
     return
 
   def spawn(self, type):
@@ -379,8 +381,6 @@ class Tile(Mappable):
 
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot spawn a unit on a tile you do not own. ({},{})'.format(self.game.turnNumber, self.x, self.y)
-    if player.oxygen < self.game.unitCost:
-      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, self.game.unitCost, self.x, self.y)
     if len(self.game.grid[self.x][self.y]) > 1:
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.totalUnits >= self.game.maxUnits:
@@ -390,12 +390,15 @@ class Tile(Mappable):
     unittype = self.game.typeToUnitType(type)
     if unittype is None:
       return 'Turn {}: You cannot spawn a unit with this type.'.format(self.game.turnNumber)
+    if player.oxygen < unittype.cost:
+      return 'Turn {}: You do not have enough resources({}) to spawn this unit({}). ({},{})'.format(self.game.turnNumber, player.oxygen, unittype.cost, self.x, self.y)
 
     player.oxygen -= unittype.cost
 
     #['id', 'x', 'y', 'owner', 'type', 'hasAttacked', 'hasDug', 'hasFilled', 'healthLeft', 'maxHealth', 'movementLeft', 'maxMovement', 'range', 'offensePower', 'defensePower', 'digpower', 'fillPower', 'attackPower']
-    newUnitStats = [unittype.cost, self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower, unittype.attackPower]
+    newUnitStats = [self.x, self.y, self.owner, type, 0, 0, 0, unittype.maxHealth, unittype.maxHealth, unittype.maxMovement, unittype.maxMovement, unittype.range, unittype.offensePower, unittype.defensePower, unittype.digPower, unittype.fillPower, unittype.attackPower]
     player.spawnQueue.append(newUnitStats)
+    player.spawnCostQueue.append(unittype.cost)
     player.totalUnits += 1
 
     #TODO: Add spawning animation

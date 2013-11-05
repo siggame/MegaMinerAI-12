@@ -12,10 +12,10 @@ texture trench_canal textures/Trench_Canal.png
 texture trench_corner textures/Trench_Corner.png
 texture trench_tail textures/Trench_Tail.png
 texture trench_tip textures/Trench_Tip.png
-texture trail textures/footprint.png
 texture water_tank hud/Water_Tank.png
 texture water_tank_back hud/Water_Tank_Back.png
 texture background hud/stars.png
+texture laser textures/laser.png
 animation pump animations/pump.png
 animation death animations/death.png
 animation tile textures/tile_ground.png

@@ -6,12 +6,37 @@
 #include <utility>
 #include <time.h>
 #include <list>
-#include <glm/glm.hpp>
 #include <queue>
 #include <set>
+#include <iomanip>
+
+#include <glm/glm.hpp>
 
 namespace visualizer
 {
+
+void RenderProgressBar(const IRenderer& renderer,
+						   float xPos, float yPos,
+						   float width, float height,
+						   float percent, const Color& col, bool bDrawText)
+{
+	// Render the health bars
+	renderer.setColor(Color(0.4f,0.4f,0.4f,1.0f));
+	renderer.drawQuad(xPos + width,yPos, -(1.0f - percent) * width, height); // height
+
+	renderer.setColor(col);
+	renderer.drawQuad(xPos,yPos, percent * width, height);
+
+	if(bDrawText)
+	{
+		ostringstream stream;
+		stream << fixed << setprecision(2) << percent * 100 << '%';
+
+		float middle = (xPos + (width / 2.0f));
+		renderer.setColor(Color(1.0f,1.0f,1.0f,1.0f));
+		renderer.drawText(middle,yPos - 0.1f,"Roboto",stream.str(),5.0f*height,IRenderer::Center);
+	}
+}
 
 Mars::Mars()
 {
@@ -115,31 +140,31 @@ glm::vec3 Mars::GetTeamColor(int owner) const
 void Mars::drawObjectSelection() const
 {
 	int turn = timeManager->getTurn();
-    if(turn < m_game->states.size())
-    {
-        for(auto& iter : m_selectedUnitIDs)
-        {
-            if(m_game->states[turn].units.find(iter) != m_game->states[turn].units.end())
-                drawQuadAroundObj(m_game->states[turn].units.at(iter), glm::vec4(1.0, 0.4, 0.4, 0.6 ));
-        }
+	if(turn < m_game->states.size())
+	{
+		for(auto& iter : m_selectedUnitIDs)
+		{
+			if(m_game->states[turn].units.find(iter) != m_game->states[turn].units.end())
+				drawQuadAroundObj(m_game->states[turn].units.at(iter), glm::vec4(1.0, 0.4, 0.4, 0.6 ));
+		}
 
-        for(auto& iter : m_selectedUnitIDs)
-        {
-            if(m_game->states[turn].tiles.find(iter) != m_game->states[turn].tiles.end())
-                drawQuadAroundObj(m_game->states[turn].tiles.at(iter), glm::vec4(0.3, 0.0, 1.0, 0.6));
-        }
+		for(auto& iter : m_selectedUnitIDs)
+		{
+			if(m_game->states[turn].tiles.find(iter) != m_game->states[turn].tiles.end())
+				drawQuadAroundObj(m_game->states[turn].tiles.at(iter), glm::vec4(0.3, 0.0, 1.0, 0.6));
+		}
 
-        int focus = gui->getCurrentUnitFocus();
+		int focus = gui->getCurrentUnitFocus();
 
-        if(focus >= 0)
-        {
-            if(m_game->states[turn].units.find(focus) != m_game->states[turn].units.end())
-                drawBoxAroundObj(m_game->states[turn].units.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+		if(focus >= 0)
+		{
+			if(m_game->states[turn].units.find(focus) != m_game->states[turn].units.end())
+				drawBoxAroundObj(m_game->states[turn].units.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
-            if(m_game->states[turn].tiles.find(focus) != m_game->states[turn].tiles.end())
-                drawBoxAroundObj(m_game->states[turn].tiles.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-        }
-    }
+			if(m_game->states[turn].tiles.find(focus) != m_game->states[turn].tiles.end())
+				drawBoxAroundObj(m_game->states[turn].tiles.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+		}
+	}
 }
 
 void Mars::drawBoxAroundObj(const SmartPointer<parser::Mappable> obj, const glm::vec4& color) const
@@ -182,7 +207,7 @@ void Mars::preDraw()
 
 	ProccessInput();
 
-    renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
+	renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
 	renderer->drawTexturedQuad(-1.0f, -1.0f, 77, 37 ,tile, "background");
 
 	renderer->setColor(Color());
@@ -190,7 +215,7 @@ void Mars::preDraw()
 	renderer->drawTexturedQuad(0.0f,0.0f,m_game->mapWidth,m_game->mapHeight,1.7f,"dirt"); // 1.7
 
 	drawGrid();
-    RenderHUD();
+	RenderHUD();
 
 // Handle player input here
 }
@@ -270,34 +295,34 @@ void Mars::pruneSelection()
 	int focus = gui->getCurrentUnitFocus();
 
 
-    if(turn < m_game->states.size())
-    {
-        auto iter = m_selectedUnitIDs.begin();
-        while(iter != m_selectedUnitIDs.end())
-        {
-            // if it doesn't exist anymore, remove it from the selection.
-            if(m_game->states[turn].units.find(*iter) == m_game->states[turn].units.end() &&
-              (m_game->states[turn].tiles.find(*iter) == m_game->states[turn].tiles.end() ||
+	if(turn < m_game->states.size())
+	{
+		auto iter = m_selectedUnitIDs.begin();
+		while(iter != m_selectedUnitIDs.end())
+		{
+			// if it doesn't exist anymore, remove it from the selection.
+			if(m_game->states[turn].units.find(*iter) == m_game->states[turn].units.end() &&
+			  (m_game->states[turn].tiles.find(*iter) == m_game->states[turn].tiles.end() ||
 			  (m_game->states[turn].tiles.at(*iter)->depth > 0 &&
-               m_game->states[turn].tiles.at(*iter)->owner != 3 &&
-               m_game->states[turn].tiles.at(*iter)->pumpID == -1)))
-            {
-                iter = m_selectedUnitIDs.erase(iter);
-                changed = true;
-            }
-            else
-                iter++;
-        }
+			   m_game->states[turn].tiles.at(*iter)->owner != 3 &&
+			   m_game->states[turn].tiles.at(*iter)->pumpID == -1)))
+			{
+				iter = m_selectedUnitIDs.erase(iter);
+				changed = true;
+			}
+			else
+				iter++;
+		}
 
-        if(changed == true)
-        {
-            gui->updateDebugWindow();
-        }
+		if(changed == true)
+		{
+			gui->updateDebugWindow();
+		}
 
-        // if previous focus is dead/gone then reset it to the top of the table
-        if(std::find(m_selectedUnitIDs.begin(), m_selectedUnitIDs.end(), focus) == m_selectedUnitIDs.end())
-            gui->updateDebugUnitFocus();
-    }
+		// if previous focus is dead/gone then reset it to the top of the table
+		if(std::find(m_selectedUnitIDs.begin(), m_selectedUnitIDs.end(), focus) == m_selectedUnitIDs.end())
+			gui->updateDebugUnitFocus();
+	}
 }
 
 void Mars::optionStateChanged()
@@ -353,19 +378,21 @@ void Mars::loadGamelog( std::string gamelog )
 
 void Mars::RenderHUD()
 {
-    std::ostringstream waterInfo;
-    int turn = timeManager->getTurn();
-    float tankWidth = 21.0f;
+	std::ostringstream waterInfo;
+	int turn = timeManager->getTurn();
+	float tankWidth = 21.0f;
 
-    const float barWidth = 13.0f;  // <--- unlucky as shit
+	const float barWidth = 13.0f;  // <--- unlucky as shit
 
-    float totalWater = m_game->states[turn].players[0]->waterStored + m_game->states[turn].players[1]->waterStored;
+	float totalWater = m_game->states[turn].players[0]->waterStored + m_game->states[turn].players[1]->waterStored;
+
+
 	float lengthBlue = 0.0f;
 	float lengthRed = 0.0f;
 
-    if(totalWater != 0)
+	if(totalWater != 0)
 	{
-        lengthBlue = (m_game->states[turn].players[0]->waterStored / totalWater) * barWidth;
+		lengthBlue = (m_game->states[turn].players[0]->waterStored / totalWater) * barWidth;
 		lengthRed = barWidth - lengthBlue;
 	}
 
@@ -374,34 +401,41 @@ void Mars::RenderHUD()
 	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"water_tank_back");
 
 	// Render player #0 info
+	float oxygenLevel = m_game->states[turn].players[0]->oxygen / (float)m_game->states[turn].players[0]->maxOxygen;
+
 	glm::vec3 playerColor = GetTeamColor(0);
 	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
 	renderer->drawText(0.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[0]->playerName, 3.0f, IRenderer::Left);
 
-    waterInfo << "Water Amount: " << m_game->states[turn].players[0]->waterStored;
-    renderer->drawText(0.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
-    waterInfo.str("");
+	waterInfo << "Water Amount: " << m_game->states[turn].players[0]->waterStored;
+	renderer->drawText(0.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
+	waterInfo.str("");
 
 	renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2.0f), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
 
-    // Render player #1
+	RenderProgressBar(*renderer,0.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),true);
+
+	// Render player #1
+	oxygenLevel = m_game->states[turn].players[1]->oxygen / (float)m_game->states[turn].players[1]->maxOxygen;
+
 	playerColor = GetTeamColor(1);
 	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
 	renderer->drawText(40.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
 
-    waterInfo << "Water Amount: " << m_game->states[turn].players[1]->waterStored;
-    renderer->drawText(40.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Right);
+	waterInfo << "Water Amount: " << m_game->states[turn].players[1]->waterStored;
+	renderer->drawText(40.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Right);
 
 	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
+
+	RenderProgressBar(*renderer,36.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),true);
 
 	// Render the divider between the players progress bar
 	renderer->setColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
 	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue - 0.1f, m_game->mapHeight + 1.2f, 0.2f, 2.0f);
 
-    // Render the front of the tank
-    renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
+	// Render the front of the tank
+	renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
 	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"water_tank");
-
 }
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
@@ -432,7 +466,7 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 	return false;
 }
 
-void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<int>>& trailMap, Frame& turn)
+void Mars::RenderWorld(int state, Frame& turn)
 {
 	// todo: this could be moved elsewhere, it should be
 	static std::map<int,int> counter;
@@ -794,7 +828,7 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 				waterAmountString << tileIter->waterAmount;
 				DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
 														glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
-														glm::vec4(0.3f,0.0f,1.0f,1.0f),
+														glm::vec4(0.0f,0.0f,0.0f,1.0f),
 														3.0f);
 
 				pText->addKeyFrame(textBox);
@@ -810,32 +844,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		turn[tileIter->id]["y"] = tileIter->y;
 		turn[tileIter->id]["id"] = tileIter->id;
 
-	}
-
-	// todo: clean this up
-	for(auto iter = trail.begin(); iter != trail.end();)
-	{
-		ColorSprite::Fade fade = ColorSprite::None;
-		if(trailMap[iter->y][iter->x] == 0)
-		{
-			fade = ColorSprite::FadeOut;
-		}
-
-		// First Draw trail at iter->second
-		SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(iter->x, iter->y), glm::vec2(1.0f, 1.0f), "trail", "footprints");
-		pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.3f),fade));
-		turn.addAnimatable(pTile);
-
-		// Then pop them if turnDiff > n
-		if(trailMap[iter->y][iter->x] == 0)
-		{
-			iter = trail.erase(iter);
-		}
-		else
-		{
-			--trailMap[iter->y][iter->x];
-			++iter;
-		}
 	}
 
 
@@ -866,15 +874,31 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 			{
 				parser::move& move = (parser::move&)*animationIter;
 				pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(move.toX, move.toY), glm::vec2(move.fromX, move.fromY)));
-
-				if(trailMap[move.toY][move.toX] == 0)
+			}
+			else if(animationIter->type == parser::ATTACK)
+			{
+				if(state != 0)
 				{
-					//trail.push_back(glm::ivec2(move.fromX, move.fromY));
-					trail.push_back(glm::ivec2(move.toX, move.toY));
-				}
+					parser::attack& attack = (parser::attack&)*animationIter;
+					auto attackerIter = m_game->states[state - 1].units.find(attack.actingID);
+					auto targetIter = m_game->states[state].units.find(attack.targetID);
 
-				// todo: move the path length var into a const
-				trailMap[move.toY][move.toX] = 4;
+					if(attackerIter != m_game->states[state].units.end() && targetIter != m_game->states[state].units.end())
+					{
+						glm::vec2 from(attackerIter->second->x,attackerIter->second->y);
+						glm::vec2 to(targetIter->second->x,targetIter->second->y);
+						glm::vec2 diff = to - from;
+						float angle = glm::degrees(std::atan2(diff.y,diff.x));
+
+						SmartPointer<MoveableSprite> pLaser = new MoveableSprite("laser");
+						pLaser->m_Moves.push_back(MoveableSprite::Move(to,from));
+						pLaser->addKeyFrame(new DrawRotatedSmoothMoveSprite(pLaser, glm::vec4(1.0f,1.0f,1.0f,0.7f),angle));
+						//turn.addAnimatable(pLaser);
+
+						animList.push(pLaser);
+
+					}
+				}
 			}
 		}
 
@@ -892,12 +916,6 @@ void Mars::RenderWorld(int state, std::deque<glm::ivec2>& trail, vector<vector<i
 		if(pUnit->m_Moves.empty())
 		{
 			pUnit->m_Moves.push_back(MoveableSprite::Move(glm::vec2(unitIter->x, unitIter->y), glm::vec2(unitIter->x, unitIter->y)));
-			if(trailMap[unitIter->y][unitIter->x] == 0)
-			{
-				trail.push_back(glm::ivec2(unitIter->x, unitIter->y));
-			}
-			trailMap[unitIter->y][unitIter->x] = 4;
-
 
 			if(state > 0 &&
 			   m_game->states[state - 1].units.find(unitIter->id) != m_game->states[state - 1].units.end() &&
@@ -956,21 +974,12 @@ void Mars::run()
 
 	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
 
-	std::deque<glm::ivec2> trail;
-
-	// todo: maybe flip this so that x is first, then y
-	std::vector<std::vector<int>> trailMap(m_game->mapHeight);
-	for(auto& idMapiter : trailMap)
-	{
-		idMapiter.resize(m_game->mapWidth,0);
-	}
-
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
 	{
 		Frame turn;  // The frame that will be drawn
 
-		RenderWorld(state, trail, trailMap, turn);
+		RenderWorld(state, turn);
 
 		if(state >= (int)(m_game->states.size() - 10))
 		{
