@@ -861,7 +861,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 						glm::vec2 diff = to - from;
 						float angle = glm::degrees(std::atan2(diff.y,diff.x));
 
-						SmartPointer<MoveableSprite> pLaser = new MoveableSprite("laser");
+						SmartPointer<MoveableSprite> pLaser = new MoveableSprite("laser",glm::vec2(1.0f,0.5f));
 						pLaser->m_Moves.push_back(MoveableSprite::Move(to,from));
 						pLaser->addKeyFrame(new DrawRotatedSmoothMoveSprite(pLaser, glm::vec4(1.0f,1.0f,1.0f,0.7f),angle));
 

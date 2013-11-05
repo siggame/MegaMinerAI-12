@@ -71,14 +71,14 @@ namespace visualizer
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
         ColorSprite::animate(t,d,game);
-		game->renderer->drawTexturedQuad(m_sprite->pos.x, m_sprite->pos.y, m_sprite->scale.x, m_sprite->scale.y,1.0f,m_sprite->m_sprite);
+		game->renderer->drawTexturedQuad(m_sprite->m_pos.x, m_sprite->m_pos.y, m_sprite->m_scale.x, m_sprite->m_scale.y,1.0f,m_sprite->m_sprite);
 	}
 
 	void DrawRotatedSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
         ColorSprite::animate(t,d,game);
-        game->renderer->drawRotatedTexturedQuad(m_sprite->pos.x, m_sprite->pos.y,
-				  m_sprite->scale.x, m_sprite->scale.y, 1.0f, m_rot, m_sprite->m_sprite);
+		game->renderer->drawRotatedTexturedQuad(m_sprite->m_pos.x, m_sprite->m_pos.y,
+				  m_sprite->m_scale.x, m_sprite->m_scale.y, 1.0f, m_rot, m_sprite->m_sprite);
 	}
 
 	void DrawSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
@@ -96,13 +96,13 @@ namespace visualizer
 	void DrawFlippedSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
 		DrawSmoothMoveSprite::animate(t, d, game);
-		game->renderer->drawTexturedQuad(m_pos.x, m_pos.y, 1.0f, 1.0f, 1.0f, m_Sprite->m_SpriteName, m_Flipped);
+		game->renderer->drawTexturedQuad(m_pos.x, m_pos.y, m_Sprite->m_scale.x, m_Sprite->m_scale.y, 1.0f, m_Sprite->m_sprite, m_Flipped);
 	}
 
 	void DrawRotatedSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
 		DrawSmoothMoveSprite::animate(t, d, game);
-		game->renderer->drawRotatedTexturedQuad(m_pos.x, m_pos.y, 1.0f, 1.0f, 1.0f, m_angle, m_Sprite->m_SpriteName);
+		game->renderer->drawRotatedTexturedQuad(m_pos.x, m_pos.y, m_Sprite->m_scale.x, m_Sprite->m_scale.y, 1.0f, m_angle, m_Sprite->m_sprite);
 	}
 
     void DrawAnimatedSprite::animate(const float &t, AnimData*d, IGame* game)
@@ -110,7 +110,7 @@ namespace visualizer
         ColorSprite::animate(t, d, game);
 
         float animTime = m_Sprite->m_SingleFrame ? t : 1.0f;
-        game->renderer->drawAnimQuad( m_Sprite->pos.x, m_Sprite->pos.y, m_Sprite->scale.x, m_Sprite->scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * animTime));
+		game->renderer->drawAnimQuad( m_Sprite->m_pos.x, m_Sprite->m_pos.y, m_Sprite->m_scale.x, m_Sprite->m_scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * animTime));
 
 		//game->renderer->drawProgressBar()
 	}
@@ -119,7 +119,7 @@ namespace visualizer
 	{
         game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
 
-        game->renderer->drawText(m_Pos.x, m_Pos.y, "Roboto", m_Text, m_Size, m_Alignment);
+		game->renderer->drawText(m_Pos.x, m_Pos.y, "Roboto", m_Text, m_Size, m_Alignment);
 
 	};
 
