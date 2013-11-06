@@ -19,3 +19,5 @@ texture laser textures/laser.png
 animation pump animations/pump.png
 animation death animations/death.png
 animation tile textures/tile_ground.png
+animation dig animations/dig.png
+animation fill animations/fill.png

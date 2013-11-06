@@ -887,6 +887,33 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 					}
 				}
 			}
+			else if(animationIter->type == parser::DIG)
+			{
+				parser::dig& dig = (parser::dig&)*animationIter;
+
+				auto digIter = m_game->states[state].tiles.find(dig.tileID);
+				if(digIter != m_game->states[state].tiles.end())
+				{
+					SmartPointer<AnimatedSprite> pDig = new AnimatedSprite(glm::vec2(digIter->second->x, digIter->second->y), glm::vec2(1.0f), "dig", 8,true);
+					pDig->addKeyFrame(new DrawAnimatedSprite(pDig,glm::vec4(1.0f)));
+
+					turn.addAnimatable(pDig);
+
+				}
+			}
+			else if(animationIter->type == parser::FILL)
+			{
+				parser::fill& fill = (parser::fill&)*animationIter;
+
+				auto fillIter = m_game->states[state].tiles.find(fill.tileID);
+				if(fillIter != m_game->states[state].tiles.end())
+				{
+					SmartPointer<AnimatedSprite> pFill = new AnimatedSprite(glm::vec2(fillIter->second->x, fillIter->second->y), glm::vec2(1.0f), "fill", 6,true);
+					pFill->addKeyFrame(new DrawAnimatedSprite(pFill,glm::vec4(1.0f)));
+
+					turn.addAnimatable(pFill);
+				}
+			}
 		}
 
 		glm::vec2 deathPos(unitIter->x,unitIter->y);
