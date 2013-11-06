@@ -4,6 +4,31 @@
 
 namespace visualizer
 {
+	void RenderProgressBar(const IRenderer& renderer,
+					   float xPos, float yPos,
+					   float width, float height,
+					   float percent,
+					   const Color& col, const Color& backgroundColor,
+					   bool bDrawText)
+	{
+		// Render the health bars
+		renderer.setColor(backgroundColor);
+		renderer.drawQuad(xPos + width,yPos, -(1.0f - percent) * width, height); // height
+
+		renderer.setColor(col);
+		renderer.drawQuad(xPos,yPos, percent * width, height);
+
+		if(bDrawText)
+		{
+			ostringstream stream;
+			stream << fixed << setprecision(2) << percent * 100 << '%';
+
+			float middle = (xPos + (width / 2.0f));
+			renderer.setColor(Color(1.0f,1.0f,1.0f,1.0f));
+			renderer.drawText(middle,yPos - 0.1f,"Roboto",stream.str(),5.0f*height,IRenderer::Center);
+		}
+	}
+
 	void ColorSprite::animate(const float &t, AnimData*, IGame *game)
     {
 		float alpha = m_color.a;
@@ -32,24 +57,7 @@ namespace visualizer
 
 	void DrawProgressBar::animate(const float &t, AnimData* d, IGame *game)
 	{
-		IRenderer& renderer = *game->renderer;
-
-		renderer.setColor(Color(0.0f,0.0f,0.0f,0.7f));
-		renderer.drawQuad(m_pos.x + m_width,m_pos.y, -(1.0f - m_percent) * m_width, m_height); // height
-
-		renderer.setColor(Color(1.0f,0.0f,0.0f,0.5f));
-		renderer.drawQuad(m_pos.x,m_pos.y, m_percent * m_width, m_height);
-
-		// enable this to draw the % in the progress bar
-		/*if(bDrawText)
-		{
-			ostringstream stream;
-			stream << fixed << setprecision(2) << m_percent * 100 << '%';
-
-			float middle = (m_pos.x + (m_width / 2.0f));
-			renderer.setColor(Color(1.0f,1.0f,1.0f,1.0f));
-			renderer.drawText(middle,m_pos.y - 0.1f,"Roboto",stream.str(),5.0f*m_height,IRenderer::Center);
-		}*/
+		RenderProgressBar(*game->renderer,m_pos.x,m_pos.y,m_width,m_height,m_percent,Color(1.0f,0.0f,0.0f,0.5f));
 	}
 
 	void DrawSmoothSpriteProgressBar::animate(const float &t, AnimData *d, IGame *game)
@@ -63,14 +71,14 @@ namespace visualizer
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
         ColorSprite::animate(t,d,game);
-		game->renderer->drawTexturedQuad(m_sprite->pos.x, m_sprite->pos.y, m_sprite->scale.x, m_sprite->scale.y,1.0f,m_sprite->m_sprite);
+		game->renderer->drawTexturedQuad(m_sprite->m_pos.x, m_sprite->m_pos.y, m_sprite->m_scale.x, m_sprite->m_scale.y,1.0f,m_sprite->m_sprite);
 	}
 
 	void DrawRotatedSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
         ColorSprite::animate(t,d,game);
-        game->renderer->drawRotatedTexturedQuad(m_sprite->pos.x, m_sprite->pos.y,
-				  m_sprite->scale.x, m_sprite->scale.y, 1.0f, m_rot, m_sprite->m_sprite);
+		game->renderer->drawRotatedTexturedQuad(m_sprite->m_pos.x, m_sprite->m_pos.y,
+				  m_sprite->m_scale.x, m_sprite->m_scale.y, 1.0f, m_rot, m_sprite->m_sprite);
 	}
 
 	void DrawSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
@@ -88,13 +96,13 @@ namespace visualizer
 	void DrawFlippedSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
 		DrawSmoothMoveSprite::animate(t, d, game);
-		game->renderer->drawTexturedQuad(m_pos.x, m_pos.y, 1.0f, 1.0f, 1.0f, m_Sprite->m_SpriteName, m_Flipped);
+		game->renderer->drawTexturedQuad(m_pos.x, m_pos.y, m_Sprite->m_scale.x, m_Sprite->m_scale.y, 1.0f, m_Sprite->m_sprite, m_Flipped);
 	}
 
 	void DrawRotatedSmoothMoveSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
 		DrawSmoothMoveSprite::animate(t, d, game);
-		game->renderer->drawRotatedTexturedQuad(m_pos.x, m_pos.y, 1.0f, 1.0f, 1.0f, m_angle, m_Sprite->m_SpriteName);
+		game->renderer->drawRotatedTexturedQuad(m_pos.x, m_pos.y, m_Sprite->m_scale.x, m_Sprite->m_scale.y, 1.0f, m_angle, m_Sprite->m_sprite);
 	}
 
     void DrawAnimatedSprite::animate(const float &t, AnimData*d, IGame* game)
@@ -102,7 +110,7 @@ namespace visualizer
         ColorSprite::animate(t, d, game);
 
         float animTime = m_Sprite->m_SingleFrame ? t : 1.0f;
-        game->renderer->drawAnimQuad( m_Sprite->pos.x, m_Sprite->pos.y, m_Sprite->scale.x, m_Sprite->scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * animTime));
+		game->renderer->drawAnimQuad( m_Sprite->m_pos.x, m_Sprite->m_pos.y, m_Sprite->m_scale.x, m_Sprite->m_scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * animTime));
 
 		//game->renderer->drawProgressBar()
 	}
@@ -111,22 +119,32 @@ namespace visualizer
 	{
         game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
 
-        game->renderer->drawText(m_Pos.x, m_Pos.y, "Roboto", m_Text, m_Size, m_Alignment);
+		game->renderer->drawText(m_Pos.x, m_Pos.y, "Roboto", m_Text, m_Size, m_Alignment);
 
 	};
 
-	void DrawSplashScreen::animate(const float &, AnimData*, IGame *game)
+	void DrawSplashScreen::animate(const float &t, AnimData*, IGame *game)
 	{
-		game->renderer->setColor(Color(1.0f,1.0f,1.0f,0.5f));
+		if(game->options->getNumber("Enable Victory Screen") > 0.0f)
+		{
+			//game->timeManager->setSpeed(1 - t);
 
-		game->renderer->drawQuad(0.0f,0.0f,m_SplashScreen->width,m_SplashScreen->height);
+			game->renderer->setColor(Color(1.0f,1.0f,1.0f,0.8f * t));
 
-		game->renderer->setColor(Color(0.2f,1.0f,1.0f,1.0f));
-		game->renderer->drawText(m_SplashScreen->width / 2.0f,
-								 m_SplashScreen->height / 2.0f,
-								 "Roboto",
-								 m_SplashScreen->winReason,8.0f,
-								 IRenderer::Center);
+			game->renderer->drawQuad(0.0f,0.0f,m_SplashScreen->width,m_SplashScreen->height);
+
+			game->renderer->setColor(Color(0.2f,1.0f,1.0f,1.0f));
+			game->renderer->drawText(m_SplashScreen->width / 2.0f,
+									 m_SplashScreen->height / 2.0f,
+									 "Roboto",
+									 m_SplashScreen->winReason,8.0f,
+									 IRenderer::Center);
+
+			/*if(game->timeManager->getSpeed() >= 0.0f && game->timeManager->getSpeed() <= 0.01f )
+			{
+				game->timeManager->setSpeed(1.0f);
+			}*/
+		}
 	}
 
 }

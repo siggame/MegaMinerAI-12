@@ -233,7 +233,7 @@ class Unit(Mappable):
 
     if tile.depth > 0 ^ prevTile.depth > 0:
       self.healthLeft -= self.game.trenchDamage
-    if tile.waterAmount > 0:
+    if tile.waterAmount > 0 and tile.depth > 0:
       self.healthLeft -= self.game.waterDamage
     self.handleDeath(self)
 

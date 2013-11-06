@@ -5,6 +5,13 @@
 
 namespace visualizer
 {
+	void RenderProgressBar(const IRenderer& renderer,
+						   float xPos, float yPos,
+						   float width, float height,
+						   float percent,
+						   const Color& col, const Color& backgroundColor = Color(0,0,0,0.8f),
+						   bool bDrawText = false);
+
     // NOTE: consider combining color sprite and DrawSprite since they are
     //    essentially the same, except that DrawSprite is drawn with white.
     class ColorSprite : public Anim
@@ -88,8 +95,8 @@ namespace visualizer
 
 	protected:
 
-		glm::vec2 m_pos;
 		MoveableSprite * m_Sprite;
+		glm::vec2 m_pos;
 
 	};
 

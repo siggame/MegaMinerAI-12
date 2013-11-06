@@ -15,29 +15,6 @@
 namespace visualizer
 {
 
-void RenderProgressBar(const IRenderer& renderer,
-						   float xPos, float yPos,
-						   float width, float height,
-						   float percent, const Color& col, bool bDrawText)
-{
-	// Render the health bars
-	renderer.setColor(Color(0.4f,0.4f,0.4f,1.0f));
-	renderer.drawQuad(xPos + width,yPos, -(1.0f - percent) * width, height); // height
-
-	renderer.setColor(col);
-	renderer.drawQuad(xPos,yPos, percent * width, height);
-
-	if(bDrawText)
-	{
-		ostringstream stream;
-		stream << fixed << setprecision(2) << percent * 100 << '%';
-
-		float middle = (xPos + (width / 2.0f));
-		renderer.setColor(Color(1.0f,1.0f,1.0f,1.0f));
-		renderer.drawText(middle,yPos - 0.1f,"Roboto",stream.str(),5.0f*height,IRenderer::Center);
-	}
-}
-
 Mars::Mars()
 {
 	m_game = 0;
@@ -280,7 +257,7 @@ list<IGUI::DebugOption> Mars::getDebugOptions()
 {
 	return std::list<IGUI::DebugOption>({{"Units Selectable", true},
 										 {"Tiles Selectable", true},
-										 {"Render Footprints", true}});
+										});
 }
 
 std::map<std::string, bool> Mars::getRenderTagState()
@@ -293,7 +270,6 @@ void Mars::pruneSelection()
 	int turn = timeManager->getTurn();
 	bool changed = false;
 	int focus = gui->getCurrentUnitFocus();
-
 
 	if(turn < m_game->states.size())
 	{
@@ -327,12 +303,7 @@ void Mars::pruneSelection()
 
 void Mars::optionStateChanged()
 {
-	int footprints = gui->getDebugOptionState("Render Footprints");
-
-	std::cout << "options state changed\n";
-
-	if(footprints > -1)
-		m_renderTagState["footprints"] = footprints;
+	cout << "options state changed" << endl;
 }
 
 void Mars::loadGamelog( std::string gamelog )
@@ -413,7 +384,7 @@ void Mars::RenderHUD()
 
 	renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2.0f), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
 
-	RenderProgressBar(*renderer,0.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),true);
+	RenderProgressBar(*renderer,0.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
 
 	// Render player #1
 	oxygenLevel = m_game->states[turn].players[1]->oxygen / (float)m_game->states[turn].players[1]->maxOxygen;
@@ -427,7 +398,7 @@ void Mars::RenderHUD()
 
 	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
 
-	RenderProgressBar(*renderer,36.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),true);
+	RenderProgressBar(*renderer,36.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
 
 	// Render the divider between the players progress bar
 	renderer->setColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
@@ -890,23 +861,25 @@ void Mars::RenderWorld(int state, Frame& turn)
 						glm::vec2 diff = to - from;
 						float angle = glm::degrees(std::atan2(diff.y,diff.x));
 
-						SmartPointer<MoveableSprite> pLaser = new MoveableSprite("laser");
+						SmartPointer<MoveableSprite> pLaser = new MoveableSprite("laser",glm::vec2(1.0f,0.5f));
 						pLaser->m_Moves.push_back(MoveableSprite::Move(to,from));
 						pLaser->addKeyFrame(new DrawRotatedSmoothMoveSprite(pLaser, glm::vec4(1.0f,1.0f,1.0f,0.7f),angle));
-						//turn.addAnimatable(pLaser);
 
 						animList.push(pLaser);
 
 					}
 				}
 			}
-		}
-
-		if((state + 1) < (int)m_game->states.size())
-		{
-			if(m_game->states[state + 1].units.find(unitIter->id) == m_game->states[state + 1].units.end())
+			else if(animationIter->type == parser::DEATH)
 			{
-				SmartPointer<AnimatedSprite> pDeathAnimation = new AnimatedSprite(glm::vec2(unitIter->x, unitIter->y), glm::vec2(1.0f), "death", 7,true);
+				glm::vec2 deathPos(unitIter->x, unitIter->y);
+
+				if(!pUnit->m_Moves.empty())
+				{
+					deathPos = pUnit->m_Moves.back().to;
+				}
+
+				SmartPointer<AnimatedSprite> pDeathAnimation = new AnimatedSprite(deathPos, glm::vec2(1.0f), "death", 7,true);
 				pDeathAnimation->addKeyFrame(new DrawAnimatedSprite(pDeathAnimation,glm::vec4(GetTeamColor(unitIter->owner),1.0f)));
 
 				deathList.push(pDeathAnimation);
@@ -981,7 +954,7 @@ void Mars::run()
 
 		RenderWorld(state, turn);
 
-		if(state >= (int)(m_game->states.size() - 10))
+		if(state >= (int)(m_game->states.size() - 1))
 		{
 			turn.addAnimatable(splashScreen);
 		}
@@ -1067,7 +1040,17 @@ Mars::Game::Game(parser::Game* game) :
 			states[i].players[player.second.id] = SmartPointer<parser::Player>(new parser::Player(player.second));
 
 		for(auto& unit : game->states[i].units)
+		{
+			if((i + 1) < (int)game->states.size())
+			{
+				if(game->states[i + 1].units.find(unit.second.id) == game->states[i + 1].units.end())
+				{
+					states[i + 1].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i + 1], unit.second));
+				}
+			}
+
 			states[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
+		}
 
 		// set all pointer this frame to the one before
 		for(auto& tileBefore : states[i-1].tiles)
