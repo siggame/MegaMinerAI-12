@@ -1,0 +1,38 @@
+import time
+
+# Test .pop
+list1 = [x for x in xrange(0, 10000)]
+genesis = time.clock()
+
+while list1:
+  d = list1.pop()
+
+print("Time .pop() 10000 values : {}".format(time.clock() - genesis))
+
+# Test equivalent at beginning
+list1 = [x for x in xrange(0, 10000)]
+genesis = time.clock()
+
+while list1:
+  d = list1[0]
+  del list1[0]
+
+print("Time del list[0] 10000 values : {}".format(time.clock() - genesis))
+
+# Test .append()
+list1 = []
+genesis = time.clock()
+
+for x in xrange(0, 10000):
+  list1.append(x)
+
+print("Time .append(x) 10000 values : {}".format(time.clock() - genesis))
+
+# Test .insert() at beginning
+list1 = []
+genesis = time.clock()
+
+for x in xrange(0, 10000):
+  list1.insert(0, x)
+
+print("Time .insert(0, x) 10000 values : {}".format(time.clock() - genesis))
