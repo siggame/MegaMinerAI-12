@@ -15,6 +15,8 @@
 namespace visualizer
 {
 
+const int GLACIER = 3;
+
 Mars::Mars()
 {
 	m_game = 0;
@@ -97,7 +99,7 @@ void Mars::ProccessInput()
 				const auto& tile = iter.second;
 
 				if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y &&
-				  (tile->depth >= 1 || tile->owner == 3 || tile->pumpID != -1))
+                  (tile->depth >= 1 || tile->owner == GLACIER || tile->pumpID != -1))
 				{
 					m_selectedUnitIDs.push_back(tile->id);
 				}
@@ -280,7 +282,7 @@ void Mars::pruneSelection()
 			if(m_game->states[turn].units.find(*iter) == m_game->states[turn].units.end() &&
 			  (m_game->states[turn].tiles.find(*iter) == m_game->states[turn].tiles.end() ||
 			  (m_game->states[turn].tiles.at(*iter)->depth > 0 &&
-			   m_game->states[turn].tiles.at(*iter)->owner != 3 &&
+               m_game->states[turn].tiles.at(*iter)->owner != GLACIER &&
 			   m_game->states[turn].tiles.at(*iter)->pumpID == -1)))
 			{
 				iter = m_selectedUnitIDs.erase(iter);
@@ -427,7 +429,7 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 		if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
 		{
 			const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
-			if((pTile->owner == 3) || (pTile->waterAmount > 0))
+            if((pTile->owner == GLACIER) || (pTile->waterAmount > 0))
 			{
 				return true;
 			}
@@ -452,7 +454,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 		std::string texture;
 
 		// if there is water then render water
-		if(tileIter->owner == 3) // if the tile is a glacier
+        if(tileIter->owner == GLACIER)
 		{
 			texture = "glacier";
 		}
@@ -531,7 +533,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 			}
 
 			// Canal Overlays
-			if(tileIter->depth > 0 && tileIter->owner != 3)
+            if(tileIter->depth > 0 && tileIter->owner != GLACIER)
 			{
 				int surroundingTrenches = 0;
 				bool North = false, South = false, East = false, West = false;
@@ -545,7 +547,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 				//         trench, then you will need a trench overlay with one less channel.
 				if(tileIter->y > 0 &&
 				  (m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->depth > 0 ||
-				   m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->owner == 3))
+                   m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->owner == GLACIER))
 				{
 					surroundingTrenches++;
 					North = true;
@@ -553,7 +555,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				if(tileIter->y < m_game->mapHeight - 1 &&
 				  (m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->depth > 0 ||
-				   m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->owner == 3))
+                   m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->owner == GLACIER))
 				{
 					surroundingTrenches++;
 					South = true;
@@ -561,7 +563,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				if(tileIter->x > 0 &&
 				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->depth > 0 ||
-				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->owner == 3))
+                   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->owner == GLACIER))
 				{
 					surroundingTrenches++;
 					West = true;
@@ -569,7 +571,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				if(tileIter->x < m_game->mapWidth - 1 &&
 				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->depth > 0 ||
-				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->owner == 3))
+                   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->owner == GLACIER))
 				{
 					surroundingTrenches++;
 					East = true;
@@ -577,28 +579,28 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				if(tileIter->x > 0 && tileIter->y > 0 &&
 				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->depth > 0  ||
-				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->owner == 3))
+                   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->owner == GLACIER))
 				{
 					NorthWest = true;
 				}
 
 				if(tileIter->x < m_game->mapWidth - 1 && tileIter->y > 0 &&
 				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->depth > 0 ||
-				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->owner == 3))
+                   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->owner == GLACIER))
 				{
 					NorthEast = true;
 				}
 
 				if(tileIter->x > 0 && tileIter->y < m_game->mapHeight - 1 &&
 				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->depth > 0 ||
-				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->owner == 3))
+                   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->owner == GLACIER))
 				{
 					SouthWest = true;
 				}
 
 				if(tileIter->x < m_game->mapWidth - 1 && tileIter->y < m_game->mapHeight - 1 &&
 				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->depth > 0 ||
-				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->owner == 3))
+                   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->owner == GLACIER))
 				{
 					SouthEast = true;
 				}
@@ -791,20 +793,25 @@ void Mars::RenderWorld(int state, Frame& turn)
 				}
 			}
 
-			// Water amount display on water filled trenches
-			if(tileIter->waterAmount != 0)
-			{
-				std::ostringstream waterAmountString;
-				SmartPointer<Animatable> pText = new Animatable;
-				waterAmountString << tileIter->waterAmount;
-				DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
-														glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
-														glm::vec4(0.0f,0.0f,0.0f,1.0f),
-														3.0f);
+            if((tileIter->depth > 0 && tileIter->depth < 9000) || (tileIter->owner == GLACIER))
+            {
+                int amount = tileIter->depth;
+                if(tileIter->owner == GLACIER)
+                {
+                    amount = tileIter->waterAmount;
+                }
 
-				pText->addKeyFrame(textBox);
-				turn.addAnimatable(pText);
-			}
+                std::ostringstream waterAmountString;
+                SmartPointer<Animatable> pText = new Animatable;
+                waterAmountString << amount;
+                DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
+                                                        glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
+                                                        glm::vec4(0.0f,0.0f,0.0f,1.0f),
+                                                        3.0f);
+
+                pText->addKeyFrame(textBox);
+                turn.addAnimatable(pText);
+            }
 		}
 
 		turn[tileIter->id]["owner"] = tileIter->owner;
