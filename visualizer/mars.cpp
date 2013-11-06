@@ -6,7 +6,6 @@
 #include <utility>
 #include <time.h>
 #include <list>
-#include <queue>
 #include <set>
 #include <iomanip>
 
@@ -99,7 +98,7 @@ void Mars::ProccessInput()
 				const auto& tile = iter.second;
 
 				if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y &&
-                  (tile->depth >= 1 || tile->owner == GLACIER || tile->pumpID != -1))
+				  (tile->depth >= 1 || tile->owner == GLACIER || tile->pumpID != -1))
 				{
 					m_selectedUnitIDs.push_back(tile->id);
 				}
@@ -282,7 +281,7 @@ void Mars::pruneSelection()
 			if(m_game->states[turn].units.find(*iter) == m_game->states[turn].units.end() &&
 			  (m_game->states[turn].tiles.find(*iter) == m_game->states[turn].tiles.end() ||
 			  (m_game->states[turn].tiles.at(*iter)->depth > 0 &&
-               m_game->states[turn].tiles.at(*iter)->owner != GLACIER &&
+			   m_game->states[turn].tiles.at(*iter)->owner != GLACIER &&
 			   m_game->states[turn].tiles.at(*iter)->pumpID == -1)))
 			{
 				iter = m_selectedUnitIDs.erase(iter);
@@ -429,7 +428,7 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 		if((xPos < (int)m_game->states[state].tileGrid.size() && xPos >= 0) && (yPos < (int)m_game->states[state].tileGrid[xPos].size() && yPos >= 0))
 		{
 			const SmartPointer<Game::Tile> pTile = m_game->states[state].tileGrid[xPos][yPos];
-            if((pTile->owner == GLACIER) || (pTile->waterAmount > 0))
+			if((pTile->owner == GLACIER) || (pTile->waterAmount > 0))
 			{
 				return true;
 			}
@@ -439,11 +438,8 @@ bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
 	return false;
 }
 
-void Mars::RenderWorld(int state, Frame& turn)
+void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::map<int,int>& depthCounter, std::queue<SmartPointer<Animatable>>& deathList, Frame& turn)
 {
-	// todo: this could be moved elsewhere, it should be
-	static std::map<int,int> counter;
-	static std::queue<SmartPointer<Animatable>> deathList;
 	std::queue<SmartPointer<Animatable>> animList;
 
 	std::set<int> pumpStations;
@@ -453,8 +449,18 @@ void Mars::RenderWorld(int state, Frame& turn)
 		auto& tileIter = iter.second;
 		std::string texture;
 
+		if(tileIter->depth == 0)
+		{
+			depthCounter[tileIter->id] = 0;
+		}
+		else if(tileIter->depth > 0)
+		{
+			int& depth = depthCounter[tileIter->id];
+			depth = max(depth,tileIter->depth);
+		}
+
 		// if there is water then render water
-        if(tileIter->owner == GLACIER)
+		if(tileIter->owner == GLACIER)
 		{
 			texture = "glacier";
 		}
@@ -491,7 +497,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 				}
 
 
-				int& counterValue = counter[tileIter->id];
+				int& counterValue = pumpStationCounter[tileIter->id];
 				SmartPointer<AnimatedSprite> pPump = new AnimatedSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(2.0f), "pump", counterValue);
 				pPump->addKeyFrame(new DrawAnimatedSprite(pPump,glm::vec4(GetTeamColor(tileIter->owner),1.0f)));
 
@@ -526,20 +532,24 @@ void Mars::RenderWorld(int state, Frame& turn)
 				turn.addAnimatable(pTile);
 			}
 			else
-            {
-                float depth = 1.0f;
-                if(tileIter->depth > 0 && tileIter->depth < 9000)
-                {
-                    depth = glm::clamp(tileIter->depth / 5.0f,0.5f,1.0f);
-                }
+			{
+				float depth = 1.0f;
+				if(tileIter->depth > 0)
+				{
+					float maxDepth = depthCounter[tileIter->id];
+
+					depth = glm::clamp(tileIter->depth / maxDepth,0.5f,1.0f);
+
+					//cout << "depth:" << tileIter->depth <<" maxDepth:"<<maxDepth<< endl;
+				}
 
 				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), texture);
-                pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,depth)));
+				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,depth)));
 				turn.addAnimatable(pTile);
 			}
 
 			// Canal Overlays
-            if(tileIter->depth > 0 && tileIter->owner != GLACIER)
+			if(tileIter->depth > 0 && tileIter->owner != GLACIER)
 			{
 				int surroundingTrenches = 0;
 				bool North = false, South = false, East = false, West = false;
@@ -553,7 +563,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 				//         trench, then you will need a trench overlay with one less channel.
 				if(tileIter->y > 0 &&
 				  (m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->depth > 0 ||
-                   m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->owner == GLACIER))
+				   m_game->states[state].tileGrid[tileIter->x][tileIter->y - 1]->owner == GLACIER))
 				{
 					surroundingTrenches++;
 					North = true;
@@ -561,7 +571,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				if(tileIter->y < m_game->mapHeight - 1 &&
 				  (m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->depth > 0 ||
-                   m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->owner == GLACIER))
+				   m_game->states[state].tileGrid[tileIter->x][tileIter->y + 1]->owner == GLACIER))
 				{
 					surroundingTrenches++;
 					South = true;
@@ -569,7 +579,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				if(tileIter->x > 0 &&
 				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->depth > 0 ||
-                   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->owner == GLACIER))
+				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->owner == GLACIER))
 				{
 					surroundingTrenches++;
 					West = true;
@@ -577,7 +587,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				if(tileIter->x < m_game->mapWidth - 1 &&
 				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->depth > 0 ||
-                   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->owner == GLACIER))
+				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y]->owner == GLACIER))
 				{
 					surroundingTrenches++;
 					East = true;
@@ -585,28 +595,28 @@ void Mars::RenderWorld(int state, Frame& turn)
 
 				if(tileIter->x > 0 && tileIter->y > 0 &&
 				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->depth > 0  ||
-                   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->owner == GLACIER))
+				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y - 1]->owner == GLACIER))
 				{
 					NorthWest = true;
 				}
 
 				if(tileIter->x < m_game->mapWidth - 1 && tileIter->y > 0 &&
 				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->depth > 0 ||
-                   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->owner == GLACIER))
+				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y - 1]->owner == GLACIER))
 				{
 					NorthEast = true;
 				}
 
 				if(tileIter->x > 0 && tileIter->y < m_game->mapHeight - 1 &&
 				  (m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->depth > 0 ||
-                   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->owner == GLACIER))
+				   m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y + 1]->owner == GLACIER))
 				{
 					SouthWest = true;
 				}
 
 				if(tileIter->x < m_game->mapWidth - 1 && tileIter->y < m_game->mapHeight - 1 &&
 				  (m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->depth > 0 ||
-                   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->owner == GLACIER))
+				   m_game->states[state].tileGrid[tileIter->x + 1][tileIter->y + 1]->owner == GLACIER))
 				{
 					SouthEast = true;
 				}
@@ -799,25 +809,19 @@ void Mars::RenderWorld(int state, Frame& turn)
 				}
 			}
 
-            if(tileIter->owner == GLACIER)
-            {
-                int amount = tileIter->depth;
-                if(tileIter->owner == GLACIER)
-                {
-                    amount = tileIter->waterAmount;
-                }
+			if(tileIter->owner == GLACIER)
+			{
+				std::ostringstream waterAmountString;
+				SmartPointer<Animatable> pText = new Animatable;
+				waterAmountString << tileIter->waterAmount;
+				DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
+														glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
+														glm::vec4(0.0f,0.0f,0.0f,1.0f),
+														3.0f);
 
-                std::ostringstream waterAmountString;
-                SmartPointer<Animatable> pText = new Animatable;
-                waterAmountString << amount;
-                DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
-                                                        glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
-                                                        glm::vec4(0.0f,0.0f,0.0f,1.0f),
-                                                        3.0f);
-
-                pText->addKeyFrame(textBox);
-                turn.addAnimatable(pText);
-            }
+				pText->addKeyFrame(textBox);
+				turn.addAnimatable(pText);
+			}
 		}
 
 		turn[tileIter->id]["owner"] = tileIter->owner;
@@ -885,7 +889,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 			}
 		}
 
-        glm::vec2 deathPos(unitIter->x,unitIter->y);
+		glm::vec2 deathPos(unitIter->x,unitIter->y);
 
 		if(pUnit->m_Moves.empty())
 		{
@@ -905,19 +909,19 @@ void Mars::RenderWorld(int state, Frame& turn)
 					m_game->states[state - 1].units.find(unitIter->id) != m_game->states[state - 1].units.end())
 				unitIter->m_Flipped = m_game->states[state - 1].units.at(unitIter->id)->m_Flipped;
 
-            deathPos = pUnit->m_Moves.back().to;
+			deathPos = pUnit->m_Moves.back().to;
 		}
 
-        if((state + 1) < (int)m_game->states.size())
-        {
-            if(m_game->states[state + 1].units.find(unitIter->id) == m_game->states[state + 1].units.end())
-            {
-                SmartPointer<AnimatedSprite> pDeathAnimation = new AnimatedSprite(deathPos, glm::vec2(1.0f), "death", 7,true);
-                pDeathAnimation->addKeyFrame(new DrawAnimatedSprite(pDeathAnimation,glm::vec4(GetTeamColor(unitIter->owner),1.0f)));
+		if((state + 1) < (int)m_game->states.size())
+		{
+			if(m_game->states[state + 1].units.find(unitIter->id) == m_game->states[state + 1].units.end())
+			{
+				SmartPointer<AnimatedSprite> pDeathAnimation = new AnimatedSprite(deathPos, glm::vec2(1.0f), "death", 7,true);
+				pDeathAnimation->addKeyFrame(new DrawAnimatedSprite(pDeathAnimation,glm::vec4(GetTeamColor(unitIter->owner),1.0f)));
 
-                deathList.push(pDeathAnimation);
-            }
-        }
+				deathList.push(pDeathAnimation);
+			}
+		}
 
 		DrawProgressBar* pBar = new DrawProgressBar(1.0f,0.2f,unitIter->healthLeft / (float)unitIter->maxHealth);
 
@@ -960,12 +964,16 @@ void Mars::run()
 
 	splashScreen->addKeyFrame(new DrawSplashScreen(splashScreen));
 
+	std::map<int,int> pumpStationCounter;
+	std::map<int,int> depthCounter;
+	std::queue<SmartPointer<Animatable>> deathList;
+
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
 	{
 		Frame turn;  // The frame that will be drawn
 
-		RenderWorld(state, turn);
+		RenderWorld(state, pumpStationCounter, depthCounter, deathList, turn);
 
 		if(state >= (int)(m_game->states.size() - 1))
 		{
@@ -1054,13 +1062,13 @@ Mars::Game::Game(parser::Game* game) :
 
 		for(auto& unit : game->states[i].units)
 		{
-            if((i + 1) < (int)game->states.size())
+			if((i + 1) < (int)game->states.size())
 			{
 				if(game->states[i + 1].units.find(unit.second.id) == game->states[i + 1].units.end())
 				{
 					states[i + 1].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i + 1], unit.second));
 				}
-            }
+			}
 
 			states[i].units[unit.second.id] = SmartPointer<Unit>(new Unit(game->states[i], unit.second));
 		}
