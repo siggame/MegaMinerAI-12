@@ -12,7 +12,6 @@ import math
 
 class AI(BaseAI):
 
-  history = None
   spawnTiles = []
   myPumpTiles = []
   pumpTiles = []
@@ -218,15 +217,10 @@ class AI(BaseAI):
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
     print(self.turnNumber)
-    #SNAPSHOT AT BEGINNING
-    self.history.save_snapshot()
 
     self.spawnUnits()
     self.moveUnits2()
 
-
-    #SNAPSHOT AT END
-    self.history.save_snapshot()
     return 1
 
   def __init__(self, conn):
