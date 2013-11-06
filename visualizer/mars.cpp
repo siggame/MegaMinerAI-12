@@ -526,9 +526,15 @@ void Mars::RenderWorld(int state, Frame& turn)
 				turn.addAnimatable(pTile);
 			}
 			else
-			{
+            {
+                float depth = 1.0f;
+                if(tileIter->depth > 0 && tileIter->depth < 9000)
+                {
+                    depth = glm::clamp(tileIter->depth / 5.0f,0.5f,1.0f);
+                }
+
 				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), texture);
-				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,0.8f)));
+                pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,depth)));
 				turn.addAnimatable(pTile);
 			}
 
@@ -793,7 +799,7 @@ void Mars::RenderWorld(int state, Frame& turn)
 				}
 			}
 
-            if((tileIter->depth > 0 && tileIter->depth < 9000) || (tileIter->owner == GLACIER))
+            if(tileIter->owner == GLACIER)
             {
                 int amount = tileIter->depth;
                 if(tileIter->owner == GLACIER)
