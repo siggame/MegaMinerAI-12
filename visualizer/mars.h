@@ -10,6 +10,7 @@
 #include <string>
 #include <list>
 #include <deque>
+#include <queue>
 #include <glm/glm.hpp>
 
 // The Codegen's Parser
@@ -148,7 +149,7 @@ namespace visualizer
             void UpdateWorld(int state);
             void RenderHUD();
 
-			void RenderWorld(int state, Frame& turn);
+            void RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::map<int,int>& depthCounter, std::queue<SmartPointer<Animatable>>& deathList, Frame& turn);
 
 			void ProccessInput();
 

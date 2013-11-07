@@ -95,8 +95,8 @@ namespace visualizer
 
 	protected:
 
-		glm::vec2 m_pos;
 		MoveableSprite * m_Sprite;
+		glm::vec2 m_pos;
 
 	};
 

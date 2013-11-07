@@ -335,6 +335,8 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   // Only workers can fill
   if (object->fillPower <= 0)
     return 0;
+  if (object->healthLeft <= 0)
+    return 0;
   // Can only fill once per turn
   if (object->hasFilled == 1)
     return 0;
@@ -390,6 +392,8 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   // Only diggers can dig
   if (object->digPower <= 0)
     return 0;
+  if (object->healthLeft <= 0)
+    return 0;
   // Can only dig once per turn
   if (object->hasDug == 1)
     return 0;
@@ -434,6 +438,8 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   
   // Only owner can control unit
   if (object->owner != getPlayerID(c))
+    return 0;
+  if (object->healthLeft <= 0)
     return 0;
   // Target must be adjacent
   if (abs(object->x - x) + abs(object->y - y) > object->range)

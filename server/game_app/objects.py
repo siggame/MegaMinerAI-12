@@ -176,14 +176,15 @@ class Unit(Mappable):
   def toJson(self):
     return dict(id = self.id, x = self.x, y = self.y, owner = self.owner, type = self.type, hasAttacked = self.hasAttacked, hasDug = self.hasDug, hasFilled = self.hasFilled, healthLeft = self.healthLeft, maxHealth = self.maxHealth, movementLeft = self.movementLeft, maxMovement = self.maxMovement, range = self.range, offensePower = self.offensePower, defensePower = self.defensePower, digPower = self.digPower, fillPower = self.fillPower, attackPower = self.attackPower, )
 
-  @staticmethod
-  def handleDeath(unit):
+  def handleDeath(self, unit):
     if unit.healthLeft <= 0:
       unit.game.objects.players[unit.owner].totalUnits -= 1
       unit.game.grid[unit.x][unit.y].remove(unit)
       unit.game.removeObject(unit)
 
-      unit.game.addAnimation(DeathAnimation(unit.id))
+      tile = self.game.getTile(unit.x, unit.y)
+
+      unit.game.addAnimation(DeathAnimation(tile.id))
 
   def nextTurn(self):
     tile = self.game.getTile(self.x, self.y)
@@ -205,6 +206,8 @@ class Unit(Mappable):
   def move(self, x, y):
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot use the other player\'s unit {}. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif self.healthLeft <= 0:
+      return 'Turn {}: Your unit {} does not have any health left. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.movementLeft <= 0:
       return 'Turn {}: Your unit {} does not have any movements left. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif not (0 <= x < self.game.mapWidth) or not (0 <= y < self.game.mapHeight):
@@ -244,6 +247,8 @@ class Unit(Mappable):
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.fillPower <= 0:
       return 'Turn {}: Your unit {} cannot fill.'.format(self.game.turnNumber, self.id)
+    elif self.healthLeft <= 0:
+      return 'Turn {}: Your unit {} does not have any health left. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif tile.owner != 2:
       return 'Turn {}: Your unit {} can only fill normal tiles. ({},{}) fills ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.hasFilled == 1:
@@ -285,6 +290,8 @@ class Unit(Mappable):
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
     elif self.digPower <= 0:
       return 'Turn {}: Your unit {} cannot dig.'.format(self.game.turnNumber, self.id)
+    elif self.healthLeft <= 0:
+      return 'Turn {}: Your unit {} does not have any health left. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.hasDug == 1:
       return 'Turn {}: Your unit {} has already dug a trench this turn.'.format(self.game.turnNumber, self.id)
     elif abs(self.x-x) + abs(self.y-y) > 1:
@@ -316,6 +323,8 @@ class Unit(Mappable):
     
     if self.owner != self.game.playerID:
       return 'Turn {}: You cannot control the opponent\'s {}.'.format(self.game.turnNumber, self.id)
+    elif self.healthLeft <= 0:
+      return 'Turn {}: Your unit {} does not have any health left. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif abs(self.x-x) + abs(self.y-y) > self.range:
       return 'Turn {}: Your {} can only attack Units within range ({}). ({}, {}) -> ({}, {})'.format(self.game.turnNumber, self.id, self.range, self.x, self.y, x, y)
     elif self.hasAttacked == 1:

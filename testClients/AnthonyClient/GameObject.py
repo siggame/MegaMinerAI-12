@@ -305,7 +305,7 @@ class Unit(Mappable):
     self.validify()
     return library.unitGetType(self._ptr)
   #\endcond
-  ##The type of this unit (digger/filler).
+  ##The type of this unit. This type refers to list of UnitTypes.
   type = property(getType)
 
   #\cond
@@ -364,6 +364,54 @@ class Unit(Mappable):
   ##The maximum number of moves this unit can move.
   maxMovement = property(getMaxMovement)
 
+  #\cond
+  def getRange(self):
+    self.validify()
+    return library.unitGetRange(self._ptr)
+  #\endcond
+  ##The range of this unit's attack.
+  range = property(getRange)
+
+  #\cond
+  def getOffensePower(self):
+    self.validify()
+    return library.unitGetOffensePower(self._ptr)
+  #\endcond
+  ##The power of the unit's offensive siege ability.
+  offensePower = property(getOffensePower)
+
+  #\cond
+  def getDefensePower(self):
+    self.validify()
+    return library.unitGetDefensePower(self._ptr)
+  #\endcond
+  ##The power of the unit's defensive siege ability.
+  defensePower = property(getDefensePower)
+
+  #\cond
+  def getDigPower(self):
+    self.validify()
+    return library.unitGetDigPower(self._ptr)
+  #\endcond
+  ##The power of this unit types's digging ability.
+  digPower = property(getDigPower)
+
+  #\cond
+  def getFillPower(self):
+    self.validify()
+    return library.unitGetFillPower(self._ptr)
+  #\endcond
+  ##The power of this unit type's filling ability.
+  fillPower = property(getFillPower)
+
+  #\cond
+  def getAttackPower(self):
+    self.validify()
+    return library.unitGetAttackPower(self._ptr)
+  #\endcond
+  ##The power of this unit type's attack.
+  attackPower = property(getAttackPower)
+
 
   def __str__(self):
     self.validify()
@@ -380,6 +428,12 @@ class Unit(Mappable):
     ret += "maxHealth: %s\n" % self.getMaxHealth()
     ret += "movementLeft: %s\n" % self.getMovementLeft()
     ret += "maxMovement: %s\n" % self.getMaxMovement()
+    ret += "range: %s\n" % self.getRange()
+    ret += "offensePower: %s\n" % self.getOffensePower()
+    ret += "defensePower: %s\n" % self.getDefensePower()
+    ret += "digPower: %s\n" % self.getDigPower()
+    ret += "fillPower: %s\n" % self.getFillPower()
+    ret += "attackPower: %s\n" % self.getAttackPower()
     return ret
 
 ##Represents a single tile on the map, can contain some amount of water.
@@ -458,12 +512,20 @@ class Tile(Mappable):
   waterAmount = property(getWaterAmount)
 
   #\cond
-  def getIsTrench(self):
+  def getDepth(self):
     self.validify()
-    return library.tileGetIsTrench(self._ptr)
+    return library.tileGetDepth(self._ptr)
   #\endcond
-  ##Whether the tile is a trench or not.
-  isTrench = property(getIsTrench)
+  ##The depth of the tile. Tile is a trench if depth is greater than zero.
+  depth = property(getDepth)
+
+  #\cond
+  def getTurnsUntilDeposit(self):
+    self.validify()
+    return library.tileGetTurnsUntilDeposit(self._ptr)
+  #\endcond
+  ##The number of turns until sediment is deposited on this tile.
+  turnsUntilDeposit = property(getTurnsUntilDeposit)
 
 
   def __str__(self):
@@ -475,5 +537,142 @@ class Tile(Mappable):
     ret += "owner: %s\n" % self.getOwner()
     ret += "pumpID: %s\n" % self.getPumpID()
     ret += "waterAmount: %s\n" % self.getWaterAmount()
-    ret += "isTrench: %s\n" % self.getIsTrench()
+    ret += "depth: %s\n" % self.getDepth()
+    ret += "turnsUntilDeposit: %s\n" % self.getTurnsUntilDeposit()
+    return ret
+
+##Represents type of unit.
+class UnitType(GameObject):
+  def __init__(self, ptr):
+    from BaseAI import BaseAI
+    self._ptr = ptr
+    self._iteration = BaseAI.iteration
+    self._id = library.unitTypeGetId(ptr)
+
+  #\cond
+  def validify(self):
+    from BaseAI import BaseAI
+    #if this class is pointing to an object from before the current turn it's probably
+    #somewhere else in memory now
+    if self._iteration == BaseAI.iteration:
+      return True
+    for i in BaseAI.unitTypes:
+      if i._id == self._id:
+        self._ptr = i._ptr
+        self._iteration = BaseAI.iteration
+        return True
+    raise ExistentialError()
+  #\endcond
+  #\cond
+  def getId(self):
+    self.validify()
+    return library.unitTypeGetId(self._ptr)
+  #\endcond
+  ##Unique Identifier
+  id = property(getId)
+
+  #\cond
+  def getName(self):
+    self.validify()
+    return library.unitTypeGetName(self._ptr)
+  #\endcond
+  ##The name of this type of unit.
+  name = property(getName)
+
+  #\cond
+  def getType(self):
+    self.validify()
+    return library.unitTypeGetType(self._ptr)
+  #\endcond
+  ##The UnitType specific id representing this type of unit.
+  type = property(getType)
+
+  #\cond
+  def getCost(self):
+    self.validify()
+    return library.unitTypeGetCost(self._ptr)
+  #\endcond
+  ##The oxygen cost to spawn this unit type into the game.
+  cost = property(getCost)
+
+  #\cond
+  def getAttackPower(self):
+    self.validify()
+    return library.unitTypeGetAttackPower(self._ptr)
+  #\endcond
+  ##The power of the attack of this type of unit.
+  attackPower = property(getAttackPower)
+
+  #\cond
+  def getDigPower(self):
+    self.validify()
+    return library.unitTypeGetDigPower(self._ptr)
+  #\endcond
+  ##The power of this unit types's digging ability.
+  digPower = property(getDigPower)
+
+  #\cond
+  def getFillPower(self):
+    self.validify()
+    return library.unitTypeGetFillPower(self._ptr)
+  #\endcond
+  ##The power of this unit type's filling ability.
+  fillPower = property(getFillPower)
+
+  #\cond
+  def getMaxHealth(self):
+    self.validify()
+    return library.unitTypeGetMaxHealth(self._ptr)
+  #\endcond
+  ##The maximum amount of this health this unit can have
+  maxHealth = property(getMaxHealth)
+
+  #\cond
+  def getMaxMovement(self):
+    self.validify()
+    return library.unitTypeGetMaxMovement(self._ptr)
+  #\endcond
+  ##The maximum number of moves this unit can move.
+  maxMovement = property(getMaxMovement)
+
+  #\cond
+  def getOffensePower(self):
+    self.validify()
+    return library.unitTypeGetOffensePower(self._ptr)
+  #\endcond
+  ##The power of the unit type's offensive siege ability.
+  offensePower = property(getOffensePower)
+
+  #\cond
+  def getDefensePower(self):
+    self.validify()
+    return library.unitTypeGetDefensePower(self._ptr)
+  #\endcond
+  ##The power of the unit type's defensive siege ability.
+  defensePower = property(getDefensePower)
+
+  #\cond
+  def getRange(self):
+    self.validify()
+    return library.unitTypeGetRange(self._ptr)
+  #\endcond
+  ##The range of the unit type's attack.
+  range = property(getRange)
+
+
+  def __str__(self):
+    self.validify()
+    ret = ""
+    ret += "id: %s\n" % self.getId()
+    ret += "name: %s\n" % self.getName()
+    ret += "type: %s\n" % self.getType()
+    ret += "cost: %s\n" % self.getCost()
+    ret += "attackPower: %s\n" % self.getAttackPower()
+    ret += "digPower: %s\n" % self.getDigPower()
+    ret += "fillPower: %s\n" % self.getFillPower()
+    ret += "maxHealth: %s\n" % self.getMaxHealth()
+    ret += "maxMovement: %s\n" % self.getMaxMovement()
+    ret += "offensePower: %s\n" % self.getOffensePower()
+    ret += "defensePower: %s\n" % self.getDefensePower()
+    ret += "range: %s\n" % self.getRange()
     return ret

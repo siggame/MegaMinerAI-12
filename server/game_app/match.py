@@ -38,7 +38,6 @@ class Match(DefaultGameWorld):
     self.trenchDamage = self.trenchDamage
     self.waterDamage = self.waterDamage
     self.turnNumber = -1
-    self.attackDamage = self.attackDamage
     self.maxUnits = self.maxUnits
     self.playerID = -1
     self.gameNumber = id
@@ -47,6 +46,8 @@ class Match(DefaultGameWorld):
     self.oxygenRate = self.oxygenRate
     self.maxOxygen = self.maxOxygen
     self.depositionRate = self.depositionRate
+
+    self.startingOxygen = self.startingOxygen
 
     self.ice = []
 
@@ -62,8 +63,9 @@ class Match(DefaultGameWorld):
       self.players.append(connection)
       try:
         #['id', 'playerName', 'time', 'waterStored', 'oxygen', 'maxOxygen']
+        #todo not right :[
         startingResources = 1000
-        self.addObject(Player, [connection.screenName, self.startTime, 0, startingResources, self.maxOxygen])
+        self.addObject(Player, [connection.screenName, self.startTime, 0, self.startingOxygen, self.maxOxygen])
       except TypeError:
         raise TypeError("Someone forgot to add the extra attributes to the Player object initialization")
     elif type == "spectator":

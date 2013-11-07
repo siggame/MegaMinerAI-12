@@ -1,8 +1,7 @@
-import copy
 import time
 
-import operator
 import sys
+import random
 
 from heapq import *
 
@@ -16,6 +15,39 @@ def getTile(ai, x, y):
 
 def taxiDis(x1, y1, x2, y2):
   return abs(x1 - x2) + abs(y1 - y2)
+
+def getDir(x1, y1, x2, y2):
+  if abs(x2 - x1) > abs(y2 - y1):
+    return (cmp(x2 - x1, 0), 0)
+  else:
+    return (0, cmp(y2 - y1, 0))
+
+def getNearest(ai, start, goal, valid):
+  open_list = [goal]
+  open_set = set()
+  closed_set = set()
+  open_set.add(goal)
+  while open_list:
+    tile = open_list.pop()
+    open_set.remove(tile)
+    closed_set.add(tile)
+    if valid(tile):
+      return tile
+    dir = getDir(goal.x, goal.y, start.x, start.y)
+    if random.random() < 0.5:
+      sideDir = (dir[1], dir[0])
+    else:
+      sideDir = (-dir[1], -dir[0])
+    backDir = (-dir[0], -dir[1])
+    nextTile = getTile(ai, tile.x + dir[0], tile.y + dir[1])
+    if nextTile is not None and nextTile not in closed_set and nextTile not in open_set:
+      if valid(nextTile):
+        return nextTile
+      else:
+        open_list.append(nextTile)
+        open_set.add(nextTile)
+  return None
+
 
 def aStar(ai, start, goal, valid, cost):
   offsets = ((1,0),(0,1),(-1,0),(0,-1))
@@ -45,6 +77,9 @@ def aStar(ai, start, goal, valid, cost):
     if current == goal:
       path = [current]
       while current in came_from:
+        if time.clock() - genesis > 0.1:
+          print('A* restructure timed out')
+          return None
         current = came_from[current]
         path.append(current)
       path.reverse()
