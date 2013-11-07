@@ -309,26 +309,25 @@ class Match(DefaultGameWorld):
           if neighbor in closed or neighbor.pumpID in closed:
             continue
           #if it is a tile that needs water
-          if neighbor.depth < 0 and neighbor.waterAmount == 0 and neighbor.owner == 2:
+          if neighbor.depth > 0 and neighbor.waterAmount == 0:
             closed.add(neighbor)
             flowTiles.add(neighbor)
           #if it is a pump station taking in water 
-          elif neighbor.pumpID != -1 and self.game.objects[neighbor.pumpID].owner in [0, 1]:
+          elif neighbor.pumpID != -1 and self.objects[neighbor.pumpID].owner in [0, 1]:
             closed.add(neighbor.pumpID)
-            flowTiles.add(self.game.objects[neighbor.pumpID])
-          #if it has water
-          elif neighbor.waterAmount == 1 and neighbor not in open:   
+            flowTiles.add(self.objects[neighbor.pumpID])
+          #if it has water or is dug
+          elif (neighbor.waterAmount == 1 or neighbor.depth > 0) and neighbor not in open:   
             open.append(neighbor)          
             
       #if enough water is in ice to flow to all tiles
       if len(flowTiles) <= ice.waterAmount:
         for flowable in flowTiles:
           if isinstance(flowable, Tile):
-            tile.waterAmount += 1
+            flowable.waterAmount += 1
             ice.waterAmount -= 1
           elif isinstance(flowable, PumpStation):
-            p = self.game.objects[PumpStation]
-            self.game.players[p.owner].waterStored += 1
+            self.objects.players[flowable.owner].waterStored += 1
             ice.waterAmount -= 1
     return    
 
