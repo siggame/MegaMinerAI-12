@@ -284,7 +284,7 @@ class Match(DefaultGameWorld):
 
 
 
-  def adjacent(tile):
+  def adjacent(self, tile):
     adj = []
     if tile.x+1 < self.mapWidth:
         adj.append(self.getTile(tile.x+1, tile.y))
