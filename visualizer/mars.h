@@ -158,8 +158,10 @@ namespace visualizer
             void drawGrid();
 			void drawObjectSelection() const;
             void drawBoxAroundObj(const SmartPointer<parser::Mappable> obj, const glm::vec4& color) const;
+            void drawBoxAroundObj(const glm::vec2 topLeft, const int width, const int height, const glm::vec4 color) const;
 
             void drawQuadAroundObj(const SmartPointer<parser::Mappable> obj, const glm::vec4& color) const;
+            void drawQuadAroundObj(const glm::vec2 topLeft, const int width, const int height, const glm::vec4 color) const;
     };
 
 } // visualizer
