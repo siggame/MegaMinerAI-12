@@ -240,6 +240,8 @@ class Match(DefaultGameWorld):
       otherTile.owner = 3
       tile.waterAmount = randWaterAmount
       otherTile.waterAmount = randWaterAmount
+      self.ice.append(tile)
+      self.ice.append(otherTile)
 
   def typeToUnitType(self, type):
     for unittype in self.objects.unitTypes:
@@ -278,83 +280,58 @@ class Match(DefaultGameWorld):
       otherTile.owner = 1
     return
 
-  def waterFlow(self):
-    offsets = ([1,0],[0,1],[-1,0],[0,-1])
-  
-    closedIce = set()
-  
-    # Find every ice tile
-    for ice in self.objects.tiles:
-      if ice.owner == 3 and ice.waterAmount > 0 and ice not in closedIce:
-        open = []
-        closed = set()
-        newTiles = []
-        pumps = []
-        iceTiles = []
-    
-        open.append(ice)
-        iceTiles.append(ice)
-        closedIce.add(ice)
-        
-        while open:
-          # Get next tile in open[]
-          tile = open.pop()
-          
-          # Check neighbors
-          for offset in offsets:
-            newX = tile.x + offset[0]
-            newY = tile.y + offset[1]
-            
-            # Check if a valid tile
-            neighbor = self.getTile(newX, newY)
-            if neighbor != None:
-              if neighbor not in closed and neighbor not in open:
-                # Trench
-                if neighbor.depth > 0:
-                  if neighbor.waterAmount > 0:
-                    open.append(neighbor)
-                  else:
-                    closed.add(neighbor)
-                    newTiles.append(neighbor)
-                # Pump
-                elif neighbor.pumpID != -1:
-                  closed.add(neighbor)
-                  if neighbor.pumpID not in pumps:
-                    pumps.append(neighbor.pumpID)
-                # Ice
-                elif neighbor.owner == 3 and neighbor not in closedIce:
-                  iceTiles.append(neighbor)
-                  closedIce.add(neighbor)
-                  open.append(neighbor)
 
-          closed.add(tile)
-          
-        # Check if we need to expand water
-        if newTiles:
-          # Remove one water from every ice tile in system
-          for iceTile in iceTiles:
-            iceTile.waterAmount -= 1
-            if iceTile.waterAmount <= 0:
-              iceTile.owner = 2
-              iceTile.waterAmount = 0
-          # Fill new tiles with water
-          for tile in newTiles:
-            tile.waterAmount = 1
+
+  def adjacent(tile):
+    adj = []
+    if tile.x+1 < self.mapWidth:
+        adj.append(self.getTile(tile.x+1, tile.y))
+    if tile.y-1 >= 0:
+        adj.append(self.getTile(tile.x, tile.y-1))
+    if tile.x-1 >= 0:
+        adj.append(self.getTile(tile.x-1, tile.y))
+    if tile.y+1 < self.mapHeight:
+        adj.append(self.getTile(tile.x, tile.y+1))
+    return adj 
+  
+  def waterFlow(self):
+    for ice in self.ice:
+      open = [ice]
+      closed = set()
+      flowTiles = set()
+      while len(open) > 0:
+        current = open.pop()
+        closed.add(current)
+        neighbors = self.adjacent(current)
+        for neighbor in neighbors:
+          if neighbor in closed or neighbor.pumpID in closed:
+            continue
+          #if it is a tile that needs water
+          if neighbor.depth < 0 and neighbor.waterAmount == 0 and neighbor.owner == 2:
+            closed.add(neighbor)
+            flowTiles.add(neighbor)
+          #if it is a pump station taking in water 
+          elif neighbor.pumpID != -1 and self.game.objects[neighbor.pumpID].owner in [0, 1]:
+            closed.add(neighbor.pumpID)
+            flowTiles.add(self.game.objects[neighbor.pumpID])
+          #if it has water
+          elif neighbor.waterAmount == 1 and neighbor not in open:   
+            open.append(neighbor)          
             
-        # Check for pumps
-        if pumps:
-          # Remove one water from every ice tile in system
-          for iceTile in iceTiles:
-            if iceTile.waterAmount > 0:
-              iceTile.waterAmount -= 1
-              if iceTile.waterAmount <= 0:
-                iceTile.owner = 2
-                iceTile.waterAmount = 0
-          # Give points to owners of pump stations
-          for pumpID in pumps:
-            self.getPlayerFromId(self.getPump(pumpID).owner).waterStored += len(iceTiles)
-            
-    return
+      #if enough water is in ice to flow to all tiles
+      if len(flowTiles) <= ice.waterAmount:
+        for flowable in flowTiles:
+          if isinstance(flowable, Tile):
+            tile.waterAmount += 1
+            ice.waterAmount -= 1
+          elif isinstance(flowable, PumpStation):
+            p = self.game.objects[PumpStation]
+            self.game.players[p.owner].waterStored += 1
+            ice.waterAmount -= 1
+    return    
+
+   
+
 
   def nextTurn(self):
     self.turnNumber += 1
