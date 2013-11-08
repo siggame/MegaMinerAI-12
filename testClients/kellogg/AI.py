@@ -56,7 +56,7 @@ class AI(BaseAI):
        tile = self.getTile(neighbor[0],neighbor[1])
        unit = self.getUnit(neighbor[0],neighbor[1])
        ###
-       if (tile.owner == 2 and tile.waterAmount == 0 and unit == None) or (neighbor[0],neighbor[1])==(goalX,goalY):
+       if len(self.grid[neighbor[0]][neighbor[1]]) == 1 and tile.waterAmount < 1 and not(tile.pumpID == -1 and tile.owner == self.playerID^1):
         if neighbor in closedTup:
          continue
         g = current[3]+self.distance(neighbor[0],neighbor[1],current[1][0],current[1][1])
@@ -73,7 +73,7 @@ class AI(BaseAI):
       while len(path) > 0 and unit.movementLeft > 0:
         old = next
         next = path.pop()
-        if (old is None or self.distance(old[0], old[1], next[0], next[1])) == 1 and self.distance(unit.x, unit.y, next[0], next[1]) == 1:
+        if self.distance(unit.x, unit.y, next[0], next[1]) == 1:
           self.removeGrid(unit)
           unit.move(next[0], next[1])
           self.addGrid(unit.x, unit.y, unit)
@@ -89,25 +89,36 @@ class AI(BaseAI):
     return nearest
 
   def takePump(self, unit, pumpStation):
+    try:
+      if isinstance(unit.missions["Siege"], Tile) and self.getUnit(unit.missions["Siege"]) is None:
+        #print unit.missions
+        self.moveTo(unit, unit.missions["Siege"])
+    except AttributeError:
+      #print "Unit hasn't been given a mission yet"
+      unit.missions = {"Siege": None}
+
     if self.getTile(unit.x, unit.y).pumpID == pumpStation.id:
       return True
     tiles = [tile for tile in self.pumpTiles if tile.pumpID == pumpStation.id]
     target = None
     for tile in tiles:
-      if self.getUnit(tile.x, tile.y) == None:
+      if self.getUnit(tile.x, tile.y) is None:
         target = tile
-        break
-    if target == None:
+
+    if target is None:
       return False
-    unit.missions["Seige"] = target
+
+    unit.missions["Siege"] = target
     self.moveTo(unit, target)
+    return True
     
   def getTile(self, x, y):
     return self.grid[x][y][0]
 
   def getUnit(self, x, y):
     loc = self.grid[x][y]
-    if len(loc) > 0:
+    
+    if len(loc) == 1:
       return None
     else:
      return loc[:1]
@@ -124,7 +135,6 @@ class AI(BaseAI):
     self.pumpTiles = [tile for tile in self.tiles if tile.pumpID != -1]
     for tile in self.pumpTiles:
       self.pumpDict[tile.pumpID] = [pump for pump in self.pumpStations if pump.id == tile.pumpID][0]
-    print self.pumpDict
 
     for tile in self.tiles:
       if tile.owner == self.playerID:
@@ -139,6 +149,8 @@ class AI(BaseAI):
   ##This function is called each time it is your turn
   ##Return true to end your turn, return false to ask the server for updated information
   def run(self):
+    self.myTiles = []
+    self.enemyTiles = []
     self.iceCaps = []
     self.myDudes = []
     self.enemyDudes = []
@@ -161,27 +173,21 @@ class AI(BaseAI):
         else:
           self.enemyPumps.append(pump)
 
-    for unit in self.units:
-      if unit.owner == self.playerID:      
-        unit.missions = {"Attack": None, "Defend": None, "Siege": None, "Fill": None, "Dig": None}
-    
+    for tile in self.tiles:
+      if tile.owner == self.playerID:
+        self.myTiles.append(tile)
+      elif tile.owner == self.playerID^1:
+        self.enemyTiles.append(tile)
+    #use try catch for mission controls    
     for tile in self.myTiles:
       if self.myPlayer.oxygen >= self.unitTypes[0].cost:
         tile.spawn(0)
 
     for unit in self.myDudes:
-      pumpTile = unit.missions["Siege"]
-      if isinstance(pumpTile, Tile) and self.pumpDict[pumpTile.pumpID].owner == self.playerID:
-        unit.missions["Siege"] = None
-
-      if pumpTile == None:
-        self.takePump(unit, random.choice(self.enemyPumps))
-      
-      else:
-        if (pumpTile.x, pumpTile.y) == (unit.x, unit.y):
-          continue
-        else:
-          self.moveTo(unit, pumpTile)
+      nearestPump = self.findNearest(unit, [tile for tile in self.pumpTiles if tile.owner == self.playerID^1 and self.getUnit(tile.x, tile.y) in [None, unit] ])
+      #print nearestPump
+      self.moveTo(unit, nearestPump)
+#      self.takePump(unit, nearestPump)
 
     return 1
 
