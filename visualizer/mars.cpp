@@ -908,7 +908,7 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 														3.0f);
 
 				pText->addKeyFrame(textBox);
-				turn.addAnimatable(pText);
+				animList.push(pText);
 			}
 		}
 
