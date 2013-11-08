@@ -278,6 +278,9 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   
   // Get the tile we're trying to get to
   _Tile* tile = getTile(c, x * getMapHeight(c) + y);
+  // Cannot move onto ice tiles
+  if (tile->owner == 3)
+    return 0;
   // Cannot move onto enemy spawn tiles
   if (tile->owner == (getPlayerID(c)^1) && tile->pumpID == -1)
     return 0;
