@@ -140,6 +140,9 @@ namespace visualizer
 			int m_rand[2]; // two random numbers
 
 			static const unsigned int GRID_OFFSET = 1;
+			static const int GLACIER = 3;
+			static const int TANK_WIDTH = 21;
+			static const int BAR_WIDTH = 13;  // <--- unlucky as shit
 
             glm::vec3 GetTeamColor(int) const;
 
@@ -148,6 +151,8 @@ namespace visualizer
             void BuildWorld();
             void UpdateWorld(int state);
             void RenderHUD();
+			void RenderHUDWaterTank();
+			void RenderHUDPlayerInfo(int);
 
             void RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::map<int,int>& depthCounter, std::queue<SmartPointer<Animatable>>& deathList, Frame& turn);
 

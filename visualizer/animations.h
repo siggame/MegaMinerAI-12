@@ -10,7 +10,8 @@ namespace visualizer
 						   float width, float height,
 						   float percent,
 						   const Color& col, const Color& backgroundColor = Color(0,0,0,0.8f),
-						   bool bDrawText = false);
+						   bool bDrawText = false,
+						   bool bDrawDivider = false);
 
     // NOTE: consider combining color sprite and DrawSprite since they are
     //    essentially the same, except that DrawSprite is drawn with white.
