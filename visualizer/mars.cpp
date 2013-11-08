@@ -574,14 +574,10 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 
 					if(percent != 0.0f)
 					{
-						auto eastPumpIter = tileIter->x > 0 ? pumps.find(m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->pumpID) : pumps.end();
-						if(eastPumpIter == pumps.end() || (eastPumpIter->second->id != pumpIter->second->id))
-						{
-							SmartPointer<Animatable> pumpBar = new Animatable;
-							pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.3f,percent));
+						SmartPointer<Animatable> pumpBar = new Animatable;
+						pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.3f,percent));
 
-							animList.push(pumpBar);
-						}
+						animList.push(pumpBar);
 					}
 				}
 
