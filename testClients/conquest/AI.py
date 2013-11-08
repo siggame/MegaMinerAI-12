@@ -27,8 +27,8 @@ class AI(BaseAI):
     def spawnUnits(self):
         units = len([i for i in self.units if i.owner == self.playerID])
         for tile in self.spawnTiles:
-            if self.player.oxygen >= self.unitTypes[TANK].cost:
-                tile.spawn(TANK)
+            if self.player.oxygen >= self.unitTypes[SCOUT].cost:
+                tile.spawn(SCOUT)
 
     def moveUnits(self):
         for unit in self.ourUnits:
@@ -37,6 +37,9 @@ class AI(BaseAI):
             target = first(options, self.hostilePump)
             if target:
                 print 'Coming to conquer pump %s' % target.tile.pumpID
+            else:
+                target = first(options, self.isEnemy)
+            if target:
                 self.moveToward(unit, target)
 
     ##This function is called once, before your first turn
@@ -102,3 +105,8 @@ class AI(BaseAI):
             return False
         return True
 
+    def isEnemy(self, tile):
+        item = tile.item
+        if item and item.owner != self.playerID:
+            return True
+        return False

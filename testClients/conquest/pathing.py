@@ -53,7 +53,7 @@ class Pathfinder(object):
     def blocked(self, unit, tile):
         if tile.tile.owner not in [unit.owner, 2]:
             return True
-        if tile.tile.depth > 0:
+        if tile.tile.waterAmount > 0:
             return True
         if tile.item and tile.item.id != unit.id:
             return True
