@@ -214,6 +214,8 @@ class Unit(Mappable):
       return 'Turn {}: Your unit {} cannot move off the map. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif len(self.game.grid[x][y]) > 1:
       return 'Turn {}: Your unit {} is trying to run into something. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
+    elif self.game.getTile(x, y).owner == 3:
+      return 'Turn {}: Your unit {} is trying to move onto an ice tile. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif self.game.getTile(x, y).pumpID == -1 and self.game.getTile(x, y).owner == self.game.playerID^1:
       return 'Turn {}: Your unit {} is trying to move onto the enemy\'s spawn base. ({},{}) -> ({},{})'.format(self.game.turnNumber, self.id, self.x, self.y, x, y)
     elif abs(self.x-x) + abs(self.y-y) != 1:
@@ -383,6 +385,9 @@ class Tile(Mappable):
           self.waterAmount = 0
       else:
         self.turnsUntilDeposit -= 1
+    if self.waterAmount <= 0 and self.owner == 3:
+      self.owner = 2
+      self.waterAmount = 0
     return
 
   def spawn(self, type):
