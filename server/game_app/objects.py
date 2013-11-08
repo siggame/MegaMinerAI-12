@@ -394,8 +394,10 @@ class Tile(Mappable):
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.totalUnits >= self.game.maxUnits:
       return 'Turn {} You cannot spawn a unit because you already have the maximum amount of units ({})'.format(self.game.turnNumber, self.game.maxUnits)
-
-
+    if self.pumpID != -1:
+      pump = next(pump for pump in self.game.objects.pumpStations if pump.id == self.pumpID)
+      if pump.siegeAmount > 0:
+        return 'Turn {} You cannot spawn a unit on pump station that is under seige. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     unittype = self.game.typeToUnitType(type)
     if unittype is None:
       return 'Turn {}: You cannot spawn a unit with this type.'.format(self.game.turnNumber)
