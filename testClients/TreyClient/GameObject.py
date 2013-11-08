@@ -404,6 +404,14 @@ class Unit(Mappable):
   ##The power of this unit type's filling ability.
   fillPower = property(getFillPower)
 
+  #\cond
+  def getAttackPower(self):
+    self.validify()
+    return library.unitGetAttackPower(self._ptr)
+  #\endcond
+  ##The power of this unit type's attack.
+  attackPower = property(getAttackPower)
+
 
   def __str__(self):
     self.validify()
@@ -425,6 +433,7 @@ class Unit(Mappable):
     ret += "defensePower: %s\n" % self.getDefensePower()
     ret += "digPower: %s\n" % self.getDigPower()
     ret += "fillPower: %s\n" % self.getFillPower()
+    ret += "attackPower: %s\n" % self.getAttackPower()
     return ret
 
 ##Represents a single tile on the map, can contain some amount of water.
@@ -510,6 +519,14 @@ class Tile(Mappable):
   ##The depth of the tile. Tile is a trench if depth is greater than zero.
   depth = property(getDepth)
 
+  #\cond
+  def getTurnsUntilDeposit(self):
+    self.validify()
+    return library.tileGetTurnsUntilDeposit(self._ptr)
+  #\endcond
+  ##The number of turns until sediment is deposited on this tile.
+  turnsUntilDeposit = property(getTurnsUntilDeposit)
+
 
   def __str__(self):
     self.validify()
@@ -521,6 +538,7 @@ class Tile(Mappable):
     ret += "pumpID: %s\n" % self.getPumpID()
     ret += "waterAmount: %s\n" % self.getWaterAmount()
     ret += "depth: %s\n" % self.getDepth()
+    ret += "turnsUntilDeposit: %s\n" % self.getTurnsUntilDeposit()
     return ret
 
 ##Represents type of unit.

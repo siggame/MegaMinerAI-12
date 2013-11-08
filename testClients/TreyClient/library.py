@@ -92,6 +92,9 @@ library.getMaxSiege.argtypes = [c_void_p]
 library.getOxygenRate.restype = c_float
 library.getOxygenRate.argtypes = [c_void_p]
 
+library.getDepositionRate.restype = c_int
+library.getDepositionRate.argtypes = [c_void_p]
+
 library.getPlayer.restype = c_void_p
 library.getPlayer.argtypes = [c_void_p, c_int]
 
@@ -221,6 +224,9 @@ library.unitGetDigPower.argtypes = [c_void_p]
 library.unitGetFillPower.restype = c_int
 library.unitGetFillPower.argtypes = [c_void_p]
 
+library.unitGetAttackPower.restype = c_int
+library.unitGetAttackPower.argtypes = [c_void_p]
+
 library.tileGetId.restype = c_int
 library.tileGetId.argtypes = [c_void_p]
 
@@ -241,6 +247,9 @@ library.tileGetWaterAmount.argtypes = [c_void_p]
 
 library.tileGetDepth.restype = c_int
 library.tileGetDepth.argtypes = [c_void_p]
+
+library.tileGetTurnsUntilDeposit.restype = c_int
+library.tileGetTurnsUntilDeposit.argtypes = [c_void_p]
 
 library.unitTypeGetId.restype = c_int
 library.unitTypeGetId.argtypes = [c_void_p]
