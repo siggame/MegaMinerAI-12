@@ -385,6 +385,9 @@ class Tile(Mappable):
           self.waterAmount = 0
       else:
         self.turnsUntilDeposit -= 1
+    if self.waterAmount <= 0 and self.owner == 3:
+      self.owner = 2
+      self.waterAmount = 0
     return
 
   def spawn(self, type):
