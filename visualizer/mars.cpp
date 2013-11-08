@@ -69,6 +69,8 @@ void Mars::ProccessInput()
 	int tilesSelectable = gui->getDebugOptionState("Tiles Selectable");
     int pumpsSelectable = gui->getDebugOptionState("Pumps Selectable");
 
+	set<int> pumpStations;
+
 	if( input.leftRelease && turn < (int)m_game->states.size())
 	{
 		Rect R;
@@ -112,7 +114,10 @@ void Mars::ProccessInput()
 
                 if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y && tile->pumpID != -1)
                 {
-                    m_selectedUnitIDs.push_back(tile->id);
+					if(pumpStations.insert(tile->pumpID).second)
+					{
+						m_selectedUnitIDs.push_back(tile->id);
+					}
                 }
 
             }
