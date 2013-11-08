@@ -14,8 +14,6 @@
 namespace visualizer
 {
 
-const int GLACIER = 3;
-
 Mars::Mars()
 {
 	m_game = 0;
@@ -71,7 +69,7 @@ void Mars::ProccessInput()
 	int tilesSelectable = gui->getDebugOptionState("Tiles Selectable");
     int pumpsSelectable = gui->getDebugOptionState("Pumps Selectable");
 
-	if( input.leftRelease && turn < m_game->states.size())
+	if( input.leftRelease && turn < (int)m_game->states.size())
 	{
 		Rect R;
 		GetSelectedRect(R);
@@ -139,7 +137,7 @@ void Mars::drawObjectSelection() const
 
 	int turn = timeManager->getTurn();
 
-	if(turn < m_game->states.size())
+	if(turn < (int)m_game->states.size())
 	{
 		for(auto& iter : m_selectedUnitIDs)
 		{
@@ -362,7 +360,7 @@ void Mars::pruneSelection()
 	bool changed = false;
 	int focus = gui->getCurrentUnitFocus();
 
-	if(turn < m_game->states.size())
+	if(turn < (int)m_game->states.size())
 	{
 		auto iter = m_selectedUnitIDs.begin();
 
@@ -435,67 +433,70 @@ void Mars::loadGamelog( std::string gamelog )
 	start();
 } // Mars::loadGamelog()
 
-
-void Mars::RenderHUD()
+void Mars::RenderHUDWaterTank()
 {
-	std::ostringstream waterInfo;
 	int turn = timeManager->getTurn();
-	float tankWidth = 21.0f;
 
-	const float barWidth = 13.0f;  // <--- unlucky as shit
-
-	float totalWater = m_game->states[turn].players[0]->waterStored + m_game->states[turn].players[1]->waterStored;
-
-
-	float lengthBlue = 0.0f;
-	float lengthRed = 0.0f;
-
-	if(totalWater != 0)
-	{
-		lengthBlue = (m_game->states[turn].players[0]->waterStored / totalWater) * barWidth;
-		lengthRed = barWidth - lengthBlue;
-	}
+	renderer->setColor(Color(1.0f,1.0f,1.0f,1.0f));
 
 	// Render the back of the tank
 	renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"water_tank_back");
+	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (TANK_WIDTH/2.0f), m_game->mapHeight, TANK_WIDTH, TANK_WIDTH/4.0f,1.0f,"water_tank_back");
 
-	// Render player #0 info
-	float oxygenLevel = m_game->states[turn].players[0]->oxygen / (float)m_game->states[turn].players[0]->maxOxygen;
+	float totalWater = m_game->states[turn].players[0]->waterStored + m_game->states[turn].players[1]->waterStored;
+	if(totalWater != 0)
+	{
+		glm::vec3 playerColor0 = GetTeamColor(0);
+		glm::vec3 playerColor1 = GetTeamColor(1);
 
-	glm::vec3 playerColor = GetTeamColor(0);
-	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
-	renderer->drawText(0.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[0]->playerName, 3.0f, IRenderer::Left);
-
-	waterInfo << "Water Amount: " << m_game->states[turn].players[0]->waterStored;
-	renderer->drawText(0.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Left);
-	waterInfo.str("");
-
-	renderer->drawQuad((m_game->mapWidth/2.0f) - (barWidth/2.0f), m_game->mapHeight + 1.2f, lengthBlue, 2.0f);
-
-	RenderProgressBar(*renderer,0.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
-
-	// Render player #1
-	oxygenLevel = m_game->states[turn].players[1]->oxygen / (float)m_game->states[turn].players[1]->maxOxygen;
-
-	playerColor = GetTeamColor(1);
-	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
-	renderer->drawText(40.0f, m_game->mapHeight + 1.0f, "Roboto", m_game->states[0].players[1]->playerName, 3.0f, IRenderer::Right);
-
-	waterInfo << "Water Amount: " << m_game->states[turn].players[1]->waterStored;
-	renderer->drawText(40.0f, m_game->mapHeight + 2.0f, "Roboto", waterInfo.str(), 2.0f, IRenderer::Right);
-
-	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue, m_game->mapHeight + 1.2f, lengthRed, 2.0f);
-
-	RenderProgressBar(*renderer,36.0f,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
-
-	// Render the divider between the players progress bar
-	renderer->setColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
-	renderer->drawQuad(((m_game->mapWidth/2.0f) - (barWidth/2.0f)) + lengthBlue - 0.1f, m_game->mapHeight + 1.2f, 0.2f, 2.0f);
+		RenderProgressBar(*renderer,(m_game->mapWidth/2.0f) - (BAR_WIDTH/2.0f),m_game->mapHeight + 1.2f,BAR_WIDTH,2.0f,(m_game->states[turn].players[0]->waterStored / totalWater),
+				Color(playerColor0.r,playerColor0.g,playerColor0.b, 1.0f),Color(playerColor1.r,playerColor1.g,playerColor1.b, 1.0f),false,true);
+	}
 
 	// Render the front of the tank
 	renderer->setColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (tankWidth/2.0f), m_game->mapHeight, tankWidth, tankWidth/4.0f,1.0f,"water_tank");
+	renderer->drawTexturedQuad((m_game->mapWidth/2.0f) - (TANK_WIDTH/2.0f), m_game->mapHeight, TANK_WIDTH, TANK_WIDTH/4.0f,1.0f,"water_tank");
+
+}
+
+void Mars::RenderHUDPlayerInfo(int owner)
+{
+	int turn = timeManager->getTurn();
+
+	float oxygenBarPos = (m_game->mapWidth - 4.0f) * owner;
+
+	float oxygenLevel = m_game->states[turn].players[owner]->oxygen / (float)m_game->states[turn].players[owner]->maxOxygen;
+	float namePos = owner == 0 ? 1 : m_game->mapWidth - 1;
+	IRenderer::Alignment alignment = owner == 0 ? IRenderer::Left : IRenderer::Right;
+
+	std::ostringstream stream;
+	if(owner == 0)
+	{
+		stream << m_game->states[turn].players[owner]->playerName <<"  " << (int)m_game->states[turn].players[owner]->time;
+	}
+	else
+	{
+		stream <<(int)m_game->states[turn].players[owner]->time << "  " << m_game->states[turn].players[owner]->playerName;
+	}
+
+
+	glm::vec3 playerColor = GetTeamColor(owner);
+	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
+	renderer->drawText(namePos, m_game->mapHeight + 0.5f, "Roboto", stream.str(), 3.0f, alignment);
+
+	stream.str("");
+	stream << m_game->states[turn].players[owner]->waterStored;
+	renderer->drawText(((m_game->mapWidth/2.0f) - (BAR_WIDTH/2.0f)) + BAR_WIDTH*owner, m_game->mapHeight + 1.2f, "Roboto", stream.str(), 2.0f, alignment);
+
+	renderer->drawText(oxygenBarPos + 2.0f,m_game->mapHeight + 2.2f,"Roboto","Oxygen",2.0f,IRenderer::Alignment::Center);
+	RenderProgressBar(*renderer,oxygenBarPos,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
+}
+
+void Mars::RenderHUD()
+{
+	RenderHUDWaterTank();
+	RenderHUDPlayerInfo(0);
+	RenderHUDPlayerInfo(1);
 }
 
 bool Mars::IsWaterNearTilePos(int state, int xPosIn, int yPosIn) const
@@ -573,14 +574,10 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 
 					if(percent != 0.0f)
 					{
-						auto eastPumpIter = tileIter->x > 0 ? pumps.find(m_game->states[state].tileGrid[tileIter->x - 1][tileIter->y]->pumpID) : pumps.end();
-						if(eastPumpIter == pumps.end() || (eastPumpIter->second->id != pumpIter->second->id))
-						{
-							SmartPointer<Animatable> pumpBar = new Animatable;
-							pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.3f,percent));
+						SmartPointer<Animatable> pumpBar = new Animatable;
+						pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.3f,percent));
 
-							animList.push(pumpBar);
-						}
+						animList.push(pumpBar);
 					}
 				}
 

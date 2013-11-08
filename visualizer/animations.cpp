@@ -9,23 +9,34 @@ namespace visualizer
 					   float width, float height,
 					   float percent,
 					   const Color& col, const Color& backgroundColor,
-					   bool bDrawText)
+					   bool bDrawText,
+					   bool bDrawDivider)
 	{
+		float leftWidth = percent * width;
+
+		renderer.setColor(col);
+		renderer.drawQuad(xPos,yPos, leftWidth, height);
+
 		// Render the health bars
 		renderer.setColor(backgroundColor);
 		renderer.drawQuad(xPos + width,yPos, -(1.0f - percent) * width, height); // height
 
-		renderer.setColor(col);
-		renderer.drawQuad(xPos,yPos, percent * width, height);
-
 		if(bDrawText)
 		{
+			float middle = (xPos + (width / 2.0f));
+
 			ostringstream stream;
 			stream << fixed << setprecision(2) << percent * 100 << '%';
 
-			float middle = (xPos + (width / 2.0f));
 			renderer.setColor(Color(1.0f,1.0f,1.0f,1.0f));
 			renderer.drawText(middle,yPos - 0.1f,"Roboto",stream.str(),5.0f*height,IRenderer::Center);
+		}
+
+		if(bDrawDivider)
+		{
+			// todo: this needs to be changed
+			renderer.setColor(Color(0.0f,0.0f,0.0f,1.0f));
+			renderer.drawQuad(xPos + leftWidth,yPos, 0.2f, height);
 		}
 	}
 
