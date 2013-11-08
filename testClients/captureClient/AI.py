@@ -21,10 +21,12 @@ class AI(BaseAI):
 
   ##This function is called once, before your first turn
   def init(self):
-    self.unitTypesByName = dict()
     self.unitTypesByName = {unitType.name : unitType for unitType in self.unitTypes}
-
-
+    self.unitTypeConfiguration = [self.unitTypesByName["Scout"], self.unitTypesByName["Scout"], self.unitTypesByName["Scout"],
+      self.unitTypesByName["Worker"], self.unitTypesByName["Worker"], self.unitTypesByName["Tank"],
+      self.unitTypesByName["Scout"], self.unitTypesByName["Scout"], self.unitTypesByName["Scout"]]
+    #self.unitTypeConfiguration = [self.unitTypesByName["Scout"]]
+      
     self.history = game_history(self, True)
     return
 
@@ -48,6 +50,7 @@ class AI(BaseAI):
     self.unitAt = dict()
     self.myUnitAt = dict()
     self.enemyUnitAt = dict()
+    self.enemySpawnTilesSet = set()
     for unit in self.units:
       self.unitAt[(unit.x, unit.y)] = unit
       if unit.owner == self.playerID:
@@ -57,6 +60,7 @@ class AI(BaseAI):
 
     spawnTiles = [tile for tile in self.tiles if tile.owner == self.playerID and (tile.x, tile.y) not in self.unitAt]
     spawnTiles.sort(key = lambda tile: -tile.x)
+    self.enemySpawnTilesSet = set([tile for tile in self.tiles if tile.pumpID == -1 and tile.owner == (self.playerID^1)])
 
     availableEnemyPumpTiles = [tile for tile in self.tiles if tile.owner == self.playerID^1 and tile.pumpID != -1 and
         (tile.x, tile.y) not in self.myUnitAt]
@@ -68,7 +72,7 @@ class AI(BaseAI):
 
     if len(myUnits) < self.maxUnits:
       for tile in spawnTiles:
-        type = random.choice(self.unitTypes)
+        type = random.choice(self.unitTypeConfiguration)
         if myPlayer.oxygen >= type.cost:
           if not tile.spawn(type.type):
             print('Error spawning ulnit, own units: {}'.format(len(myUnits)))
@@ -87,8 +91,8 @@ class AI(BaseAI):
           target = getNearest(self, unitTile, target,
             lambda tile: (tile.x, tile.y) not in self.enemyUnitAt and not (tile.owner == (self.playerID^1) and tile.pumpID == -1))
         path = aStar(self, unitTile, target,
-          lambda prev, tile: (tile.x, tile.y) not in self.unitAt and not (tile.owner == (self.playerID^1) and tile.pumpID == -1),
-          lambda prev, tile: 1 + ((prev.depth > 0) != (tile.depth > 0)) + 3 * (tile.waterAmount > 0))
+          lambda prev, tile: (tile.x, tile.y) not in self.unitAt and tile not in self.enemySpawnTilesSet and (tile.waterAmount <= 0 or unit.healthLeft > self.waterDamage),
+          lambda prev, tile: 1 + (self.trenchDamage / unit.healthLeft) * ((prev.depth > 0) != (tile.depth > 0)) + 3 * (tile.waterAmount > 0) + (self.waterDamage / unit.healthLeft) * (tile.waterAmount > 0))
         if path is not None:
           if (unit.x, unit.y) not in self.unitAt:
             print('WTF')
@@ -121,7 +125,7 @@ class AI(BaseAI):
 
     if enemyUnits:
       for unit in myUnits:
-        target = min(enemyUnits, key = lambda enemy: taxiDis(unit.x, unit.x, enemy.x, enemy.y)
+        target = min(enemyUnits, key = lambda enemy: (taxiDis(unit.x, unit.y, enemy.x, enemy.y) > unit.range) * 1.0
             + (float(enemy.healthLeft) / enemy.maxHealth))
         if taxiDis(unit.x, unit.y, target.x, target.y) <= unit.range:
           result = unit.attack(target)
