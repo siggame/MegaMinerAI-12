@@ -510,6 +510,16 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   // Cannot spawn more than MaxUnits units
   if (count >= getMaxUnits(c))
     return 0;
+    
+  // Cannot spawn unit on seiged pump stations
+  if (object->pumpID != -1)
+  {
+    for (int i = 0; i < getPumpStationCount(c); ++i)
+    {
+      if (getPumpStation(c, i)->id == object->pumpID && getPumpStation(c, i)->siegeAmount > 0)
+        return 0;
+    }
+  }
 
   getPlayer(c, getPlayerID(c))->oxygen -= unitCost;
   
