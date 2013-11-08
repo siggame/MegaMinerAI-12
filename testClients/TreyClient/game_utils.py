@@ -112,6 +112,11 @@ def taxiDis(x1, y1, x2, y2):
 def isOnMap(ai, x, y):
   return x >= 0 and x < ai.mapWidth and y >= 0 and y < ai.mapHeight
 
+def getDir(x1, y1, x2, y2):
+  if abs(x2 - x1) > abs(y2 - y1):
+    return (cmp(x2 - x1, 0), 0)
+  else:
+    return (0, cmp(y2 - y1, 0))
 
 
 def validMove(ai, tile, healthLeft):

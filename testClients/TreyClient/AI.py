@@ -108,6 +108,42 @@ class AI(BaseAI):
     # Smallest threat first
     return sorted([(unit, threatLevel[unit]) for unit in possibleThreats], key=lambda threat: -threat[1])
 
+  def fitnessSquat(self, hero, enemy):
+    dis = taxiDis(hero.x, hero.y, enemy.x, enemy.y)
+    # 3.0 for being in range
+    # 1.0 if hero can kill enemy
+    # 1.0 / distance
+    # 0.5 for SCOUT
+    return (dis < hero.range) * 3.0 + min(hero.attackPower / enemy.healthLeft, 1.0) + 1.0 / float(dis) + 0.5 * (enemy.type == SCOUT)
+
+  def attack(self, hero, enemy):
+    result = hero.attack(enemy)
+    if result != 1:
+      print('Error {} attacking'.format(result))
+    else:
+      if enemy.healthLeft <= 0:
+        self.enemyUnits.remove(enemy)
+        del self.unitAt[(enemy.x, enemy.y)]
+        del self.enemyUnitAt[(enemy.x, enemy.y)]
+        del self.unitByID[enemy.id]
+    return result
+
+  def move(self, hero, x, y):
+    del self.unitAt[(hero.x, hero.y)]
+    del self.myUnitAt[(hero.x, hero.y)]
+    result = hero.move(x, y)
+    self.unitAt[(hero.x, hero.y)] = hero
+    self.myUnitAt[(hero.x, hero.y)] = hero
+    if result != 1:
+      print('Error {} moving'.format(result))
+    else:
+      if hero.healthLeft <= 0:
+        self.myUnits.remove(hero)
+        del self.unitAt[(hero.x, hero.y)]
+        del self.myUnitAt[(hero.x, hero.y)]
+        del self.unitByID[hero.id]
+    return result
+
   ##This function is called once, before your first turn
   def init(self):
     self.squatMission = [] # Sit on pump
@@ -116,10 +152,13 @@ class AI(BaseAI):
     self.conquerMission = [] # Attack towards enemy Pump/Spawn
     self.infiltrateMission = [] # Sneak to enemy pump (Scouts)
     self.fillMission = [] # Fill in trench tile
+    self.nextTurnMission = dict() # {(x, y): missionList} Used for applying missions to units that haven't spawned yet
 
     self.guessEnemySpawn = [] # Holds tiles of most likely enemy spawns (first most likely)
     self.guessEnemyTarget = [] # Holds tiles most likely to be targeted by enemy (first most likely), Usually pump tiles
     self.enemyPreviousPositions = dict() # {ID : tile} holds previous tile position for enemy units
+    self.enemyPreviousPositions2 = dict() # 2 enemy turns back
+    self.enemyPreviousPositions3 = dict() # 3 enemy turns back
 
     self.unitTypeToTypeName = dict()
     self.unitTypeNameToType = dict()
@@ -151,6 +190,8 @@ class AI(BaseAI):
 
     self.emptyGrid = [[0 for y in xrange(self.mapHeight)] for _ in xrange(self.mapWidth)]
     self.enemyDamageGrid = copy.copy(self.emptyGrid) # The maximum amount of damage the enemy could inflict on a unit at a given position on the enemy's next turn
+
+    self.squattersByPump = {pump:[] for pump in self.pumpStations} # Squatters on each pump stations
 
     self.history = game_history(self, True)
     return
@@ -230,9 +271,34 @@ class AI(BaseAI):
       - set(map(lambda unitID: self.unitByID[unitID], self.fillMission)))
     self.threats = self.identifyThreats()
 
-    
+    self.squattersByPumpID = {pump.id:[] for pump in self.pumpStations}
+    # Execute squatter mission
+    for unitID in self.squatMission:
+      if unitID not in self.unitByID:
+        self.squatMission.remove(unitID)
+        continue
+      hero = self.unitByID[unitID]
+      self.squattersByPump[getTile(self, hero.x, hero.y).pumpID].append(hero)
+      if self.enemyUnits:
+        enemy = min(self.enemyUnits, key = lambda enemy: self.fitnessSquat(hero, enemy))
+        if taxiDis(hero.x, hero.y, enemy.x, enemy.y) <= hero.range:
+          self.attack(hero, enemy)
+        else:
+          # Slide toward enemy
+          targetDir = getDir(hero.x, hero.y, enemy.x, enemy.y)
+          if targetDir[0]:
+            if (hero.x + targetDir[0], hero.y) not in self.unitAt and getTile(self, hero.x + targetDir[0], hero.y).pumpID != -1:
+              self.move(hero, hero.x + targetDir[0], hero.y)
+          if targetDir[1]:
+            if (hero.x, hero.y + targetDir[1]) not in self.unitAt and getTile(self, hero.x, hero.y + targetDir[1]).pumpID != -1:
+              self.move(hero, hero.x, hero.y + targetDir[1])
+          # See if we can attack now
+          if taxiDis(hero.x, hero.y, enemy.x, enemy.y) <= hero.range:
+            self.attack(hero, enemy)
 
 
+    self.enemyPreviousPositions3 = self.enemyPreviousPositions2
+    self.enemyPreviousPositions2 = self.enemyPreviousPositions
     self.enemyPreviousPositions = dict()
     for unit in self.units:
       if unit.owner == (self.playerID^1):
