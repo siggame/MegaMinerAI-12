@@ -1101,7 +1101,7 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 			}
 		}
 
-		DrawProgressBar* pBar = new DrawProgressBar(1.0f,0.2f,unitIter->healthLeft / (float)unitIter->maxHealth);
+		DrawProgressBar* pBar = new DrawProgressBar(1.0f,0.15f,unitIter->healthLeft / (float)unitIter->maxHealth);
 
 		pUnit->addKeyFrame(new DrawSmoothSpriteProgressBar(pUnit, pBar , glm::vec4(GetTeamColor(unitIter->owner),1.0f), unitIter->m_Flipped));
 		turn.addAnimatable(pUnit);
