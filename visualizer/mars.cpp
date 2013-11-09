@@ -509,7 +509,9 @@ void Mars::RenderHUDPlayerInfo(int owner)
 
 	float A = m_game->states[turn].players[owner]->oxygen;
 	float B = m_game->states[turn].players[owner]->maxOxygen;
-	RenderProgressBar(*renderer,oxygenBarPos,m_game->mapHeight + 3.2f,4.0f,0.5f,A,B,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),Value,false);
+
+	ProgressBarTextMode mode = options->getNumber("Toggle Oxygen Bar Text Mode") > 0 ? Value : Percent;
+	RenderProgressBar(*renderer,oxygenBarPos,m_game->mapHeight + 3.2f,4.0f,0.5f,A,B,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),mode,false);
 }
 
 void Mars::RenderHUD()
