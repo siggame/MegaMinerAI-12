@@ -502,7 +502,7 @@ void Mars::RenderHUDPlayerInfo(int owner)
 	waterAmountOffset += (owner==0)? -0.7f : 0.7f;
 
 	// water info on tank
-	renderer->drawText(waterAmountOffset , m_game->mapHeight + 3.0f, "Roboto", stream.str(), 3.0f, alignment);
+	renderer->drawText(waterAmountOffset , m_game->mapHeight + 2.2f, "Roboto", stream.str(), 3.0f, alignment);
 
 	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
 	renderer->drawText(oxygenBarPos + 2.0f,m_game->mapHeight + 2.2f,"Roboto","Oxygen",2.0f,IRenderer::Alignment::Center);
