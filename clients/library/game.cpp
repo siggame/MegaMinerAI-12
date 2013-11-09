@@ -522,6 +522,7 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   }
 
   getPlayer(c, getPlayerID(c))->oxygen -= unitCost;
+  object->isSpawning = 1;
   
   return 1;
 }

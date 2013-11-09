@@ -49,6 +49,7 @@ class Player(object):
       for newUnitStats in self.spawnQueue:
         newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
+        self.game.grid[newUnit.x][newUnit.y][0].isSpawning = 0
         # Add spawn animation
         self.game.addAnimation(SpawnAnimation(self.game.getTile(newUnit.x, newUnit.y), newUnit.id))
       self.spawnQueue = []
@@ -399,6 +400,8 @@ class Tile(Mappable):
       return 'Turn {} You cannot spawn a unit on top of another unit. ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if player.totalUnits >= self.game.maxUnits:
       return 'Turn {} You cannot spawn a unit because you already have the maximum amount of units ({})'.format(self.game.turnNumber, self.game.maxUnits)
+    if self.isSpawning == 1:
+      return 'Turn {} You cannot spawn a unit because you are already attempting to spawn here ({},{})'.format(self.game.turnNumber, self.x, self.y)
     if self.pumpID != -1:
       pump = next(pump for pump in self.game.objects.pumpStations if pump.id == self.pumpID)
       if pump.siegeAmount > 0:
@@ -416,6 +419,7 @@ class Tile(Mappable):
     player.spawnQueue.append(newUnitStats)
     player.spawnCostQueue.append(unittype.cost)
     player.totalUnits += 1
+    self.isSpawning = 1
     
     return True
 

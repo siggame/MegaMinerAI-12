@@ -62,8 +62,6 @@ class Match(DefaultGameWorld):
       self.players.append(connection)
       try:
         #['id', 'playerName', 'time', 'waterStored', 'oxygen', 'maxOxygen']
-        #todo not right :[
-        startingResources = 1000
         self.addObject(Player, [connection.screenName, self.startTime, 0, self.startingOxygen, self.maxOxygen])
       except TypeError:
         raise TypeError("Someone forgot to add the extra attributes to the Player object initialization")
