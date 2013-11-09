@@ -20,6 +20,7 @@ public:
   std::vector<Tile*> spawnTiles;
   std::vector<Tile*> pumpTiles;
   std::vector<Tile*> iceTiles;
+  std::vector<Tile*> path;
   std::vector<Unit*> enemyUnits;
   std::vector<Unit*> friendTankUnits;
   std::vector<Unit*> friendSpyUnits;
@@ -35,11 +36,13 @@ public:
   bool waterNear(const int xCoord, const int yCoord);
   bool isTankAt(const int x, const int y);
   void spawnUnits();
+  bool pathFind(int x, int y, int xEnd, int yEnd, int xStart, int yStart);
   void moveTo(Unit & unit, int x, int y);
   void digTo(Unit & unit, int x, int y);
   void controlUnits();
   void tryToAttack(Unit & unit);
   bool validMove(const int x, const int y);
+  bool validDig(const int x, const int y);
 };
 
 #endif

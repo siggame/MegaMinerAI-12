@@ -1,6 +1,7 @@
 #include "AI.h"
 #include "util.h"
 #include <iostream>
+#include "string"
 using namespace std;
 
 AI::AI(Connection* conn) : BaseAI(conn) {}
@@ -155,6 +156,13 @@ Tile* AI::getNearestEnemyPump(const int xCoord, const int yCoord)
       }
       noEnemy=false;
     }
+    for(int j =0; j< pumpStations.size(); j++)
+    {
+      if(pumpStations[j].id()==pumpTiles[i]->pumpID()
+         && pumpTiles[i]->owner() == playerID() && pumpStations[j].siegeAmount()>0)
+        return pumpTiles[i];
+    }
+    
   }
   if(noEnemy)
     return NULL;
@@ -222,60 +230,6 @@ void AI::spawnUnits()
 {
   getSpawnTiles();
   int temp;
-  for(int i=0; i< pumpTiles.size(); i++)
-  {
-    if(pumpTiles[i]->owner()==playerID())
-    {
-      temp=rand()%3;
-      if(temp==1)
-        temp=0;
-      pumpTiles[i]->spawn(temp);
-    }
-  }
-  for(int i = 0; i < spawnTiles.size(); i++)
-  {
-    if(spawnTiles[i]->pumpID() > 0)
-    {
-      temp=rand()%3;
-      if(temp==1)
-        temp=0;
-      spawnTiles[i]->spawn(temp);
-    }
-    else
-      spawnTiles[i]->spawn(1);
-  }
-  return;
-  /*
-  getSpawnTiles();
-  int temp, pumpsLookedat[pumpTiles.size()/4], tempX, tempY, tempPumpId;
-  Tile* tile;
-  //spawn tanks
-  for(int i=0; i< pumpTiles.size(); i++)
-  {
-    tempPumpId = pumpTiles[i]->pumpID();
-    for(int j=0; j< (pumpTiles.size()/4); j++)
-    {
-      if(tempPumpId != pumpsLookedat[j]
-         && pumpTiles[i]->owner()==playerID())
-      {
-        tempX=pumpTiles[i]->x();
-        tempY=pumpTiles[i]->y();
-        if(getTile(tempX-1, tempY)->pumpID() != tempPumpId
-           && getTile(tempX, tempY-1)->pumpID() != tempPumpId)
-        {
-          
-        }
-        
-      }
-    }
-    if(pumpTiles[i]->owner()==playerID())
-    {
-      temp=rand()%3;
-      if(temp==1)
-        temp=0;
-      pumpTiles[i]->spawn(temp);
-    }
-  }
   
   for(int i = 0; i < spawnTiles.size(); i++)
   {
@@ -284,19 +238,137 @@ void AI::spawnUnits()
       temp=rand()%3;
       if(temp==1)
         temp=0;
-      spawnTiles[i]->spawn(temp);
+      spawnTiles[i]->spawn(0);
     }
     else
       spawnTiles[i]->spawn(1);
   }
   return;
-*/ 
+  
+  /*
+  getSpawnTiles();
+  bool lookedAt=false;
+  int temp, tempX, tempY, tempPumpId;
+  std::vector<int> pumpsLookedAt;
+  Tile* tile;
+  //spawn tanks
+  for(int i=0; i< pumpTiles.size(); i++)
+  {
+    tempPumpId = pumpTiles[i]->pumpID();
+    for(int j=0; j<pumpsLookedAt.size(); j++)
+    {
+      if(tempPumpId == pumpsLookedAt[j])
+        lookedAt=true;
+      
+    }
+    
+      if(!lookedAt)
+      {
+        
+        tempX=pumpTiles[i]->x();
+        tempY=pumpTiles[i]->y();
+        
+        if(getTile(tempX-1, tempY)->pumpID() != tempPumpId
+           && getTile(tempX, tempY-1)->pumpID() != tempPumpId)
+        {
+          if(!isTankAt(tempX,tempY))
+          {
+           // if(players[playerID()].oxygen()<10)
+              //return;
+            getTile(tempX,tempY)->spawn(2);
+          }
+         // if(!isTankAt(tempX+1,tempY+1))
+         // {
+            //if(players[playerID()].oxygen()<10)
+              //return;
+          //  getTile(tempX+1,tempY+1)->spawn(2);
+         // }
+          pumpsLookedAt.push_back(tempPumpId);
+        }
+        
+        
+        
+      }
+      lookedAt=false;
+      
+  }
+  
+  for(int i = 0; i < spawnTiles.size(); i++)
+  {
+    if(spawnTiles[i]->pumpID() > 0)
+    {
+      spawnTiles[i]->spawn(0);
+    }
+    else
+      spawnTiles[i]->spawn(1);
+  }
+  return;
+  */
+
 }
 
-
+bool AI::pathFind(int x, int y, int xEnd, int yEnd, int xStart, int yStart)
+{
+  bool ask;
+  if(x==xStart && y==yStart)
+    path.clear();
+  string choice[4]={"NORTH", "SOUTH", "EAST", "WEST"};
+  int newX, newY;
+  for(int choiceNum=0; choiceNum<4; choiceNum++)
+  {
+ 
+    if(choice[choiceNum]=="NORTH")
+    {
+      newX=x;
+      newY=y-1;
+    }
+    else if(choice[choiceNum]=="SOUTH")
+    {
+      newX=x;
+      newY=y+1;
+    }
+    else if(choice[choiceNum]=="EAST")
+    {
+      newX=x+1;
+      newY=y;
+    }
+    else if(choice[choiceNum]=="WEST")
+    {
+      newX=x-1;
+      newY=y;
+    }
+    
+    if(getTile(newX,newY) != NULL && validMove(newX, newY))
+    {
+      path.push_back(getTile(newX, newY));
+      if(newX==xEnd && newY==yEnd)
+        return true;
+      else
+      {
+        ask=pathFind(newX, newY, xEnd, yEnd, xStart, yStart);
+        if(ask)
+          return true;
+        else if(path.size()>0)
+          path.pop_back();
+      }  
+    }
+  }
+  return false;
+}
 
 void AI::moveTo(Unit & unit, int x, int y)
 {
+  /*
+  int variable=0;
+  if(pathFind(unit.x(), unit.y(), x, y, unit.x(), unit.y()))
+  {
+    while(unit.movementLeft()>0)
+    {
+      unit.move(path[variable]->x(), path[variable]->y());
+      variable++;
+    }
+  }*/
+  
   for(int i=0; i<unit.maxMovement(); i++)
   {
     tryToAttack(unit);
@@ -310,11 +382,13 @@ void AI::moveTo(Unit & unit, int x, int y)
       unit.move(unit.x(),unit.y()-1);
     tryToAttack(unit);
   }
+  
 }
 
 void AI::digTo(Unit & unit, int x, int y)
 {
   int oldX, oldY;
+  Tile* tile;
   for(int i=0; i<unit.maxMovement(); i++)
   {
     tryToAttack(unit);
@@ -329,11 +403,13 @@ void AI::digTo(Unit & unit, int x, int y)
     else if(unit.y()>y)
       unit.move(unit.x(),unit.y()-1);
     
-    Tile* tile = getTile(oldX, oldY);
-    if(tile != NULL)
+    tile = getTile(oldX, oldY);
+    if(tile != NULL && tile->depth()<3)
       unit.dig(*tile);
     tryToAttack(unit);
   }
+  unit.dig(*tile);
+  tryToAttack(unit);
 }
 
 void AI::controlUnits()
@@ -368,10 +444,10 @@ void AI::controlUnits()
       if(units[i].type()==2)  //tank
       {
         tryToAttack(units[i]);
-        moveTile = getNearestEnemyPump(units[i].x(), units[i].y());
+        //moveTile = getNearestEnemyPump(units[i].x(), units[i].y());
         if(moveTile != NULL)
         {
-          moveTo(units[i], moveTile->x(), moveTile->y());
+          //moveTo(units[i], moveTile->x(), moveTile->y());
         }
         tryToAttack(units[i]);
       }
@@ -401,6 +477,10 @@ bool AI::validMove(const int x, const int y)
     player2ID=0;
   else if(playerID()==0)
     player2ID=1;
+  if(x<0 || y<0 || x>39 || y>19)
+    return false;
+  if(tile->depth()==0 && tile->waterAmount()>0)
+    return false;
   if(tile->owner()==player2ID && tile->pumpID()==-1)
     return false;
   for(int i = 0; i < units.size(); i++)
@@ -411,3 +491,24 @@ bool AI::validMove(const int x, const int y)
   return true;
 }
 
+bool AI::validDig(const int x, const int y)
+{
+  Tile* tile = getTile(x, y);
+  int player2ID;
+  if(playerID()==1)
+    player2ID=0;
+  else if(playerID()==0)
+    player2ID=1;
+  if(x<0 || y<0 || x>39 || y>19)
+    return false;
+  if(tile->depth()==0 && tile->waterAmount()>0)
+    return false;
+  if(tile->owner()==player2ID && tile->pumpID()==-1)
+    return false;
+  for(int i = 0; i < units.size(); i++)
+  {
+    if(units[i].x()==x && units[i].y()==y)
+      return false;
+  }
+  return true;
+}
