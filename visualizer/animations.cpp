@@ -41,7 +41,7 @@ namespace visualizer
 	}
 
 	void ColorSprite::animate(const float &t, AnimData*, IGame *game)
-    {
+	{
 		float alpha = m_color.a;
 		if(m_fade != None)
 		{
@@ -54,7 +54,7 @@ namespace visualizer
 		}
 
 		game->renderer->setColor( Color(m_color.r, m_color.g, m_color.b, alpha) );
-    }
+	}
 
 	DrawProgressBar::DrawProgressBar(const glm::vec2& pos, float width, float height, float percent) :
 		m_pos(pos), m_width(width), m_height(height), m_percent(percent)
@@ -81,13 +81,13 @@ namespace visualizer
 
 	void DrawSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
-        ColorSprite::animate(t,d,game);
+		ColorSprite::animate(t,d,game);
 		game->renderer->drawTexturedQuad(m_sprite->m_pos.x, m_sprite->m_pos.y, m_sprite->m_scale.x, m_sprite->m_scale.y,1.0f,m_sprite->m_sprite);
 	}
 
 	void DrawRotatedSprite::animate(const float &t, AnimData *d, IGame *game)
 	{
-        ColorSprite::animate(t,d,game);
+		ColorSprite::animate(t,d,game);
 		game->renderer->drawRotatedTexturedQuad(m_sprite->m_pos.x, m_sprite->m_pos.y,
 				  m_sprite->m_scale.x, m_sprite->m_scale.y, 1.0f, m_rot, m_sprite->m_sprite);
 	}
@@ -116,11 +116,11 @@ namespace visualizer
 		game->renderer->drawRotatedTexturedQuad(m_pos.x, m_pos.y, m_Sprite->m_scale.x, m_Sprite->m_scale.y, 1.0f, m_angle, m_Sprite->m_sprite);
 	}
 
-    void DrawAnimatedSprite::animate(const float &t, AnimData*d, IGame* game)
-    {
-        ColorSprite::animate(t, d, game);
+	void DrawAnimatedSprite::animate(const float &t, AnimData*d, IGame* game)
+	{
+		ColorSprite::animate(t, d, game);
 
-        float animTime = m_Sprite->m_SingleFrame ? t : 1.0f;
+		float animTime = m_Sprite->m_SingleFrame ? t : 1.0f;
 		game->renderer->drawAnimQuad( m_Sprite->m_pos.x, m_Sprite->m_pos.y, m_Sprite->m_scale.x, m_Sprite->m_scale.y, m_Sprite->m_sprite , (int)(m_Sprite->m_Frames * animTime));
 
 		//game->renderer->drawProgressBar()
@@ -128,11 +128,10 @@ namespace visualizer
 
 	void DrawTextBox::animate(const float &, AnimData*, IGame* game)
 	{
-        game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
+		game->renderer->setColor(Color(m_Color.r, m_Color.g, m_Color.b, m_Color.a));
 
 		game->renderer->drawText(m_Pos.x, m_Pos.y, "Roboto", m_Text, m_Size, m_Alignment);
-
-	};
+	}
 
 	void DrawSplashScreen::animate(const float &t, AnimData*, IGame *game)
 	{

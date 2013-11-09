@@ -64,12 +64,14 @@ void Mars::GetSelectedRect(Rect &out) const
 void Mars::ProccessInput()
 {
 	const Input& input = gui->getInput();
+	set<int> pumpStations;
 	int turn = timeManager->getTurn();
 	int unitsSelectable = gui->getDebugOptionState("Units Selectable");
 	int tilesSelectable = gui->getDebugOptionState("Tiles Selectable");
-    int pumpsSelectable = gui->getDebugOptionState("Pumps Selectable");
+	int pumpsSelectable = gui->getDebugOptionState("Pumps Selectable");
+	int renderGlacierWaterAmount = gui->getDebugOptionState("Draw Glacier Water Amount");
 
-	set<int> pumpStations;
+	m_renderTagState["glacier"] = renderGlacierWaterAmount != 0 ? true : false;
 
 	if( input.leftRelease && turn < (int)m_game->states.size())
 	{
@@ -106,21 +108,21 @@ void Mars::ProccessInput()
 			}
 		}
 
-        if(pumpsSelectable)
-        {
-            for(auto& iter : m_game->states[turn].tiles)
-            {
-                const auto& tile = iter.second;
+		if(pumpsSelectable)
+		{
+			for(auto& iter : m_game->states[turn].tiles)
+			{
+				const auto& tile = iter.second;
 
-                if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y && tile->pumpID != -1)
-                {
+				if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y && tile->pumpID != -1)
+				{
 					if(pumpStations.insert(tile->pumpID).second)
 					{
 						m_selectedUnitIDs.push_back(tile->id);
 					}
-                }
-            }
-        }
+				}
+			}
+		}
 
 		gui->updateDebugWindow();
 		gui->updateDebugUnitFocus();
@@ -134,10 +136,10 @@ glm::vec3 Mars::GetTeamColor(int owner) const
 
 void Mars::drawObjectSelection() const
 {
-    bool north = false;
-    bool south = false;
-    bool east = false;
-    bool west = false;
+	bool north = false;
+	bool south = false;
+	bool east = false;
+	bool west = false;
 
 	int turn = timeManager->getTurn();
 
@@ -147,28 +149,28 @@ void Mars::drawObjectSelection() const
 		{
 			if(m_game->states[turn].tiles.find(iter) != m_game->states[turn].tiles.end())
 			{
-                auto tile = m_game->states[turn].tiles.at(iter);
+				auto tile = m_game->states[turn].tiles.at(iter);
 
 				if(tile->pumpID != -1)
 				{
 					if(tile->y > 0 && m_game->states[turn].tileGrid[tile->x][tile->y - 1]->pumpID == tile->pumpID)
-                        north = true;
+						north = true;
 					if(tile->x < m_game->mapWidth - 1 && m_game->states[turn].tileGrid[tile->x + 1][tile->y]->pumpID == tile->pumpID)
-                        east = true;
+						east = true;
 					if(tile->y < m_game->mapHeight - 1 && m_game->states[turn].tileGrid[tile->x][tile->y + 1]->pumpID == tile->pumpID)
-                        south = true;
+						south = true;
 					if(tile->x > 0 && m_game->states[turn].tileGrid[tile->x - 1][tile->y]-> pumpID == tile->pumpID)
-                        west = true;
+						west = true;
 
-                    if(south && east) // top left corner of a pump
-                        drawQuadAroundObj(glm::vec2(tile->x, tile->y), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
-                    else if(south && west) // top right corner of a pump
-                        drawQuadAroundObj(glm::vec2(tile->x - 1, tile->y), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
-                    else if(north && east) // bottom left corner of a pump
-                        drawQuadAroundObj(glm::vec2(tile->x, tile->y - 1), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
-                    else if(north && west) // bottom right corner of a pump
+					if(south && east) // top left corner of a pump
+						drawQuadAroundObj(glm::vec2(tile->x, tile->y), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
+					else if(south && west) // top right corner of a pump
+						drawQuadAroundObj(glm::vec2(tile->x - 1, tile->y), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
+					else if(north && east) // bottom left corner of a pump
+						drawQuadAroundObj(glm::vec2(tile->x, tile->y - 1), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
+					else if(north && west) // bottom right corner of a pump
 						drawQuadAroundObj(glm::vec2(tile->x - 1, tile->y - 1), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
-                }
+				}
 				else
 				{
 					drawQuadAroundObj(tile, glm::vec4(0.3, 0.0, 1.0, 0.4));
@@ -176,17 +178,17 @@ void Mars::drawObjectSelection() const
 
 
 
-            }
+			}
 		}
 
-        for(auto& iter : m_selectedUnitIDs)
+		for(auto& iter : m_selectedUnitIDs)
 		{
 			if(m_game->states[turn].units.find(iter) != m_game->states[turn].units.end())
 				drawQuadAroundObj(m_game->states[turn].units.at(iter), glm::vec4(1.0, 0.4, 0.4, 0.6 ));
 		}
 
 		int focus = gui->getCurrentUnitFocus();
-        north = east = south = west = false;
+		north = east = south = west = false;
 
 		if(focus >= 0)
 		{
@@ -194,33 +196,33 @@ void Mars::drawObjectSelection() const
 				drawBoxAroundObj(m_game->states[turn].units.at(focus), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
 			if(m_game->states[turn].tiles.find(focus) != m_game->states[turn].tiles.end())
-            {
-                auto tile = m_game->states[turn].tiles.at(focus);
+			{
+				auto tile = m_game->states[turn].tiles.at(focus);
 
-                if(tile->pumpID != -1)
-                {
+				if(tile->pumpID != -1)
+				{
 					if(tile->y > 0 && m_game->states[turn].tileGrid[tile->x][tile->y - 1]->pumpID == tile->pumpID)
-                        north = true;
+						north = true;
 					if(tile->x < m_game->mapWidth - 1 && m_game->states[turn].tileGrid[tile->x + 1][tile->y]->pumpID == tile->pumpID)
-                        east = true;
+						east = true;
 					if(tile->y < m_game->mapHeight - 1 && m_game->states[turn].tileGrid[tile->x][tile->y + 1]->pumpID == tile->pumpID)
-                        south = true;
+						south = true;
 					if(tile->x > 0 && m_game->states[turn].tileGrid[tile->x - 1][tile->y]-> pumpID != tile->pumpID)
-                        west = true;
+						west = true;
 
-                    if(south && east) // top left corner of a pump
-                        drawBoxAroundObj(glm::vec2(tile->x, tile->y), 2, 2, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-                    else if(south && west) // top right corner of a pump
-                        drawBoxAroundObj(glm::vec2(tile->x - 1, tile->y), 2, 2, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-                    else if(north && east) // bottom left corner of a pump
-                        drawBoxAroundObj(glm::vec2(tile->x, tile->y - 1), 2, 2, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-                    else if(north && west) // bottom right corner of a pump
-                        drawBoxAroundObj(glm::vec2(tile->x - 1, tile->y - 1), 2, 2, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-                }
-                else
-                    drawBoxAroundObj(tile, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-            }
-        }
+					if(south && east) // top left corner of a pump
+						drawBoxAroundObj(glm::vec2(tile->x, tile->y), 2, 2, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+					else if(south && west) // top right corner of a pump
+						drawBoxAroundObj(glm::vec2(tile->x - 1, tile->y), 2, 2, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+					else if(north && east) // bottom left corner of a pump
+						drawBoxAroundObj(glm::vec2(tile->x, tile->y - 1), 2, 2, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+					else if(north && west) // bottom right corner of a pump
+						drawBoxAroundObj(glm::vec2(tile->x - 1, tile->y - 1), 2, 2, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+				}
+				else
+					drawBoxAroundObj(tile, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+			}
+		}
 
 
 	}
@@ -252,8 +254,8 @@ void Mars::drawQuadAroundObj(const SmartPointer<parser::Mappable> obj, const glm
 
 void Mars::drawQuadAroundObj(const glm::vec2 topLeft, const int width, const int height, const glm::vec4 color) const
 {
-    renderer->setColor(Color(color.r, color.g, color.b, color.a));
-    renderer->drawQuad(topLeft.x, topLeft.y, width, height);
+	renderer->setColor(Color(color.r, color.g, color.b, color.a));
+	renderer->drawQuad(topLeft.x, topLeft.y, width, height);
 }
 
 void Mars::preDraw()
@@ -354,7 +356,8 @@ list<IGUI::DebugOption> Mars::getDebugOptions()
 {
 	return std::list<IGUI::DebugOption>({{"Units Selectable", true},
 										 {"Tiles Selectable", true},
-                                         {"Pumps Selectable", true}
+										 {"Pumps Selectable", true},
+										 {"Draw Glacier Water Amount", false}
 										});
 }
 
@@ -911,7 +914,7 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 			if(tileIter->owner == GLACIER)
 			{
 				std::ostringstream waterAmountString;
-				SmartPointer<Animatable> pText = new Animatable;
+				SmartPointer<Animatable> pText = new Animatable("glacier");
 				waterAmountString << tileIter->waterAmount;
 				DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
 														glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
@@ -924,27 +927,27 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 		}
 
 		if(tileIter->pumpID == -1)
-        {
-            turn[tileIter->id]["id"] = tileIter->id;
-            turn[tileIter->id]["x"] = tileIter->x;
-            turn[tileIter->id]["y"] = tileIter->y;
-            turn[tileIter->id]["owner"] = tileIter->owner;
-            turn[tileIter->id]["pumpID"] = tileIter->pumpID;
-            turn[tileIter->id]["waterAmount"] = tileIter->waterAmount;
-            turn[tileIter->id]["depth"] = tileIter->depth;
-            turn[tileIter->id]["turnsUntilDeposit"] = tileIter->turnsUntilDeposit;
-        }
+		{
+			turn[tileIter->id]["id"] = tileIter->id;
+			turn[tileIter->id]["x"] = tileIter->x;
+			turn[tileIter->id]["y"] = tileIter->y;
+			turn[tileIter->id]["owner"] = tileIter->owner;
+			turn[tileIter->id]["pumpID"] = tileIter->pumpID;
+			turn[tileIter->id]["waterAmount"] = tileIter->waterAmount;
+			turn[tileIter->id]["depth"] = tileIter->depth;
+			turn[tileIter->id]["turnsUntilDeposit"] = tileIter->turnsUntilDeposit;
+		}
 		else
-        {
+		{
 			if(m_game->states[state].pump.find(tileIter->pumpID) != m_game->states[state].pump.end())
-            {
-                auto& pump = m_game->states[state].pump.at(tileIter->pumpID);
+			{
+				auto& pump = m_game->states[state].pump.at(tileIter->pumpID);
 
-                turn[tileIter->id]["id"] = pump->id;
-                turn[tileIter->id]["owner"] = pump->owner;
-                turn[tileIter->id]["siegeAmount"] = pump->siegeAmount;
+				turn[tileIter->id]["id"] = pump->id;
+				turn[tileIter->id]["owner"] = pump->owner;
+				turn[tileIter->id]["siegeAmount"] = pump->siegeAmount;
 			}
-        }
+		}
 
 		for(auto& animationIter : tileIter->m_Animations)
 		{
@@ -959,7 +962,6 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 					 SmartPointer<BaseSprite> pSpawn = new BaseSprite(glm::vec2(spawnIter->second->x, spawnIter->second->y), glm::vec2(1.0f), "egg");
 					 pSpawn->addKeyFrame(new DrawSprite(pSpawn,glm::vec4(1.0f)));
 
-					 //turn.addAnimatable(pSpawn);
 					 animList.push(pSpawn);
 				 }
 			}
@@ -1088,7 +1090,7 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 		pUnit->addKeyFrame(new DrawSmoothSpriteProgressBar(pUnit, pBar , glm::vec4(GetTeamColor(unitIter->owner),1.0f), unitIter->m_Flipped));
 		turn.addAnimatable(pUnit);
 
-        turn[unitIter->id]["id"] = unitIter->id;
+		turn[unitIter->id]["id"] = unitIter->id;
 		turn[unitIter->id]["X"] = unitIter->x;
 		turn[unitIter->id]["Y"] = unitIter->y;
 		turn[unitIter->id]["owner"] = unitIter->owner;
@@ -1102,10 +1104,10 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 		turn[unitIter->id]["maxMovement"] = unitIter->maxMovement;
 		turn[unitIter->id]["range"] = unitIter->range;
 		turn[unitIter->id]["offensePower"] = unitIter->offensePower;
-        turn[unitIter->id]["defensePower"] = unitIter->defensePower;
-        turn[unitIter->id]["digPower"] = unitIter->digPower;
-        turn[unitIter->id]["fillPower"] = unitIter->fillPower;
-        turn[unitIter->id]["attackPower"] = unitIter->attackPower;
+		turn[unitIter->id]["defensePower"] = unitIter->defensePower;
+		turn[unitIter->id]["digPower"] = unitIter->digPower;
+		turn[unitIter->id]["fillPower"] = unitIter->fillPower;
+		turn[unitIter->id]["attackPower"] = unitIter->attackPower;
 	}
 
 	while(!animList.empty())
@@ -1137,6 +1139,8 @@ void Mars::run()
 	std::map<int,int> pumpStationCounter;
 	std::map<int,int> depthCounter;
 	std::queue<SmartPointer<Animatable>> deathList;
+
+	m_renderTagState["glacier"] = true;
 
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
