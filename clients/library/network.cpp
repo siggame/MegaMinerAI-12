@@ -1,6 +1,8 @@
 //Copyright (C) 2009 - Missouri S&T ACM AI Team
 //Please do not modify this file while building your AI
 //See AI.h & AI.cpp for that
+#pragma warning(disable : 4996)
+
 #include <iostream>
 #include <string>
 #include <cstring>
