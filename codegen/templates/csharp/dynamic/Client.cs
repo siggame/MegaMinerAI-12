@@ -22,8 +22,7 @@ public class Client {
   [DllImport("client")]
   public static extern int networkLoop(IntPtr connection);
 
-
-    //commands
+#region Commands
 % for  model in models:
 %   for func in model.functions:
   [DllImport("client")]
@@ -35,8 +34,9 @@ ${toClient[arg.type]} ${arg.name}\
 );
 %   endfor
 % endfor
+#endregion
 
-    //accessors
+#region Accessors
 % for datum in globals:
   [DllImport("client")]
   public static extern ${fromClient[datum.type]} get${capitalize(datum.name)}(IntPtr connection);
@@ -50,9 +50,9 @@ ${toClient[arg.type]} ${arg.name}\
   public static extern int get${model.name}Count(IntPtr connection);
 %   endif
 % endfor
+#endregion
 
-
-    //getters
+#region Getters
 % for model in models:
 %   for datum in model.data:
   [DllImport("client")]
@@ -60,8 +60,9 @@ ${toClient[arg.type]} ${arg.name}\
 %   endfor
 
 % endfor
+#endregion
 
-    //properties
+#region Properties
 % for  model in models:
 %   for prop in model.properties:
   [DllImport("client")]
@@ -73,5 +74,5 @@ ${toClient[arg.type]} ${arg.name}\
 );
 %   endfor
 % endfor
-
+#endregion
 }
