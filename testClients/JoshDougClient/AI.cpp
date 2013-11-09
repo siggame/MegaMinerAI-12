@@ -403,13 +403,13 @@ void AI::digTo(Unit & unit, int x, int y)
     tryToAttack(unit);
     oldX=unit.x();
     oldY=unit.y();
-    if(unit.x()<x)
+    if(unit.x()<x && validDig(unit.x()+1,unit.y()))
       unit.move(unit.x()+1,unit.y());
-    else if(unit.x()>x)
+    else if(unit.x()>x && validDig(unit.x()-1,unit.y()))
       unit.move(unit.x()-1,unit.y());
-    else if(unit.y()<y)
+    else if(unit.y()<y && validDig(unit.x(),unit.y()+1))
       unit.move(unit.x(),unit.y()+1);
-    else if(unit.y()>y)
+    else if(unit.y()>y && validDig(unit.x(),unit.y()-1))
       unit.move(unit.x(),unit.y()-1);
     
     tile = getTile(oldX, oldY);
@@ -508,15 +508,15 @@ bool AI::validDig(const int x, const int y)
     player2ID=0;
   else if(playerID()==0)
     player2ID=1;
-  if(x<0 || y<0 || x>39 || y>19)
+  if(x<0 || y<0 || x>39 || y>19)  //borders
     return false;
-  if(tile->depth()==0 && tile->waterAmount()>0)
+  if(tile->depth()==0 && tile->waterAmount()>0) //ice tiles
     return false;
-  if(tile->owner()==player2ID && tile->pumpID()==-1)
+  if(tile->owner()<=1) //&& tile->pumpID()==-1)  //spawn tiles
     return false;
   for(int i = 0; i < units.size(); i++)
   {
-    if(units[i].x()==x && units[i].y()==y)
+    if(units[i].x()==x && units[i].y()==y)  //other units
       return false;
   }
   return true;
