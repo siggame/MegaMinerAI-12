@@ -68,9 +68,6 @@ library.getMapWidth.argtypes = [c_void_p]
 library.getMapHeight.restype = c_int
 library.getMapHeight.argtypes = [c_void_p]
 
-library.getTrenchDamage.restype = c_int
-library.getTrenchDamage.argtypes = [c_void_p]
-
 library.getWaterDamage.restype = c_int
 library.getWaterDamage.argtypes = [c_void_p]
 
@@ -167,9 +164,6 @@ library.pumpStationGetId.argtypes = [c_void_p]
 library.pumpStationGetOwner.restype = c_int
 library.pumpStationGetOwner.argtypes = [c_void_p]
 
-library.pumpStationGetWaterAmount.restype = c_int
-library.pumpStationGetWaterAmount.argtypes = [c_void_p]
-
 library.pumpStationGetSiegeAmount.restype = c_int
 library.pumpStationGetSiegeAmount.argtypes = [c_void_p]
 
@@ -250,6 +244,9 @@ library.tileGetDepth.argtypes = [c_void_p]
 
 library.tileGetTurnsUntilDeposit.restype = c_int
 library.tileGetTurnsUntilDeposit.argtypes = [c_void_p]
+
+library.tileGetIsSpawning.restype = c_int
+library.tileGetIsSpawning.argtypes = [c_void_p]
 
 library.unitTypeGetId.restype = c_int
 library.unitTypeGetId.argtypes = [c_void_p]

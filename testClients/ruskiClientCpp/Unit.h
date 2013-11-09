@@ -7,8 +7,8 @@
 #include "structures.h"
 
 #include "Mappable.h"
-class Tile;
 class Unit;
+class Tile;
 
 ///Represents a single unit on the map.
 class Unit : public Mappable {
@@ -50,6 +50,8 @@ class Unit : public Mappable {
   int digPower();
   ///The power of this unit type's filling ability.
   int fillPower();
+  ///The power of this unit type's attack.
+  int attackPower();
 
   // Actions
   ///Make the unit move to the respective x and y location.

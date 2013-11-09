@@ -57,7 +57,6 @@ DLLEXPORT Connection* createConnection()
 
   c->mapWidth = 0;
   c->mapHeight = 0;
-  c->trenchDamage = 0;
   c->waterDamage = 0;
   c->turnNumber = 0;
   c->maxUnits = 0;
@@ -278,6 +277,9 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   
   // Get the tile we're trying to get to
   _Tile* tile = getTile(c, x * getMapHeight(c) + y);
+  // Cannot move onto ice tiles
+  if (tile->owner == 3)
+    return 0;
   // Cannot move onto enemy spawn tiles
   if (tile->owner == (getPlayerID(c)^1) && tile->pumpID == -1)
     return 0;
@@ -303,8 +305,6 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   object->movementLeft -= 1;
 
 
-  if( (tile->depth > 0) ^ (prevTile->depth > 0))
-    object->healthLeft -= getTrenchDamage(c);
   if( tile->waterAmount > 0 )
     object->healthLeft -= getWaterDamage(c);
 
@@ -510,6 +510,16 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   // Cannot spawn more than MaxUnits units
   if (count >= getMaxUnits(c))
     return 0;
+    
+  // Cannot spawn unit on seiged pump stations
+  if (object->pumpID != -1)
+  {
+    for (int i = 0; i < getPumpStationCount(c); ++i)
+    {
+      if (getPumpStation(c, i)->id == object->pumpID && getPumpStation(c, i)->siegeAmount > 0)
+        return 0;
+    }
+  }
 
   getPlayer(c, getPlayerID(c))->oxygen -= unitCost;
   
@@ -567,8 +577,6 @@ void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
   object->id = atoi(sub->val);
   sub = sub->next;
   object->owner = atoi(sub->val);
-  sub = sub->next;
-  object->waterAmount = atoi(sub->val);
   sub = sub->next;
   object->siegeAmount = atoi(sub->val);
   sub = sub->next;
@@ -641,6 +649,8 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   object->depth = atoi(sub->val);
   sub = sub->next;
   object->turnsUntilDeposit = atoi(sub->val);
+  sub = sub->next;
+  object->isSpawning = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -752,9 +762,6 @@ DLLEXPORT int networkLoop(Connection* c)
           sub = sub->next;
 
           c->mapHeight = atoi(sub->val);
-          sub = sub->next;
-
-          c->trenchDamage = atoi(sub->val);
           sub = sub->next;
 
           c->waterDamage = atoi(sub->val);
@@ -1001,10 +1008,6 @@ DLLEXPORT int getMapWidth(Connection* c)
 DLLEXPORT int getMapHeight(Connection* c)
 {
   return c->mapHeight;
-}
-DLLEXPORT int getTrenchDamage(Connection* c)
-{
-  return c->trenchDamage;
 }
 DLLEXPORT int getWaterDamage(Connection* c)
 {

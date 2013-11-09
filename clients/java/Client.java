@@ -28,7 +28,6 @@ public interface Client extends Library {
     //accessors
   int getMapWidth(Pointer connection);
   int getMapHeight(Pointer connection);
-  int getTrenchDamage(Pointer connection);
   int getWaterDamage(Pointer connection);
   int getTurnNumber(Pointer connection);
   int getMaxUnits(Pointer connection);
@@ -66,7 +65,6 @@ public interface Client extends Library {
 
   int pumpStationGetId(Pointer ptr);
   int pumpStationGetOwner(Pointer ptr);
-  int pumpStationGetWaterAmount(Pointer ptr);
   int pumpStationGetSiegeAmount(Pointer ptr);
 
   int unitGetId(Pointer ptr);
@@ -96,6 +94,7 @@ public interface Client extends Library {
   int tileGetWaterAmount(Pointer ptr);
   int tileGetDepth(Pointer ptr);
   int tileGetTurnsUntilDeposit(Pointer ptr);
+  int tileGetIsSpawning(Pointer ptr);
 
   int unitTypeGetId(Pointer ptr);
   String unitTypeGetName(Pointer ptr);

@@ -192,14 +192,6 @@ class PumpStation(GameObject):
   owner = property(getOwner)
 
   #\cond
-  def getWaterAmount(self):
-    self.validify()
-    return library.pumpStationGetWaterAmount(self._ptr)
-  #\endcond
-  ##The amount of water the PumpStation pumps.
-  waterAmount = property(getWaterAmount)
-
-  #\cond
   def getSiegeAmount(self):
     self.validify()
     return library.pumpStationGetSiegeAmount(self._ptr)
@@ -213,7 +205,6 @@ class PumpStation(GameObject):
     ret = ""
     ret += "id: %s\n" % self.getId()
     ret += "owner: %s\n" % self.getOwner()
-    ret += "waterAmount: %s\n" % self.getWaterAmount()
     ret += "siegeAmount: %s\n" % self.getSiegeAmount()
     return ret
 
@@ -527,6 +518,14 @@ class Tile(Mappable):
   ##The number of turns until sediment is deposited on this tile.
   turnsUntilDeposit = property(getTurnsUntilDeposit)
 
+  #\cond
+  def getIsSpawning(self):
+    self.validify()
+    return library.tileGetIsSpawning(self._ptr)
+  #\endcond
+  ##Determines if this tile is attempting to spawn something or not.
+  isSpawning = property(getIsSpawning)
+
 
   def __str__(self):
     self.validify()
@@ -539,6 +538,7 @@ class Tile(Mappable):
     ret += "waterAmount: %s\n" % self.getWaterAmount()
     ret += "depth: %s\n" % self.getDepth()
     ret += "turnsUntilDeposit: %s\n" % self.getTurnsUntilDeposit()
+    ret += "isSpawning: %s\n" % self.getIsSpawning()
     return ret
 
 ##Represents type of unit.

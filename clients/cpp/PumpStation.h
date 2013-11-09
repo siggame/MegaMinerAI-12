@@ -18,8 +18,6 @@ class PumpStation {
   int id();
   ///The owner of the PumpStation.
   int owner();
-  ///The amount of water the PumpStation pumps.
-  int waterAmount();
   ///The amount the PumpStation has been sieged.
   int siegeAmount();
 

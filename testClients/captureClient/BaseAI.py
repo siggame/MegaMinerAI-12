@@ -63,11 +63,6 @@ class BaseAI:
   #\endcond
   mapHeight = property(getMapHeight)
   #\cond
-  def getTrenchDamage(self):
-    return library.getTrenchDamage(self.connection)
-  #\endcond
-  trenchDamage = property(getTrenchDamage)
-  #\cond
   def getWaterDamage(self):
     return library.getWaterDamage(self.connection)
   #\endcond
