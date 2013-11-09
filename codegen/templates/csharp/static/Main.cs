@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-public class main
+public class Program
 {
   public static void Main(string[] args)
   {

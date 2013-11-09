@@ -19,7 +19,7 @@ class AI : BaseAI
   /// <summary>
   /// This function is called each time it is your turn.
   /// </summary>
-  /// <returns>Return true to end your turn. Return false to ask the server for updated information.</returns>
+  /// <returns>True to end your turn. False to ask the server for updated information.</returns>
   public override bool run()
   {
     return true;
@@ -28,13 +28,13 @@ class AI : BaseAI
   /// <summary>
   /// This function is called once, before your first turn.
   /// </summary>
-  public override void init() {}
+  public override void init() { }
 
   /// <summary>
   /// This function is called once, after your last turn.
   /// </summary>
-  public override void end() {}
+  public override void end() { }
 
-  public AI(IntPtr c) : base(c)
-  {}
+  public AI(IntPtr c) 
+      : base(c) { }
 }
