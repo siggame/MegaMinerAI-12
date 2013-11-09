@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-
-///Represents a base to which you want to lead water.
+/// <summary>
+/// Represents a base to which you want to lead water.
+/// </summary>
 public class PumpStation
 {
   public IntPtr ptr;
@@ -35,13 +36,13 @@ public class PumpStation
     throw new ExistentialError();
   }
 
-    //commands
+  #region Commands
+  #endregion
 
-
-    //getters
-
-
-  ///Unique Identifier
+  #region Getters
+  /// <summary>
+  /// Unique Identifier
+  /// </summary>
   public int Id
   {
     get
@@ -52,7 +53,9 @@ public class PumpStation
     }
   }
 
-  ///The owner of the PumpStation.
+  /// <summary>
+  /// The owner of the PumpStation.
+  /// </summary>
   public int Owner
   {
     get
@@ -63,7 +66,9 @@ public class PumpStation
     }
   }
 
-  ///The amount the PumpStation has been sieged.
+  /// <summary>
+  /// The amount the PumpStation has been sieged.
+  /// </summary>
   public int SiegeAmount
   {
     get
@@ -74,5 +79,8 @@ public class PumpStation
     }
   }
 
-}
+  #endregion
 
+  #region Properties
+  #endregion
+}
