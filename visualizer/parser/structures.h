@@ -14,13 +14,13 @@
 namespace parser
 {
 
-const int MOVE = 0;
-const int SPAWN = 1;
-const int DIG = 2;
-const int FILL = 3;
-const int FLOW = 4;
-const int DEATH = 5;
-const int ATTACK = 6;
+const int DIG = 0;
+const int ATTACK = 1;
+const int SPAWN = 2;
+const int DEATH = 3;
+const int MOVE = 4;
+const int FLOW = 5;
+const int FILL = 6;
 
 struct Player
 {
@@ -109,6 +109,37 @@ struct Animation
   int type;
 };
 
+struct dig : public Animation
+{
+  int actingID;
+  int tileID;
+
+  friend std::ostream& operator<<(std::ostream& stream, dig obj);
+};
+
+struct attack : public Animation
+{
+  int actingID;
+  int targetID;
+
+  friend std::ostream& operator<<(std::ostream& stream, attack obj);
+};
+
+struct spawn : public Animation
+{
+  int sourceID;
+  int unitID;
+
+  friend std::ostream& operator<<(std::ostream& stream, spawn obj);
+};
+
+struct death : public Animation
+{
+  int sourceID;
+
+  friend std::ostream& operator<<(std::ostream& stream, death obj);
+};
+
 struct move : public Animation
 {
   int actingID;
@@ -120,30 +151,6 @@ struct move : public Animation
   friend std::ostream& operator<<(std::ostream& stream, move obj);
 };
 
-struct spawn : public Animation
-{
-  int sourceID;
-  int unitID;
-
-  friend std::ostream& operator<<(std::ostream& stream, spawn obj);
-};
-
-struct dig : public Animation
-{
-  int actingID;
-  int tileID;
-
-  friend std::ostream& operator<<(std::ostream& stream, dig obj);
-};
-
-struct fill : public Animation
-{
-  int actingID;
-  int tileID;
-
-  friend std::ostream& operator<<(std::ostream& stream, fill obj);
-};
-
 struct flow : public Animation
 {
   int sourceID;
@@ -153,19 +160,12 @@ struct flow : public Animation
   friend std::ostream& operator<<(std::ostream& stream, flow obj);
 };
 
-struct death : public Animation
-{
-  int sourceID;
-
-  friend std::ostream& operator<<(std::ostream& stream, death obj);
-};
-
-struct attack : public Animation
+struct fill : public Animation
 {
   int actingID;
-  int targetID;
+  int tileID;
 
-  friend std::ostream& operator<<(std::ostream& stream, attack obj);
+  friend std::ostream& operator<<(std::ostream& stream, fill obj);
 };
 
 

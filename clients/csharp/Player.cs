@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-
-///
+/// <summary>
+/// 
+/// </summary>
 public class Player
 {
   public IntPtr ptr;
@@ -35,19 +36,21 @@ public class Player
     throw new ExistentialError();
   }
 
-    //commands
-
-  ///Allows a player to display messages on the screen
+  #region Commands
+  /// <summary>
+  /// Allows a player to display messages on the screen
+  /// </summary>
   public bool talk(string message)
   {
     validify();
     return (Client.playerTalk(ptr, message) == 0) ? false : true;
   }
+  #endregion
 
-    //getters
-
-
-  ///Unique Identifier
+  #region Getters
+  /// <summary>
+  /// Unique Identifier
+  /// </summary>
   public int Id
   {
     get
@@ -58,7 +61,9 @@ public class Player
     }
   }
 
-  ///Player's Name
+  /// <summary>
+  /// Player's Name
+  /// </summary>
   public string PlayerName
   {
     get
@@ -69,7 +74,9 @@ public class Player
     }
   }
 
-  ///Time remaining, updated at start of turn
+  /// <summary>
+  /// Time remaining, updated at start of turn
+  /// </summary>
   public float Time
   {
     get
@@ -80,7 +87,9 @@ public class Player
     }
   }
 
-  ///The amount of water a player has.
+  /// <summary>
+  /// The amount of water a player has.
+  /// </summary>
   public int WaterStored
   {
     get
@@ -91,7 +100,9 @@ public class Player
     }
   }
 
-  ///Resource used to spawn in units.
+  /// <summary>
+  /// Resource used to spawn in units.
+  /// </summary>
   public int Oxygen
   {
     get
@@ -102,7 +113,9 @@ public class Player
     }
   }
 
-  ///The player's oxygen cap.
+  /// <summary>
+  /// The player's oxygen cap.
+  /// </summary>
   public int MaxOxygen
   {
     get
@@ -113,5 +126,8 @@ public class Player
     }
   }
 
-}
+  #endregion
 
+  #region Properties
+  #endregion
+}

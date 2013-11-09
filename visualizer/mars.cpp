@@ -99,7 +99,7 @@ void Mars::ProccessInput()
 				const auto& tile = iter.second;
 
 				if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y &&
-				  (tile->depth > 0 || tile->owner == GLACIER || tile->owner == 0 || tile->owner == 1))
+				  (tile->pumpID == -1 && (tile->depth > 0 || tile->owner == GLACIER || tile->owner == 0 || tile->owner == 1)))
 				{
 					m_selectedUnitIDs.push_back(tile->id);
 				}
@@ -119,7 +119,6 @@ void Mars::ProccessInput()
 						m_selectedUnitIDs.push_back(tile->id);
 					}
                 }
-
             }
         }
 
@@ -150,15 +149,15 @@ void Mars::drawObjectSelection() const
 			{
                 auto tile = m_game->states[turn].tiles.at(iter);
 
-                if(tile->pumpID != -1)
-                {
-                    if(tile->y > 0 && m_game->states[turn].tileGrid[tile->x][tile->y - 1]->pumpID != -1)
+				if(tile->pumpID != -1)
+				{
+					if(tile->y > 0 && m_game->states[turn].tileGrid[tile->x][tile->y - 1]->pumpID == tile->pumpID)
                         north = true;
-                    if(tile->x < m_game->mapWidth - 1 && m_game->states[turn].tileGrid[tile->x + 1][tile->y]->pumpID != -1)
+					if(tile->x < m_game->mapWidth - 1 && m_game->states[turn].tileGrid[tile->x + 1][tile->y]->pumpID == tile->pumpID)
                         east = true;
-                    if(tile->y < m_game->mapHeight - 1 && m_game->states[turn].tileGrid[tile->x][tile->y + 1]->pumpID != -1)
+					if(tile->y < m_game->mapHeight - 1 && m_game->states[turn].tileGrid[tile->x][tile->y + 1]->pumpID == tile->pumpID)
                         south = true;
-                    if(tile->x > 0 && m_game->states[turn].tileGrid[tile->x - 1][tile->y]-> pumpID != -1)
+					if(tile->x > 0 && m_game->states[turn].tileGrid[tile->x - 1][tile->y]-> pumpID == tile->pumpID)
                         west = true;
 
                     if(south && east) // top left corner of a pump
@@ -168,10 +167,15 @@ void Mars::drawObjectSelection() const
                     else if(north && east) // bottom left corner of a pump
                         drawQuadAroundObj(glm::vec2(tile->x, tile->y - 1), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
                     else if(north && west) // bottom right corner of a pump
-                        drawQuadAroundObj(glm::vec2(tile->x - 1, tile->y - 1), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
+						drawQuadAroundObj(glm::vec2(tile->x - 1, tile->y - 1), 2, 2, glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
                 }
-                else
-                    drawQuadAroundObj(tile, glm::vec4(0.3, 0.0, 1.0, 0.6));
+				else
+				{
+					drawQuadAroundObj(tile, glm::vec4(0.3, 0.0, 1.0, 0.4));
+				}
+
+
+
             }
 		}
 
@@ -195,13 +199,13 @@ void Mars::drawObjectSelection() const
 
                 if(tile->pumpID != -1)
                 {
-                    if(tile->y > 0 && m_game->states[turn].tileGrid[tile->x][tile->y - 1]->pumpID != -1)
+					if(tile->y > 0 && m_game->states[turn].tileGrid[tile->x][tile->y - 1]->pumpID == tile->pumpID)
                         north = true;
-                    if(tile->x < m_game->mapWidth - 1 && m_game->states[turn].tileGrid[tile->x + 1][tile->y]->pumpID != -1)
+					if(tile->x < m_game->mapWidth - 1 && m_game->states[turn].tileGrid[tile->x + 1][tile->y]->pumpID == tile->pumpID)
                         east = true;
-                    if(tile->y < m_game->mapHeight - 1 && m_game->states[turn].tileGrid[tile->x][tile->y + 1]->pumpID != -1)
+					if(tile->y < m_game->mapHeight - 1 && m_game->states[turn].tileGrid[tile->x][tile->y + 1]->pumpID == tile->pumpID)
                         south = true;
-                    if(tile->x > 0 && m_game->states[turn].tileGrid[tile->x - 1][tile->y]-> pumpID != -1)
+					if(tile->x > 0 && m_game->states[turn].tileGrid[tile->x - 1][tile->y]-> pumpID != tile->pumpID)
                         west = true;
 
                     if(south && east) // top left corner of a pump
@@ -491,8 +495,13 @@ void Mars::RenderHUDPlayerInfo(int owner)
 
 	stream.str("");
 	stream << m_game->states[turn].players[owner]->waterStored;
-	renderer->drawText(((m_game->mapWidth/2.0f) - (BAR_WIDTH/2.0f)) + BAR_WIDTH*owner, m_game->mapHeight + 1.2f, "Roboto", stream.str(), 2.0f, alignment);
 
+	renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
+	float waterAmountOffset = ((m_game->mapWidth/2.0f) - (BAR_WIDTH/2.0f)) + BAR_WIDTH*owner ;
+	waterAmountOffset += (owner==0)? -0.7f : 0.7f;
+	renderer->drawText(waterAmountOffset , m_game->mapHeight + 2.2f, "Roboto", stream.str(), 3.0f, alignment);
+
+	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
 	renderer->drawText(oxygenBarPos + 2.0f,m_game->mapHeight + 2.2f,"Roboto","Oxygen",2.0f,IRenderer::Alignment::Center);
 	RenderProgressBar(*renderer,oxygenBarPos,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
 }
@@ -914,7 +923,7 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 			}
 		}
 
-        if(tileIter->pumpID == -1)
+		if(tileIter->pumpID == -1)
         {
             turn[tileIter->id]["id"] = tileIter->id;
             turn[tileIter->id]["x"] = tileIter->x;
@@ -925,17 +934,36 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
             turn[tileIter->id]["depth"] = tileIter->depth;
             turn[tileIter->id]["turnsUntilDeposit"] = tileIter->turnsUntilDeposit;
         }
-        else
+		else
         {
-            if(m_game->states[state].pump.find(tileIter->pumpID) != m_game->states[state].pump.end())
+			if(m_game->states[state].pump.find(tileIter->pumpID) != m_game->states[state].pump.end())
             {
                 auto& pump = m_game->states[state].pump.at(tileIter->pumpID);
 
                 turn[tileIter->id]["id"] = pump->id;
                 turn[tileIter->id]["owner"] = pump->owner;
                 turn[tileIter->id]["siegeAmount"] = pump->siegeAmount;
-            }
+			}
         }
+
+		for(auto& animationIter : tileIter->m_Animations)
+		{
+			if(animationIter->type == parser::SPAWN)
+			{
+				 parser::spawn& spawn = (parser::spawn&)*animationIter;
+
+				 auto spawnIter = m_game->states[state].tiles.find(spawn.sourceID);
+
+				 if(spawnIter != m_game->states[state].tiles.end())
+				 {
+					 SmartPointer<BaseSprite> pSpawn = new BaseSprite(glm::vec2(spawnIter->second->x, spawnIter->second->y), glm::vec2(1.0f), "egg");
+					 pSpawn->addKeyFrame(new DrawSprite(pSpawn,glm::vec4(1.0f)));
+
+					 //turn.addAnimatable(pSpawn);
+					 animList.push(pSpawn);
+				 }
+			}
+		}
 	}
 
 
@@ -1012,12 +1040,13 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 				auto fillIter = m_game->states[state].tiles.find(fill.tileID);
 				if(fillIter != m_game->states[state].tiles.end())
 				{
-					SmartPointer<AnimatedSprite> pFill = new AnimatedSprite(glm::vec2(fillIter->second->x, fillIter->second->y), glm::vec2(1.0f), "fill", 6,true);
+					SmartPointer<AnimatedSprite> pFill = new AnimatedSprite(glm::vec2(fillIter->second->x, fillIter->second->y), glm::vec2(1.0f), "fill", 16,true);
 					pFill->addKeyFrame(new DrawAnimatedSprite(pFill,glm::vec4(1.0f)));
 
 					turn.addAnimatable(pFill);
 				}
 			}
+
 		}
 
 		glm::vec2 deathPos(unitIter->x,unitIter->y);

@@ -7,8 +7,8 @@
 #include "structures.h"
 
 #include "Mappable.h"
-class Unit;
 class Tile;
+class Unit;
 
 ///Represents a single unit on the map.
 class Unit : public Mappable {
