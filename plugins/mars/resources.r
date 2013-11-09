@@ -4,7 +4,6 @@ texture scout textures/scout.png
 texture worker textures/worker.png
 texture water textures/water.png
 texture trench textures/trench.png
-texture glacier textures/glacier.png
 texture dirt textures/mars.png
 texture trench_hole textures/Trench_Hole.png
 texture trench_wall textures/Trench_Wall.png
@@ -22,3 +21,4 @@ animation death animations/death.png
 animation tile textures/tile_ground.png
 animation dig animations/dig.png
 animation fill animations/fill.png
+animation glacier animations/glacier.png

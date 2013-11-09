@@ -482,27 +482,27 @@ void Mars::RenderHUDPlayerInfo(int owner)
 	IRenderer::Alignment alignment = owner == 0 ? IRenderer::Left : IRenderer::Right;
 
 	std::ostringstream stream;
-	if(owner == 0)
-	{
-		stream << m_game->states[turn].players[owner]->playerName <<"  " << (int)m_game->states[turn].players[owner]->time;
-	}
-	else
-	{
-		stream <<(int)m_game->states[turn].players[owner]->time << "  " << m_game->states[turn].players[owner]->playerName;
-	}
-
+	stream << (int)m_game->states[turn].players[owner]->time;
 
 	glm::vec3 playerColor = GetTeamColor(owner);
 	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
-	renderer->drawText(namePos, m_game->mapHeight + 0.5f, "Roboto", stream.str(), 3.0f, alignment);
+	renderer->drawText(namePos, m_game->mapHeight + 0.5f, "Roboto", m_game->states[turn].players[owner]->playerName, 3.0f, alignment);
+
+	float waterAmountOffset = ((m_game->mapWidth/2.0f) - (BAR_WIDTH/2.0f)) + BAR_WIDTH*owner ;
+
+	// player time
+	float playerTimeOffset = m_game->mapWidth/2.0f + ((owner == 0) ? -13.0f : 13.0f);
+	renderer->drawText(playerTimeOffset, m_game->mapHeight + 3.0f, "Roboto", stream.str(), 3.0f, alignment);
 
 	stream.str("");
 	stream << m_game->states[turn].players[owner]->waterStored;
 
 	renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
-	float waterAmountOffset = ((m_game->mapWidth/2.0f) - (BAR_WIDTH/2.0f)) + BAR_WIDTH*owner ;
+
 	waterAmountOffset += (owner==0)? -0.7f : 0.7f;
-	renderer->drawText(waterAmountOffset , m_game->mapHeight + 2.2f, "Roboto", stream.str(), 3.0f, alignment);
+
+	// water info on tank
+	renderer->drawText(waterAmountOffset , m_game->mapHeight + 3.0f, "Roboto", stream.str(), 3.0f, alignment);
 
 	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
 	renderer->drawText(oxygenBarPos + 2.0f,m_game->mapHeight + 2.2f,"Roboto","Oxygen",2.0f,IRenderer::Alignment::Center);
@@ -645,9 +645,25 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 					//cout << "depth:" << tileIter->depth <<" maxDepth:"<<maxDepth<< endl;
 				}
 
-				SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), texture);
-				pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,depth)));
-				turn.addAnimatable(pTile);
+				if(texture != "glacier")
+				{
+					SmartPointer<BaseSprite> pTile = new BaseSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), texture);
+					pTile->addKeyFrame(new DrawSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,depth)));
+					turn.addAnimatable(pTile);
+				}
+				else
+				{
+					auto iter = m_game->states[0].tiles.find(tileIter->id);
+
+					if(iter != m_game->states[0].tiles.end())
+					{
+						int frame = 6.0f * (1.0f - (tileIter->waterAmount / (float)iter->second->waterAmount));
+
+						SmartPointer<AnimatedSprite> pTile = new AnimatedSprite(glm::vec2(tileIter->x, tileIter->y), glm::vec2(1.0f, 1.0f), texture,frame);
+						pTile->addKeyFrame(new DrawAnimatedSprite(pTile, glm::vec4(1.0f, 1.0f, 1.0f,depth)));
+						turn.addAnimatable(pTile);
+					}
+				}
 			}
 
 			// Canal Overlays
@@ -919,7 +935,7 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 				DrawTextBox * textBox = new DrawTextBox(waterAmountString.str(),
 														glm::vec2(tileIter->x + 0.5, tileIter->y + 0.15),
 														glm::vec4(0.0f,0.0f,0.0f,1.0f),
-														3.0f);
+														3.2f);
 
 				pText->addKeyFrame(textBox);
 				animList.push(pText);
