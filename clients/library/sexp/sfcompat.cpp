@@ -1,7 +1,11 @@
 #include "sfcompat.h"
 #include "parser.h"
 
+#ifndef _WIN32
 #include "lex.yy.h"
+#else
+#include "winlex.h"
+#endif
 
 void destroy_sexp(Sexp* s)
 {
