@@ -44,8 +44,17 @@ bool AI::run()
     //if this tile is my spawn tile or my pump station
     if(tiles[i].owner() == playerID())
     {
+      //get the unit cost for a worker
+      int cost;
+      for(int j = 0; j < unitTypes.size(); j++)
+      {
+        if(unitTypes[j].type() == WORKER)
+        {
+          cost = unitTypes[j].cost();
+        }
+      }
       //if there is enough oxygen to spawn the unit
-      if(players[playerID()].oxygen() >= unitTypes[WORKER].cost())
+      if(players[playerID()].oxygen() >= cost)
       {
         //if can spawn more units in
         if(numberOfUnits < maxUnits())
@@ -126,9 +135,10 @@ bool AI::run()
          units[i].x() + moveDelta >= 0 &&
          units[i].x() + moveDelta < mapWidth())
       {
-        //if the tile is not an enemy spawn base
-        if(tiles[(units[i].x() + moveDelta) * mapHeight() + units[i].y()].pumpID() != -1 ||
-           tiles[(units[i].x() + moveDelta) * mapHeight() + units[i].y()].owner() != 1 - playerID())
+        //if the tile is not an enemy spawn point
+        if(!(tiles[(units[i].x() + moveDelta) * mapHeight() + units[i].y()].pumpID() == -1 &&
+             tiles[(units[i].x() + moveDelta) * mapHeight() + units[i].y()].owner() == 1 - playerID()) ||
+           tiles[(units[i].x() + moveDelta) * mapHeight() + units[i].y()].owner() == 2)
         {
           //if the tile is not an ice tile
           if(!(tiles[(units[i].x() + moveDelta) * mapHeight() + units[i].y()].owner() == 3 &&
