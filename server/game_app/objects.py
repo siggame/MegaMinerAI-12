@@ -50,8 +50,6 @@ class Player(object):
         newUnit = self.game.addObject(Unit, newUnitStats)
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
         self.game.grid[newUnit.x][newUnit.y][0].isSpawning = 0
-        # Add spawn animation
-        self.game.addAnimation(SpawnAnimation(self.game.getTile(newUnit.x, newUnit.y).id, newUnit.id))
       self.spawnQueue = []
 
       #FLOW WATER
@@ -422,6 +420,10 @@ class Tile(Mappable):
     player.spawnCostQueue.append(unittype.cost)
     player.totalUnits += 1
     self.isSpawning = 1
+    
+    # Add spawn animation
+    # NOTE: we are providing 0 for unit.id
+    self.game.addAnimation(SpawnAnimation(self.id, 0))
     
     return True
 
