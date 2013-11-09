@@ -132,5 +132,16 @@ public class Tile: Mappable
     }
   }
 
+  ///Determines if this tile is attempting to spawn something or not.
+  public int IsSpawning
+  {
+    get
+    {
+      validify();
+      int value = Client.tileGetIsSpawning(ptr);
+      return value;
+    }
+  }
+
 }
 

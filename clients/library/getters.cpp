@@ -44,10 +44,6 @@ DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr)
 {
   return ptr->owner;
 }
-DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr)
-{
-  return ptr->waterAmount;
-}
 DLLEXPORT int pumpStationGetSiegeAmount(_PumpStation* ptr)
 {
   return ptr->siegeAmount;
@@ -155,6 +151,10 @@ DLLEXPORT int tileGetDepth(_Tile* ptr)
 DLLEXPORT int tileGetTurnsUntilDeposit(_Tile* ptr)
 {
   return ptr->turnsUntilDeposit;
+}
+DLLEXPORT int tileGetIsSpawning(_Tile* ptr)
+{
+  return ptr->isSpawning;
 }
 DLLEXPORT int unitTypeGetId(_UnitType* ptr)
 {

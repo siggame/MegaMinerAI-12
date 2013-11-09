@@ -32,7 +32,6 @@ class Match(DefaultGameWorld):
     #TODO: INITIALIZE THESE!
     self.mapWidth = None
     self.mapHeight = None
-    self.trenchDamage = None
     self.waterDamage = None
     self.turnNumber = None
     self.maxUnits = None
@@ -112,7 +111,6 @@ class Match(DefaultGameWorld):
         dict(
           mapWidth = self.mapWidth,
           mapHeight = self.mapHeight,
-          trenchDamage = self.trenchDamage,
           waterDamage = self.waterDamage,
           turnNumber = self.turnNumber,
           maxUnits = self.maxUnits,
@@ -220,7 +218,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.trenchDamage, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate, self.depositionRate])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate, self.depositionRate])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])

@@ -102,11 +102,6 @@ public abstract class BaseAI
   {
     return Client.INSTANCE.getMapHeight(connection);
   }
-  ///The amount of damage walking over a trench.
-  int trenchDamage()
-  {
-    return Client.INSTANCE.getTrenchDamage(connection);
-  }
   ///The amount of damage walking over water.
   int waterDamage()
   {

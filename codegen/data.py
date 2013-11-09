@@ -13,7 +13,6 @@ modelOrder = ['Player', 'Mappable', 'PumpStation', 'Unit', 'Tile', 'UnitType']
 globals = [
   Variable('mapWidth', int, 'The width of the total map.'),
   Variable('mapHeight', int, 'The height of the total map.'),
-  Variable('trenchDamage', int, 'The amount of damage walking over a trench.'),
   Variable('waterDamage', int, 'The amount of damage walking over water.'),
   Variable('turnNumber', int, 'The current turn number.'),
   Variable('maxUnits', int, 'The maximum number of units allowed per player.'),
@@ -50,7 +49,8 @@ Tile = Model('Tile',
     Variable('pumpID', int, 'Determines if this tile is a part of a Pump Station.'),
     Variable('waterAmount', int, 'The amount of water contained on the tile.'),
     Variable('depth', int, 'The depth of the tile. Tile is a trench if depth is greater than zero.'),
-    Variable('turnsUntilDeposit', int, 'The number of turns until sediment is deposited on this tile.')
+    Variable('turnsUntilDeposit', int, 'The number of turns until sediment is deposited on this tile.'),
+    Variable('isSpawning', int, 'Determines if this tile is attempting to spawn something or not.')
     ],
   functions=[
     Function('spawn',[Variable('type',int)],
@@ -99,7 +99,6 @@ Unit.addFunctions([Function("attack", [ Variable("target", Unit)],
 PumpStation = Model('PumpStation',
   data = [
     Variable('owner', int, 'The owner of the PumpStation.'),
-    Variable('waterAmount', int, 'The amount of water the PumpStation pumps.'),
     Variable('siegeAmount', int, 'The amount the PumpStation has been sieged.'),
     ],
   functions=[

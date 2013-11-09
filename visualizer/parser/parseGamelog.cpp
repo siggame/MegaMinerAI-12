@@ -155,15 +155,6 @@ static bool parsePumpStation(PumpStation& object, sexp_t* expression)
     return false;
   }
 
-  object.waterAmount = atoi(sub->val);
-  sub = sub->next;
-
-  if ( !sub ) 
-  {
-    cerr << "Error in parsePumpStation.\n Parsing: " << *expression << endl;
-    return false;
-  }
-
   object.siegeAmount = atoi(sub->val);
   sub = sub->next;
 
@@ -419,6 +410,15 @@ static bool parseTile(Tile& object, sexp_t* expression)
   object.turnsUntilDeposit = atoi(sub->val);
   sub = sub->next;
 
+  if ( !sub ) 
+  {
+    cerr << "Error in parseTile.\n Parsing: " << *expression << endl;
+    return false;
+  }
+
+  object.isSpawning = atoi(sub->val);
+  sub = sub->next;
+
   return true;
 
 }
@@ -542,98 +542,6 @@ static bool parseUnitType(UnitType& object, sexp_t* expression)
 
 }
 
-static bool parseFlow(flow& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  object.type = FLOW;
-  sub = expression->list->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.sourceID = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.destID = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.waterAmount = atoi(sub->val);
-  sub = sub->next;
-  return true;
-
-}
-static bool parseDig(dig& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  object.type = DIG;
-  sub = expression->list->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parsedig.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.actingID = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parsedig.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.tileID = atoi(sub->val);
-  sub = sub->next;
-  return true;
-
-}
-static bool parseAttack(attack& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  object.type = ATTACK;
-  sub = expression->list->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.actingID = atoi(sub->val);
-  sub = sub->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.targetID = atoi(sub->val);
-  sub = sub->next;
-  return true;
-
-}
-static bool parseDeath(death& object, sexp_t* expression)
-{
-  sexp_t* sub;
-  if ( !expression ) return false;
-  object.type = DEATH;
-  sub = expression->list->next;
-  if( !sub ) 
-  {
-    cerr << "Error in parsedeath.\n Parsing: " << *expression << endl;
-    return false;
-  }
-  object.sourceID = atoi(sub->val);
-  sub = sub->next;
-  return true;
-
-}
 static bool parseMove(move& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -678,6 +586,52 @@ static bool parseMove(move& object, sexp_t* expression)
   return true;
 
 }
+static bool parseSpawn(spawn& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = SPAWN;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsespawn.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.sourceID = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsespawn.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.unitID = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
+static bool parseDig(dig& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = DIG;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsedig.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.actingID = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsedig.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.tileID = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
 static bool parseFill(fill& object, sexp_t* expression)
 {
   sexp_t* sub;
@@ -701,25 +655,71 @@ static bool parseFill(fill& object, sexp_t* expression)
   return true;
 
 }
-static bool parseSpawn(spawn& object, sexp_t* expression)
+static bool parseFlow(flow& object, sexp_t* expression)
 {
   sexp_t* sub;
   if ( !expression ) return false;
-  object.type = SPAWN;
+  object.type = FLOW;
   sub = expression->list->next;
   if( !sub ) 
   {
-    cerr << "Error in parsespawn.\n Parsing: " << *expression << endl;
+    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
     return false;
   }
   object.sourceID = atoi(sub->val);
   sub = sub->next;
   if( !sub ) 
   {
-    cerr << "Error in parsespawn.\n Parsing: " << *expression << endl;
+    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
     return false;
   }
-  object.unitID = atoi(sub->val);
+  object.destID = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseflow.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.waterAmount = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
+static bool parseDeath(death& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = DEATH;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parsedeath.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.sourceID = atoi(sub->val);
+  sub = sub->next;
+  return true;
+
+}
+static bool parseAttack(attack& object, sexp_t* expression)
+{
+  sexp_t* sub;
+  if ( !expression ) return false;
+  object.type = ATTACK;
+  sub = expression->list->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.actingID = atoi(sub->val);
+  sub = sub->next;
+  if( !sub ) 
+  {
+    cerr << "Error in parseattack.\n Parsing: " << *expression << endl;
+    return false;
+  }
+  object.targetID = atoi(sub->val);
   sub = sub->next;
   return true;
 
@@ -747,9 +747,6 @@ static bool parseSexp(Game& game, sexp_t* expression)
           sub = sub->next;
           if ( !sub ) return false;
           gs.mapHeight = atoi(sub->val);
-          sub = sub->next;
-          if ( !sub ) return false;
-          gs.trenchDamage = atoi(sub->val);
           sub = sub->next;
           if ( !sub ) return false;
           gs.waterDamage = atoi(sub->val);
@@ -865,10 +862,18 @@ static bool parseSexp(Game& game, sexp_t* expression)
       expression = expression->next;
       sub = expression->list;
       if ( !sub ) return false;
-      if(string(ToLower( sub->val ) ) == "flow")
+      if(string(ToLower( sub->val ) ) == "move")
       {
-        SmartPointer<flow> animation = new flow;
-        if ( !parseFlow(*animation, expression) )
+        SmartPointer<move> animation = new move;
+        if ( !parseMove(*animation, expression) )
+          return false;
+
+        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
+      }
+      if(string(ToLower( sub->val ) ) == "spawn")
+      {
+        SmartPointer<spawn> animation = new spawn;
+        if ( !parseSpawn(*animation, expression) )
           return false;
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
@@ -881,10 +886,18 @@ static bool parseSexp(Game& game, sexp_t* expression)
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
       }
-      if(string(ToLower( sub->val ) ) == "attack")
+      if(string(ToLower( sub->val ) ) == "fill")
       {
-        SmartPointer<attack> animation = new attack;
-        if ( !parseAttack(*animation, expression) )
+        SmartPointer<fill> animation = new fill;
+        if ( !parseFill(*animation, expression) )
+          return false;
+
+        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
+      }
+      if(string(ToLower( sub->val ) ) == "flow")
+      {
+        SmartPointer<flow> animation = new flow;
+        if ( !parseFlow(*animation, expression) )
           return false;
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
@@ -897,26 +910,10 @@ static bool parseSexp(Game& game, sexp_t* expression)
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
       }
-      if(string(ToLower( sub->val ) ) == "move")
+      if(string(ToLower( sub->val ) ) == "attack")
       {
-        SmartPointer<move> animation = new move;
-        if ( !parseMove(*animation, expression) )
-          return false;
-
-        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
-      }
-      if(string(ToLower( sub->val ) ) == "fill")
-      {
-        SmartPointer<fill> animation = new fill;
-        if ( !parseFill(*animation, expression) )
-          return false;
-
-        animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );
-      }
-      if(string(ToLower( sub->val ) ) == "spawn")
-      {
-        SmartPointer<spawn> animation = new spawn;
-        if ( !parseSpawn(*animation, expression) )
+        SmartPointer<attack> animation = new attack;
+        if ( !parseAttack(*animation, expression) )
           return false;
 
         animations[ ((AnimOwner*)&*animation)->owner ].push_back( animation );

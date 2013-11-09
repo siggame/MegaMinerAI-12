@@ -43,8 +43,6 @@ public class Client {
   [DllImport("client")]
   public static extern int getMapHeight(IntPtr connection);
   [DllImport("client")]
-  public static extern int getTrenchDamage(IntPtr connection);
-  [DllImport("client")]
   public static extern int getWaterDamage(IntPtr connection);
   [DllImport("client")]
   public static extern int getTurnNumber(IntPtr connection);
@@ -113,8 +111,6 @@ public class Client {
   [DllImport("client")]
   public static extern int pumpStationGetOwner(IntPtr ptr);
   [DllImport("client")]
-  public static extern int pumpStationGetWaterAmount(IntPtr ptr);
-  [DllImport("client")]
   public static extern int pumpStationGetSiegeAmount(IntPtr ptr);
 
   [DllImport("client")]
@@ -170,6 +166,8 @@ public class Client {
   public static extern int tileGetDepth(IntPtr ptr);
   [DllImport("client")]
   public static extern int tileGetTurnsUntilDeposit(IntPtr ptr);
+  [DllImport("client")]
+  public static extern int tileGetIsSpawning(IntPtr ptr);
 
   [DllImport("client")]
   public static extern int unitTypeGetId(IntPtr ptr);

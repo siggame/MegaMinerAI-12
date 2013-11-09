@@ -35,7 +35,6 @@ struct _PumpStation
   Connection* _c;
   int id;
   int owner;
-  int waterAmount;
   int siegeAmount;
 };
 struct _Unit
@@ -71,6 +70,7 @@ struct _Tile
   int waterAmount;
   int depth;
   int turnsUntilDeposit;
+  int isSpawning;
 };
 struct _UnitType
 {
