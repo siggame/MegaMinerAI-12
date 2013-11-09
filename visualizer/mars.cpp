@@ -69,6 +69,8 @@ void Mars::ProccessInput()
 	int tilesSelectable = gui->getDebugOptionState("Tiles Selectable");
     int pumpsSelectable = gui->getDebugOptionState("Pumps Selectable");
 
+	set<int> pumpStations;
+
 	if( input.leftRelease && turn < (int)m_game->states.size())
 	{
 		Rect R;
@@ -97,7 +99,7 @@ void Mars::ProccessInput()
 				const auto& tile = iter.second;
 
 				if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y &&
-				  (tile->depth > 0 || tile->owner == GLACIER))
+				  (tile->depth > 0 || tile->owner == GLACIER || tile->owner == 0 || tile->owner == 1))
 				{
 					m_selectedUnitIDs.push_back(tile->id);
 				}
@@ -112,7 +114,10 @@ void Mars::ProccessInput()
 
                 if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y && tile->pumpID != -1)
                 {
-                    m_selectedUnitIDs.push_back(tile->id);
+					if(pumpStations.insert(tile->pumpID).second)
+					{
+						m_selectedUnitIDs.push_back(tile->id);
+					}
                 }
 
             }
@@ -1153,7 +1158,6 @@ void Mars::run()
 Mars::Game::Game(parser::Game* game) :
 	mapWidth(game->states[0].mapWidth),
 	mapHeight(game->states[0].mapHeight),
-	trenchDamage(game->states[0].trenchDamage),
 	waterDamage(game->states[0].waterDamage),
 	turnNumber(game->states[0].turnNumber),
 	maxUnits(game->states[0].maxUnits),

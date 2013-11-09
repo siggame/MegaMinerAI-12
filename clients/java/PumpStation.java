@@ -44,12 +44,6 @@ class PumpStation
     validify();
     return Client.INSTANCE.pumpStationGetOwner(ptr);
   }
-  ///The amount of water the PumpStation pumps.
-  public int getWaterAmount()
-  {
-    validify();
-    return Client.INSTANCE.pumpStationGetWaterAmount(ptr);
-  }
   ///The amount the PumpStation has been sieged.
   public int getSiegeAmount()
   {

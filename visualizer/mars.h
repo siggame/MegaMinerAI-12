@@ -90,7 +90,6 @@ namespace visualizer
 
 				int mapWidth;
 				int mapHeight;
-				int trenchDamage;
 				int waterDamage;
 				int turnNumber;
 				int maxUnits;

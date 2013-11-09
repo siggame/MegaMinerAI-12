@@ -35,7 +35,6 @@ class Match(DefaultGameWorld):
 
     self.mapWidth = self.mapWidth
     self.mapHeight = self.mapHeight
-    self.trenchDamage = self.trenchDamage
     self.waterDamage = self.waterDamage
     self.turnNumber = -1
     self.maxUnits = self.maxUnits
@@ -94,7 +93,7 @@ class Match(DefaultGameWorld):
     self.turnNumber = -1
     # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth', 'turnsUntilDeposit']
     # ['id', 'x', 'y', 'owner', 'pumpID', 'waterAmount', 'depth']
-    self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
+    self.grid = [[[ self.addObject(Tile,[x, y, 2, -1, 0, 0, 0, 0]) ] for y in range(self.mapHeight)] for x in range(self.mapWidth)]
 
     statList = ["name", "type", "cost", "attackPower", "digPower", "fillPower", "maxHealth", "maxMovement", "offensePower", "defensePower", "range"]
     unitTypes = cfgTypes.values()
@@ -190,8 +189,8 @@ class Match(DefaultGameWorld):
               valid = False
               break
         done = valid
-      pump = self.addObject(PumpStation,[0, 0, 0])
-      otherPump = self.addObject(PumpStation,[1, 0, 0])
+      pump = self.addObject(PumpStation,[0, 0])
+      otherPump = self.addObject(PumpStation,[1, 0])
       for tileOffset in squareOffsets:
         tile = self.getTile(x + tileOffset[0], y + tileOffset[1])
         otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
@@ -360,7 +359,6 @@ class Match(DefaultGameWorld):
         dict(
           mapWidth = self.mapWidth,
           mapHeight = self.mapHeight,
-          trenchDamage = self.trenchDamage,
           waterDamage = self.waterDamage,
           turnNumber = self.turnNumber,
           maxUnits = self.maxUnits,
@@ -542,7 +540,7 @@ class Match(DefaultGameWorld):
   def status(self):
     msg = ["status"]
 
-    msg.append(["game", self.mapWidth, self.mapHeight, self.trenchDamage, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate, self.depositionRate])
+    msg.append(["game", self.mapWidth, self.mapHeight, self.waterDamage, self.turnNumber, self.maxUnits, self.playerID, self.gameNumber, self.maxSiege, self.oxygenRate, self.depositionRate])
 
     typeLists = []
     typeLists.append(["Player"] + [i.toList() for i in self.objects.values() if i.__class__ is Player])

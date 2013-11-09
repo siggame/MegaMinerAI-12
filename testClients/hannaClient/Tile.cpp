@@ -44,6 +44,16 @@ int Tile::depth()
   return ((_Tile*)ptr)->depth;
 }
 
+int Tile::turnsUntilDeposit()
+{
+  return ((_Tile*)ptr)->turnsUntilDeposit;
+}
+
+int Tile::isSpawning()
+{
+  return ((_Tile*)ptr)->isSpawning;
+}
+
 
 bool Tile::spawn(int type)
 {
@@ -61,5 +71,7 @@ std::ostream& operator<<(std::ostream& stream,Tile ob)
   stream << "pumpID: " << ((_Tile*)ob.ptr)->pumpID  <<'\n';
   stream << "waterAmount: " << ((_Tile*)ob.ptr)->waterAmount  <<'\n';
   stream << "depth: " << ((_Tile*)ob.ptr)->depth  <<'\n';
+  stream << "turnsUntilDeposit: " << ((_Tile*)ob.ptr)->turnsUntilDeposit  <<'\n';
+  stream << "isSpawning: " << ((_Tile*)ob.ptr)->isSpawning  <<'\n';
   return stream;
 }
