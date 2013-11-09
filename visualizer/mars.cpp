@@ -1228,6 +1228,9 @@ Mars::Game::Game(parser::Game* game) :
 		for(auto& tile : states[i].tiles)
 			states[i].tileGrid[tile.second->x][tile.second->y] = tile.second;
 
+		for(auto& pumpBefore : states[i-1].pump)
+			states[i].pump[pumpBefore.second->id] = pumpBefore.second;
+
 		for(auto& pump : game->states[i].pumpStations)
 		{
 			states[i].pump[pump.second.id] = SmartPointer<PumpStation>(new PumpStation(game->states[i],pump.second));
