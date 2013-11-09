@@ -7,11 +7,12 @@ namespace visualizer
 	void RenderProgressBar(const IRenderer& renderer,
 					   float xPos, float yPos,
 					   float width, float height,
-					   float percent,
+					   float A, float B,
 					   const Color& col, const Color& backgroundColor,
-					   bool bDrawText,
+					   ProgressBarTextMode textMode,
 					   bool bDrawDivider)
 	{
+		float percent = A / B;
 		float leftWidth = percent * width;
 
 		renderer.setColor(col);
@@ -21,14 +22,20 @@ namespace visualizer
 		renderer.setColor(backgroundColor);
 		renderer.drawQuad(xPos + width,yPos, -(1.0f - percent) * width, height); // height
 
-		if(bDrawText)
+		if(textMode != Off)
 		{
-			float middle = (xPos + (width / 2.0f));
-
 			ostringstream stream;
-			stream << fixed << setprecision(2) << percent * 100 << '%';
-
+			float middle = (xPos + (width / 2.0f));
 			renderer.setColor(Color(1.0f,1.0f,1.0f,1.0f));
+			if(textMode == Percent)
+			{
+				stream << fixed << setprecision(2) << percent * 100 << '%';
+			}
+			else
+			{
+				stream << A << "/" << B;
+			}
+
 			renderer.drawText(middle,yPos - 0.1f,"Roboto",stream.str(),5.0f*height,IRenderer::Center);
 		}
 
@@ -68,7 +75,7 @@ namespace visualizer
 
 	void DrawProgressBar::animate(const float &t, AnimData* d, IGame *game)
 	{
-		RenderProgressBar(*game->renderer,m_pos.x,m_pos.y,m_width,m_height,m_percent,Color(1.0f,0.0f,0.0f,0.5f));
+		RenderProgressBar(*game->renderer,m_pos.x,m_pos.y,m_width,m_height,m_percent,1.0f,Color(1.0f,0.0f,0.0f,0.5f));
 	}
 
 	void DrawSmoothSpriteProgressBar::animate(const float &t, AnimData *d, IGame *game)

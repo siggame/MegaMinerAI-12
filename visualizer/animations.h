@@ -5,12 +5,19 @@
 
 namespace visualizer
 {
+	enum ProgressBarTextMode
+	{
+		Off,
+		Percent,
+		Value
+	};
+
 	void RenderProgressBar(const IRenderer& renderer,
 						   float xPos, float yPos,
 						   float width, float height,
-						   float percent,
+						   float A, float B,
 						   const Color& col, const Color& backgroundColor = Color(0,0,0,0.8f),
-						   bool bDrawText = false,
+						   ProgressBarTextMode textMode = Off,
 						   bool bDrawDivider = false);
 
     // NOTE: consider combining color sprite and DrawSprite since they are

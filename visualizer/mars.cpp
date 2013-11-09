@@ -461,8 +461,8 @@ void Mars::RenderHUDWaterTank()
 		glm::vec3 playerColor0 = GetTeamColor(0);
 		glm::vec3 playerColor1 = GetTeamColor(1);
 
-		RenderProgressBar(*renderer,(m_game->mapWidth/2.0f) - (BAR_WIDTH/2.0f),m_game->mapHeight + 1.2f,BAR_WIDTH,2.0f,(m_game->states[turn].players[0]->waterStored / totalWater),
-				Color(playerColor0.r,playerColor0.g,playerColor0.b, 1.0f),Color(playerColor1.r,playerColor1.g,playerColor1.b, 1.0f),false,true);
+		RenderProgressBar(*renderer,(m_game->mapWidth/2.0f) - (BAR_WIDTH/2.0f),m_game->mapHeight + 1.2f,BAR_WIDTH,2.0f,m_game->states[turn].players[0]->waterStored, totalWater,
+				Color(playerColor0.r,playerColor0.g,playerColor0.b, 1.0f),Color(playerColor1.r,playerColor1.g,playerColor1.b, 1.0f),Off,true);
 	}
 
 	// Render the front of the tank
@@ -477,7 +477,7 @@ void Mars::RenderHUDPlayerInfo(int owner)
 
 	float oxygenBarPos = (m_game->mapWidth - 4.0f) * owner;
 
-	float oxygenLevel = m_game->states[turn].players[owner]->oxygen / (float)m_game->states[turn].players[owner]->maxOxygen;
+
 	float namePos = owner == 0 ? 1 : m_game->mapWidth - 1;
 	IRenderer::Alignment alignment = owner == 0 ? IRenderer::Left : IRenderer::Right;
 
@@ -506,7 +506,10 @@ void Mars::RenderHUDPlayerInfo(int owner)
 
 	renderer->setColor( Color(playerColor.r,playerColor.g,playerColor.b, 1.0f));
 	renderer->drawText(oxygenBarPos + 2.0f,m_game->mapHeight + 2.2f,"Roboto","Oxygen",2.0f,IRenderer::Alignment::Center);
-	RenderProgressBar(*renderer,oxygenBarPos,m_game->mapHeight + 3.2f,4.0f, .5f,oxygenLevel,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),true);
+
+	float A = m_game->states[turn].players[owner]->oxygen;
+	float B = m_game->states[turn].players[owner]->maxOxygen;
+	RenderProgressBar(*renderer,oxygenBarPos,m_game->mapHeight + 3.2f,4.0f,0.5f,A,B,Color(0,0,1,1),Color(0.4f,0.4f,0.4f,1),Value,false);
 }
 
 void Mars::RenderHUD()
