@@ -354,10 +354,12 @@ list<int> Mars::getSelectedUnits()
 
 list<IGUI::DebugOption> Mars::getDebugOptions()
 {
+	bool bArena = options->getString( "Game Mode" ).compare( "arena" );
+
 	return std::list<IGUI::DebugOption>({{"Units Selectable", true},
 										 {"Tiles Selectable", true},
 										 {"Pumps Selectable", true},
-										 {"Draw Glacier Water Amount", true}
+										 {"Draw Glacier Water Amount", !bArena}
 										});
 }
 
