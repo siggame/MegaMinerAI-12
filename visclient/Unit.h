@@ -11,8 +11,8 @@
 namespace client
 {
 
-class Unit;
 class Tile;
+class Unit;
 
 ///Represents a single unit on the map.
 class Unit : public Mappable {
