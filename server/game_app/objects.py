@@ -51,7 +51,7 @@ class Player(object):
         self.game.grid[newUnit.x][newUnit.y].append(newUnit)
         self.game.grid[newUnit.x][newUnit.y][0].isSpawning = 0
         # Add spawn animation
-        self.game.addAnimation(SpawnAnimation(self.game.getTile(newUnit.x, newUnit.y), newUnit.id))
+        self.game.addAnimation(SpawnAnimation(self.game.getTile(newUnit.x, newUnit.y).id, newUnit.id))
       self.spawnQueue = []
 
       #FLOW WATER

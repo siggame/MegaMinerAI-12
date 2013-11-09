@@ -46,7 +46,7 @@ class Match(DefaultGameWorld):
     self.maxOxygen = self.maxOxygen
     self.depositionRate = self.depositionRate
 
-    self.startingOxygen = self.startingOxygen
+    self.startingOxygen = self.maxOxygen
 
     self.ice = []
 
