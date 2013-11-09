@@ -280,6 +280,9 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   // Cannot move onto ice tiles
   if (tile->owner == 3)
     return 0;
+  // Cannot move onto spawning tiles
+  if (tile->isSpawning == 1)
+    return 0;
   // Cannot move onto enemy spawn tiles
   if (tile->owner == (getPlayerID(c)^1) && tile->pumpID == -1)
     return 0;

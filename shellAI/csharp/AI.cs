@@ -6,6 +6,9 @@ using System.Runtime.InteropServices;
 /// </summary>
 class AI : BaseAI
 {
+  // Enum for types of units you can spawn.
+  enum Types { Worker, Scout, Tank };
+
   public override string username()
   {
     return "Shell AI";

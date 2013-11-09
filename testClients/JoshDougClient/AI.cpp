@@ -130,6 +130,13 @@ Tile* AI::getNearestFriendlyPump(const int xCoord, const int yCoord)
       }
       noFriendly=false;
     }
+    for(int j =0; j< pumpStations.size(); j++)
+    {
+      if(pumpStations[j].id()==pumpTiles[i]->pumpID()
+         && pumpTiles[i]->owner() == playerID() && pumpStations[j].siegeAmount()>0)
+        return pumpTiles[i];
+    }
+    
   }
   if(noFriendly)
     return NULL;
@@ -230,15 +237,17 @@ void AI::spawnUnits()
 {
   getSpawnTiles();
   int temp;
-  
-  for(int i = 0; i < spawnTiles.size(); i++)
+  bool spawnedTank=false;
+  if(friendTankUnits.size()==0 && !spawnedTank)
+  {
+    pumpTiles[rand()%pumpTiles.size()]->spawn(2);
+    spawnedTank=true;
+  }
+  for(int i = spawnTiles.size()-1; i >=0; i--)
   {
     if(spawnTiles[i]->pumpID() > 0)
     {
-      temp=rand()%3;
-      if(temp==1)
-        temp=0;
-      spawnTiles[i]->spawn(0);
+      spawnTiles[i]->spawn(rand()%2);
     }
     else
       spawnTiles[i]->spawn(1);
@@ -444,10 +453,10 @@ void AI::controlUnits()
       if(units[i].type()==2)  //tank
       {
         tryToAttack(units[i]);
-        //moveTile = getNearestEnemyPump(units[i].x(), units[i].y());
+        moveTile = getNearestFriendlyPump(units[i].x(), units[i].y());
         if(moveTile != NULL)
         {
-          //moveTo(units[i], moveTile->x(), moveTile->y());
+          moveTo(units[i], moveTile->x(), moveTile->y());
         }
         tryToAttack(units[i]);
       }
