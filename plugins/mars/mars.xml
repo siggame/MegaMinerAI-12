@@ -23,7 +23,7 @@
   <option>
     <key>Toggle Oxygen Bar Text Mode</key>
     <type>Integer</type>
-    <value>0</value>
+    <value>1</value>
     <minvalue>0</minvalue>
     <maxvalue>1</maxvalue>
   </option>
