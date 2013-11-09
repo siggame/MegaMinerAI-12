@@ -127,41 +127,6 @@ class Match(DefaultGameWorld):
     return next((player for player in self.objects.players if player.id == playerID), None)
     
   def create_pumps(self):
-    # Create a pump stations next to an ice tiles
-    # Get all ice tiles on left side of map
-    iceTiles = [tile for tile in self.objects.tiles if tile.owner == 3 and tile.x <= self.mapWidth / 2]
-    # Magic
-    pumpOffsets = [
-      ((1,0), (2,0), (1,1), (2,1)),  ((1,0), (2,0), (1,-1), (2,-1)),
-      ((0,1), (0,2), (1,1), (1,2)),  ((0,1), (0,2), (-1,1), (-1,2)),
-      ((-1,0), (-2,0), (-1,1), (-2,1)),  ((-1,0), (-2,0), (-1,-1), (-2,-1)),
-      ((0,-1), (0,-2), (1,-1), (1,-2)),  ((0,-1), (0,-2), (-1,-1), (-1,-2))
-    ]
-    random.shuffle(pumpOffsets)
-    for _ in xrange(self.numPumpStationsAdjacentToIce):
-      iceTile = random.choice(iceTiles)
-      for tileOffsets in pumpOffsets:
-        validPump = True
-        # Check if every spot in the 2x2 square is available for a pump station
-        for tileOffset in tileOffsets:
-          tile = self.getTile(iceTile.x + tileOffset[0], iceTile.y + tileOffset[1])
-          if tile is None or tile.owner != 2:
-            validPump = False
-            break
-        # Put the pump
-        if validPump:
-          pump = self.addObject(PumpStation,[0, 0, 0])
-          otherPump = self.addObject(PumpStation,[1, 0, 0])
-          for tileOffset in tileOffsets:
-            tile = self.getTile(iceTile.x + tileOffset[0], iceTile.y + tileOffset[1])
-            otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
-            tile.pumpID = pump.id
-            otherTile.pumpID = otherPump.id
-            tile.owner = 0
-            otherTile.owner = 1
-          iceTiles.remove(iceTile)  # So we don't put two pump stations next to the same ice tile
-          break
-
     # Create randomly placed pump stations
     squareOffsets = [
       (0,0),(1,0),(0,1),(1,1)
@@ -173,7 +138,7 @@ class Match(DefaultGameWorld):
       x = y = 0
       done = False
       while not done:
-        x = random.randint(0, self.mapWidth / 2 - 2)
+        x = random.randint(0, self.mapWidth / 2 - 3)
         y = random.randint(0, self.mapHeight - 2)
         valid = True
         # Check 2x2 square
@@ -215,14 +180,17 @@ class Match(DefaultGameWorld):
         key=lambda tile: abs(tile.x - pumpTile.x) + abs(tile.y - pumpTile.y))
       # Find path between them
       path = aStar(self, pumpTile, iceTile,
-        lambda tile: tile.owner == 2 or tile.owner == 3)
+        lambda tile: (tile.owner == 2 or tile.owner == 3) and (tile.x < self.mapWidth / 2))
       # Dig it up on both sides of map
-      for tile in path:
-        if tile.owner == 2:
-          otherTile = self.getTile(self.mapWidth - tile.x - 1, tile.y)
-          tile.depth = 100000
-          otherTile.depth = 100000
-          # TODO: add large dugness value to trench
+      if path is not None:
+        for tile in path:
+          if tile.owner == 2:
+            otherTile = self.getTile((self.mapWidth - tile.x) - 1, tile.y)
+            if otherTile is None:
+              print('Bad trench path ? : ({},{})'.format(tile.x, tile.y))
+            tile.depth = 100000
+            otherTile.depth = 100000
+            # TODO: add large dugness value to trench
 
   def create_ice(self):
     for _ in xrange(self.numIceTiles):
