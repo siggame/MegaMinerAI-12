@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-
-///Represents a single unit on the map.
+/// <summary>
+/// Represents a single unit on the map.
+/// </summary>
 public class Unit: Mappable
 {
 
@@ -32,40 +33,48 @@ public class Unit: Mappable
     throw new ExistentialError();
   }
 
-    //commands
-
-  ///Make the unit move to the respective x and y location.
+  #region Commands
+  /// <summary>
+  /// Make the unit move to the respective x and y location.
+  /// </summary>
   public bool move(int x, int y)
   {
     validify();
     return (Client.unitMove(ptr, x, y) == 0) ? false : true;
   }
-  ///Put dirt in a hole!
+  /// <summary>
+  /// Put dirt in a hole!
+  /// </summary>
   public bool fill(Tile tile)
   {
     validify();
     tile.validify();
     return (Client.unitFill(ptr, tile.ptr) == 0) ? false : true;
   }
-  ///Dig out a tile
+  /// <summary>
+  /// Dig out a tile
+  /// </summary>
   public bool dig(Tile tile)
   {
     validify();
     tile.validify();
     return (Client.unitDig(ptr, tile.ptr) == 0) ? false : true;
   }
-  ///Command to attack another Unit.
+  /// <summary>
+  /// Command to attack another Unit.
+  /// </summary>
   public bool attack(Unit target)
   {
     validify();
     target.validify();
     return (Client.unitAttack(ptr, target.ptr) == 0) ? false : true;
   }
+  #endregion
 
-    //getters
-
-
-  ///Unique Identifier
+  #region Getters
+  /// <summary>
+  /// Unique Identifier
+  /// </summary>
   public new int Id
   {
     get
@@ -76,7 +85,9 @@ public class Unit: Mappable
     }
   }
 
-  ///X position of the object
+  /// <summary>
+  /// X position of the object
+  /// </summary>
   public new int X
   {
     get
@@ -87,7 +98,9 @@ public class Unit: Mappable
     }
   }
 
-  ///Y position of the object
+  /// <summary>
+  /// Y position of the object
+  /// </summary>
   public new int Y
   {
     get
@@ -98,7 +111,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The owner of this unit.
+  /// <summary>
+  /// The owner of this unit.
+  /// </summary>
   public int Owner
   {
     get
@@ -109,7 +124,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The type of this unit. This type refers to list of UnitTypes.
+  /// <summary>
+  /// The type of this unit. This type refers to list of UnitTypes.
+  /// </summary>
   public int Type
   {
     get
@@ -120,7 +137,9 @@ public class Unit: Mappable
     }
   }
 
-  ///Whether current unit has attacked or not.
+  /// <summary>
+  /// Whether current unit has attacked or not.
+  /// </summary>
   public bool HasAttacked
   {
     get
@@ -131,7 +150,9 @@ public class Unit: Mappable
     }
   }
 
-  ///Whether the current unit has dug or not.
+  /// <summary>
+  /// Whether the current unit has dug or not.
+  /// </summary>
   public bool HasDug
   {
     get
@@ -142,7 +163,9 @@ public class Unit: Mappable
     }
   }
 
-  ///Whether the current unit has filled or not.
+  /// <summary>
+  /// Whether the current unit has filled or not.
+  /// </summary>
   public bool HasFilled
   {
     get
@@ -153,7 +176,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The current amount health this unit has remaining.
+  /// <summary>
+  /// The current amount health this unit has remaining.
+  /// </summary>
   public int HealthLeft
   {
     get
@@ -164,7 +189,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The maximum amount of this health this unit can have
+  /// <summary>
+  /// The maximum amount of this health this unit can have
+  /// </summary>
   public int MaxHealth
   {
     get
@@ -175,7 +202,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The number of moves this unit has remaining.
+  /// <summary>
+  /// The number of moves this unit has remaining.
+  /// </summary>
   public int MovementLeft
   {
     get
@@ -186,7 +215,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The maximum number of moves this unit can move.
+  /// <summary>
+  /// The maximum number of moves this unit can move.
+  /// </summary>
   public int MaxMovement
   {
     get
@@ -197,7 +228,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The range of this unit's attack.
+  /// <summary>
+  /// The range of this unit's attack.
+  /// </summary>
   public int Range
   {
     get
@@ -208,7 +241,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The power of the unit's offensive siege ability.
+  /// <summary>
+  /// The power of the unit's offensive siege ability.
+  /// </summary>
   public int OffensePower
   {
     get
@@ -219,7 +254,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The power of the unit's defensive siege ability.
+  /// <summary>
+  /// The power of the unit's defensive siege ability.
+  /// </summary>
   public int DefensePower
   {
     get
@@ -230,7 +267,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The power of this unit types's digging ability.
+  /// <summary>
+  /// The power of this unit types's digging ability.
+  /// </summary>
   public int DigPower
   {
     get
@@ -241,7 +280,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The power of this unit type's filling ability.
+  /// <summary>
+  /// The power of this unit type's filling ability.
+  /// </summary>
   public int FillPower
   {
     get
@@ -252,7 +293,9 @@ public class Unit: Mappable
     }
   }
 
-  ///The power of this unit type's attack.
+  /// <summary>
+  /// The power of this unit type's attack.
+  /// </summary>
   public int AttackPower
   {
     get
@@ -263,5 +306,8 @@ public class Unit: Mappable
     }
   }
 
-}
+  #endregion
 
+  #region Properties
+  #endregion
+}

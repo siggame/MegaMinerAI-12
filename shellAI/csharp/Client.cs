@@ -22,8 +22,7 @@ public class Client {
   [DllImport("client")]
   public static extern int networkLoop(IntPtr connection);
 
-
-    //commands
+#region Commands
   [DllImport("client")]
   public static extern int playerTalk(IntPtr self, string message);
   [DllImport("client")]
@@ -36,8 +35,9 @@ public class Client {
   public static extern int unitAttack(IntPtr self, IntPtr target);
   [DllImport("client")]
   public static extern int tileSpawn(IntPtr self, int type);
+#endregion
 
-    //accessors
+#region Accessors
   [DllImport("client")]
   public static extern int getMapWidth(IntPtr connection);
   [DllImport("client")]
@@ -83,9 +83,9 @@ public class Client {
   public static extern IntPtr getUnitType(IntPtr connection, int num);
   [DllImport("client")]
   public static extern int getUnitTypeCount(IntPtr connection);
+#endregion
 
-
-    //getters
+#region Getters
   [DllImport("client")]
   public static extern int playerGetId(IntPtr ptr);
   [DllImport("client")]
@@ -194,7 +194,8 @@ public class Client {
   [DllImport("client")]
   public static extern int unitTypeGetRange(IntPtr ptr);
 
+#endregion
 
-    //properties
-
+#region Properties
+#endregion
 }

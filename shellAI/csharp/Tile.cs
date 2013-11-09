@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-
-///Represents a single tile on the map, can contain some amount of water.
+/// <summary>
+/// Represents a single tile on the map, can contain some amount of water.
+/// </summary>
 public class Tile: Mappable
 {
 
@@ -32,19 +33,21 @@ public class Tile: Mappable
     throw new ExistentialError();
   }
 
-    //commands
-
-  ///Attempt to spawn a unit of a type on this tile.
+  #region Commands
+  /// <summary>
+  /// Attempt to spawn a unit of a type on this tile.
+  /// </summary>
   public bool spawn(int type)
   {
     validify();
     return (Client.tileSpawn(ptr, type) == 0) ? false : true;
   }
+  #endregion
 
-    //getters
-
-
-  ///Unique Identifier
+  #region Getters
+  /// <summary>
+  /// Unique Identifier
+  /// </summary>
   public new int Id
   {
     get
@@ -55,7 +58,9 @@ public class Tile: Mappable
     }
   }
 
-  ///X position of the object
+  /// <summary>
+  /// X position of the object
+  /// </summary>
   public new int X
   {
     get
@@ -66,7 +71,9 @@ public class Tile: Mappable
     }
   }
 
-  ///Y position of the object
+  /// <summary>
+  /// Y position of the object
+  /// </summary>
   public new int Y
   {
     get
@@ -77,7 +84,9 @@ public class Tile: Mappable
     }
   }
 
-  ///The owner of the tile.
+  /// <summary>
+  /// The owner of the tile.
+  /// </summary>
   public int Owner
   {
     get
@@ -88,7 +97,9 @@ public class Tile: Mappable
     }
   }
 
-  ///Determines if this tile is a part of a Pump Station.
+  /// <summary>
+  /// Determines if this tile is a part of a Pump Station.
+  /// </summary>
   public int PumpID
   {
     get
@@ -99,7 +110,9 @@ public class Tile: Mappable
     }
   }
 
-  ///The amount of water contained on the tile.
+  /// <summary>
+  /// The amount of water contained on the tile.
+  /// </summary>
   public int WaterAmount
   {
     get
@@ -110,7 +123,9 @@ public class Tile: Mappable
     }
   }
 
-  ///The depth of the tile. Tile is a trench if depth is greater than zero.
+  /// <summary>
+  /// The depth of the tile. Tile is a trench if depth is greater than zero.
+  /// </summary>
   public int Depth
   {
     get
@@ -121,7 +136,9 @@ public class Tile: Mappable
     }
   }
 
-  ///The number of turns until sediment is deposited on this tile.
+  /// <summary>
+  /// The number of turns until sediment is deposited on this tile.
+  /// </summary>
   public int TurnsUntilDeposit
   {
     get
@@ -132,7 +149,9 @@ public class Tile: Mappable
     }
   }
 
-  ///Determines if this tile is attempting to spawn something or not.
+  /// <summary>
+  /// Determines if this tile is attempting to spawn something or not.
+  /// </summary>
   public bool IsSpawning
   {
     get
@@ -143,5 +162,8 @@ public class Tile: Mappable
     }
   }
 
-}
+  #endregion
 
+  #region Properties
+  #endregion
+}

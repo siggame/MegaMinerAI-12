@@ -1,23 +1,25 @@
 using System;
 using System.Runtime.InteropServices;
 
-///The class implementing gameplay logic.
+/// <summary>
+/// The class implementing gameplay logic.
+/// </summary>
 class AI : BaseAI
 {
-  // Enum for types of units you can spawn.
-  enum Types { Worker, Scout, Tank };
-
   public override string username()
   {
     return "Shell AI";
   }
+
   public override string password()
   {
     return "password";
   }
 
-  //This function is called each time it is your turn
-  //Return true to end your turn, return false to ask the server for updated information
+  /// <summary>
+  /// This function is called each time it is your turn.
+  /// </summary>
+  /// <returns>True to end your turn. False to ask the server for updated information.</returns>
   public override bool run()
   {
     int numberOfUnits = 0;
@@ -172,13 +174,15 @@ class AI : BaseAI
     return true;
   }
 
-  //This function is called once, before your first turn
-  public override void init() {}
+  /// <summary>
+  /// This function is called once, before your first turn.
+  /// </summary>
+  public override void init() { }
 
-  //This function is called once, after your last turn
-  public override void end() {}
-  
-  
-  public AI(IntPtr c) : base(c)
-  {}
+  /// <summary>
+  /// This function is called once, after your last turn.
+  /// </summary>
+  public override void end() { }
+
+  public AI(IntPtr c) : base(c) { }
 }
