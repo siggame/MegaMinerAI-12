@@ -357,7 +357,7 @@ list<IGUI::DebugOption> Mars::getDebugOptions()
 	return std::list<IGUI::DebugOption>({{"Units Selectable", true},
 										 {"Tiles Selectable", true},
 										 {"Pumps Selectable", true},
-										 {"Draw Glacier Water Amount", false}
+										 {"Draw Glacier Water Amount", true}
 										});
 }
 
