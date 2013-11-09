@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-
-///${model.doc}
+/// <summary>
+/// ${model.doc}
+/// </summary>
 public \
 % if model.type == 'virtual':
 abstract \
@@ -56,10 +57,11 @@ bool validify()
   }
 % endif
 
-    //commands
-
+  #region Commands
 % for func in model.functions:
-  ///${func.doc}
+  /// <summary>
+  /// ${func.doc}
+  /// </summary>
 %   if model.parent and func in model.parent.functions:
   public new bool ${func.name}(\
 %   else:
@@ -95,12 +97,13 @@ ${arg.name}\
 ) == 0) ? false : true;
   }
 % endfor
+  #endregion
 
-    //getters
-
+  #region Getters
 % for datum in model.data:
-
-  ///${datum.doc}
+  /// <summary>
+  /// ${datum.doc}
+  /// </summary>
   public \
 %   if model.parent and datum in model.parent.data:
 new \
@@ -118,8 +121,11 @@ ${types[datum.type]} ${capitalize(datum.name)}
 %     endif
     }
   }
-% endfor
 
+% endfor
+  #endregion
+
+  #region Properties
 % for prop in model.properties:
    ///${prop.doc}
 %     if isinstance(prop.type, Model):
@@ -158,5 +164,5 @@ ${types[arg.type]} ${arg.name}\
   }
 
 %   endfor
+  #endregion
 }
-
