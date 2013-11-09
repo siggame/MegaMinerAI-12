@@ -589,7 +589,7 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 					if(percent != 0.0f)
 					{
 						SmartPointer<Animatable> pumpBar = new Animatable;
-						pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.3f,percent));
+						pumpBar->addKeyFrame(new DrawProgressBar(glm::vec2(tileIter->x,tileIter->y),2.0f,0.2f,percent));
 
 						animList.push(pumpBar);
 					}
