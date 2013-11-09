@@ -4,15 +4,11 @@
 #define UNIT_H
 
 #include <iostream>
-#include "vc_structures.h"
+#include "structures.h"
 
 #include "Mappable.h"
-
-namespace client
-{
-
-class Tile;
 class Unit;
+class Tile;
 
 ///Represents a single unit on the map.
 class Unit : public Mappable {
@@ -59,21 +55,19 @@ class Unit : public Mappable {
 
   // Actions
   ///Make the unit move to the respective x and y location.
-  int move(int x, int y);
+  bool move(int x, int y);
   ///Put dirt in a hole!
-  int fill(Tile& tile);
+  bool fill(Tile& tile);
   ///Dig out a tile
-  int dig(Tile& tile);
+  bool dig(Tile& tile);
   ///Command to attack another Unit.
-  int attack(Unit& target);
+  bool attack(Unit& target);
 
   // Properties
 
 
   friend std::ostream& operator<<(std::ostream& stream, Unit ob);
 };
-
-}
 
 #endif
 
