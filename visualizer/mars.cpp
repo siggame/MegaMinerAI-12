@@ -933,7 +933,6 @@ void Mars::RenderWorld(int state, std::map<int,int>& pumpStationCounter, std::ma
 
                 turn[tileIter->id]["id"] = pump->id;
                 turn[tileIter->id]["owner"] = pump->owner;
-                turn[tileIter->id]["waterAmount"] = pump->waterAmount;
                 turn[tileIter->id]["siegeAmount"] = pump->siegeAmount;
             }
         }
