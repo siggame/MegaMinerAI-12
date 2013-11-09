@@ -3,8 +3,8 @@
 #include "Unit.h"
 #include "game.h"
 
-#include "Unit.h"
 #include "Tile.h"
+#include "Unit.h"
 
 namespace client
 {

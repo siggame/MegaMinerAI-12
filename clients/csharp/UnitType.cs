@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-
-///Represents type of unit.
+/// <summary>
+/// Represents type of unit.
+/// </summary>
 public class UnitType
 {
   public IntPtr ptr;
@@ -35,13 +36,13 @@ public class UnitType
     throw new ExistentialError();
   }
 
-    //commands
+  #region Commands
+  #endregion
 
-
-    //getters
-
-
-  ///Unique Identifier
+  #region Getters
+  /// <summary>
+  /// Unique Identifier
+  /// </summary>
   public int Id
   {
     get
@@ -52,7 +53,9 @@ public class UnitType
     }
   }
 
-  ///The name of this type of unit.
+  /// <summary>
+  /// The name of this type of unit.
+  /// </summary>
   public string Name
   {
     get
@@ -63,7 +66,9 @@ public class UnitType
     }
   }
 
-  ///The UnitType specific id representing this type of unit.
+  /// <summary>
+  /// The UnitType specific id representing this type of unit.
+  /// </summary>
   public int Type
   {
     get
@@ -74,7 +79,9 @@ public class UnitType
     }
   }
 
-  ///The oxygen cost to spawn this unit type into the game.
+  /// <summary>
+  /// The oxygen cost to spawn this unit type into the game.
+  /// </summary>
   public int Cost
   {
     get
@@ -85,7 +92,9 @@ public class UnitType
     }
   }
 
-  ///The power of the attack of this type of unit.
+  /// <summary>
+  /// The power of the attack of this type of unit.
+  /// </summary>
   public int AttackPower
   {
     get
@@ -96,7 +105,9 @@ public class UnitType
     }
   }
 
-  ///The power of this unit types's digging ability.
+  /// <summary>
+  /// The power of this unit types's digging ability.
+  /// </summary>
   public int DigPower
   {
     get
@@ -107,7 +118,9 @@ public class UnitType
     }
   }
 
-  ///The power of this unit type's filling ability.
+  /// <summary>
+  /// The power of this unit type's filling ability.
+  /// </summary>
   public int FillPower
   {
     get
@@ -118,7 +131,9 @@ public class UnitType
     }
   }
 
-  ///The maximum amount of this health this unit can have
+  /// <summary>
+  /// The maximum amount of this health this unit can have
+  /// </summary>
   public int MaxHealth
   {
     get
@@ -129,7 +144,9 @@ public class UnitType
     }
   }
 
-  ///The maximum number of moves this unit can move.
+  /// <summary>
+  /// The maximum number of moves this unit can move.
+  /// </summary>
   public int MaxMovement
   {
     get
@@ -140,7 +157,9 @@ public class UnitType
     }
   }
 
-  ///The power of the unit type's offensive siege ability.
+  /// <summary>
+  /// The power of the unit type's offensive siege ability.
+  /// </summary>
   public int OffensePower
   {
     get
@@ -151,7 +170,9 @@ public class UnitType
     }
   }
 
-  ///The power of the unit type's defensive siege ability.
+  /// <summary>
+  /// The power of the unit type's defensive siege ability.
+  /// </summary>
   public int DefensePower
   {
     get
@@ -162,7 +183,9 @@ public class UnitType
     }
   }
 
-  ///The range of the unit type's attack.
+  /// <summary>
+  /// The range of the unit type's attack.
+  /// </summary>
   public int Range
   {
     get
@@ -173,5 +196,8 @@ public class UnitType
     }
   }
 
-}
+  #endregion
 
+  #region Properties
+  #endregion
+}
