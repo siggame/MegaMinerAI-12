@@ -133,13 +133,13 @@ public class Tile: Mappable
   }
 
   ///Determines if this tile is attempting to spawn something or not.
-  public int IsSpawning
+  public bool IsSpawning
   {
     get
     {
       validify();
       int value = Client.tileGetIsSpawning(ptr);
-      return value;
+      return value == 1;
     }
   }
 

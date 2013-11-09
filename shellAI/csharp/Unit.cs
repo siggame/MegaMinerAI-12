@@ -121,35 +121,35 @@ public class Unit: Mappable
   }
 
   ///Whether current unit has attacked or not.
-  public int HasAttacked
+  public bool HasAttacked
   {
     get
     {
       validify();
       int value = Client.unitGetHasAttacked(ptr);
-      return value;
+      return value == 1;
     }
   }
 
   ///Whether the current unit has dug or not.
-  public int HasDug
+  public bool HasDug
   {
     get
     {
       validify();
       int value = Client.unitGetHasDug(ptr);
-      return value;
+      return value == 1;
     }
   }
 
   ///Whether the current unit has filled or not.
-  public int HasFilled
+  public bool HasFilled
   {
     get
     {
       validify();
       int value = Client.unitGetHasFilled(ptr);
-      return value;
+      return value == 1;
     }
   }
 
