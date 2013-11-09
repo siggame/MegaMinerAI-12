@@ -13,10 +13,6 @@ int BaseAI::mapHeight()
 {
   return getMapHeight(c);
 }
-int BaseAI::trenchDamage()
-{
-  return getTrenchDamage(c);
-}
 int BaseAI::waterDamage()
 {
   return getWaterDamage(c);
@@ -44,6 +40,10 @@ int BaseAI::maxSiege()
 float BaseAI::oxygenRate()
 {
   return getOxygenRate(c);
+}
+int BaseAI::depositionRate()
+{
+  return getDepositionRate(c);
 }
 
 bool BaseAI::startTurn()

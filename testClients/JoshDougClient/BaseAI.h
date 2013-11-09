@@ -35,8 +35,6 @@ public:
   int mapWidth();
   ///The height of the total map.
   int mapHeight();
-  ///The amount of damage walking over a trench.
-  int trenchDamage();
   ///The amount of damage walking over water.
   int waterDamage();
   ///The current turn number.
@@ -51,6 +49,8 @@ public:
   int maxSiege();
   ///The rate at which missing oxygen is regained.
   float oxygenRate();
+  ///The number of turns until sediment is deposited on the trenches.
+  int depositionRate();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

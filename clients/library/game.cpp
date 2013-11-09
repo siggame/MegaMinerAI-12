@@ -57,7 +57,6 @@ DLLEXPORT Connection* createConnection()
 
   c->mapWidth = 0;
   c->mapHeight = 0;
-  c->trenchDamage = 0;
   c->waterDamage = 0;
   c->turnNumber = 0;
   c->maxUnits = 0;
@@ -306,8 +305,6 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   object->movementLeft -= 1;
 
 
-  if( (tile->depth > 0) ^ (prevTile->depth > 0))
-    object->healthLeft -= getTrenchDamage(c);
   if( tile->waterAmount > 0 )
     object->healthLeft -= getWaterDamage(c);
 
@@ -581,8 +578,6 @@ void parsePumpStation(Connection* c, _PumpStation* object, sexp_t* expression)
   sub = sub->next;
   object->owner = atoi(sub->val);
   sub = sub->next;
-  object->waterAmount = atoi(sub->val);
-  sub = sub->next;
   object->siegeAmount = atoi(sub->val);
   sub = sub->next;
 
@@ -654,6 +649,8 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   object->depth = atoi(sub->val);
   sub = sub->next;
   object->turnsUntilDeposit = atoi(sub->val);
+  sub = sub->next;
+  object->isSpawning = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -765,9 +762,6 @@ DLLEXPORT int networkLoop(Connection* c)
           sub = sub->next;
 
           c->mapHeight = atoi(sub->val);
-          sub = sub->next;
-
-          c->trenchDamage = atoi(sub->val);
           sub = sub->next;
 
           c->waterDamage = atoi(sub->val);
@@ -1014,10 +1008,6 @@ DLLEXPORT int getMapWidth(Connection* c)
 DLLEXPORT int getMapHeight(Connection* c)
 {
   return c->mapHeight;
-}
-DLLEXPORT int getTrenchDamage(Connection* c)
-{
-  return c->trenchDamage;
 }
 DLLEXPORT int getWaterDamage(Connection* c)
 {

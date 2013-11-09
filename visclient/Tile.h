@@ -34,6 +34,8 @@ class Tile : public Mappable {
   int depth();
   ///The number of turns until sediment is deposited on this tile.
   int turnsUntilDeposit();
+  ///Determines if this tile is attempting to spawn something or not.
+  int isSpawning();
 
   // Actions
   ///Attempt to spawn a unit of a type on this tile.

@@ -63,17 +63,6 @@ public class PumpStation
     }
   }
 
-  ///The amount of water the PumpStation pumps.
-  public int WaterAmount
-  {
-    get
-    {
-      validify();
-      int value = Client.pumpStationGetWaterAmount(ptr);
-      return value;
-    }
-  }
-
   ///The amount the PumpStation has been sieged.
   public int SiegeAmount
   {

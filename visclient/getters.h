@@ -30,7 +30,6 @@ DLLEXPORT int mappableGetY(_Mappable* ptr);
 
 DLLEXPORT int pumpStationGetId(_PumpStation* ptr);
 DLLEXPORT int pumpStationGetOwner(_PumpStation* ptr);
-DLLEXPORT int pumpStationGetWaterAmount(_PumpStation* ptr);
 DLLEXPORT int pumpStationGetSiegeAmount(_PumpStation* ptr);
 
 
@@ -62,6 +61,7 @@ DLLEXPORT int tileGetPumpID(_Tile* ptr);
 DLLEXPORT int tileGetWaterAmount(_Tile* ptr);
 DLLEXPORT int tileGetDepth(_Tile* ptr);
 DLLEXPORT int tileGetTurnsUntilDeposit(_Tile* ptr);
+DLLEXPORT int tileGetIsSpawning(_Tile* ptr);
 
 
 DLLEXPORT int unitTypeGetId(_UnitType* ptr);

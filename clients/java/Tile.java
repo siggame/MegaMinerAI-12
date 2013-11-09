@@ -81,5 +81,11 @@ class Tile extends Mappable
     validify();
     return Client.INSTANCE.tileGetTurnsUntilDeposit(ptr);
   }
+  ///Determines if this tile is attempting to spawn something or not.
+  public int getIsSpawning()
+  {
+    validify();
+    return Client.INSTANCE.tileGetIsSpawning(ptr);
+  }
 
 }

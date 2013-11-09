@@ -36,7 +36,6 @@ struct Connection
   
   int mapWidth;
   int mapHeight;
-  int trenchDamage;
   int waterDamage;
   int turnNumber;
   int maxUnits;
@@ -99,7 +98,6 @@ extern "C"
 
 DLLEXPORT int getMapWidth(Connection* c);
 DLLEXPORT int getMapHeight(Connection* c);
-DLLEXPORT int getTrenchDamage(Connection* c);
 DLLEXPORT int getWaterDamage(Connection* c);
 DLLEXPORT int getTurnNumber(Connection* c);
 DLLEXPORT int getMaxUnits(Connection* c);

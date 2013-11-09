@@ -16,10 +16,6 @@ int BaseAI::mapHeight()
 {
   return getMapHeight(c);
 }
-int BaseAI::trenchDamage()
-{
-  return getTrenchDamage(c);
-}
 int BaseAI::waterDamage()
 {
   return getWaterDamage(c);

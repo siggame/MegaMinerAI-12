@@ -1158,7 +1158,6 @@ void Mars::run()
 Mars::Game::Game(parser::Game* game) :
 	mapWidth(game->states[0].mapWidth),
 	mapHeight(game->states[0].mapHeight),
-	trenchDamage(game->states[0].trenchDamage),
 	waterDamage(game->states[0].waterDamage),
 	turnNumber(game->states[0].turnNumber),
 	maxUnits(game->states[0].maxUnits),

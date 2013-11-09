@@ -35,8 +35,6 @@ public:
   int mapWidth();
   ///The height of the total map.
   int mapHeight();
-  ///The amount of damage walking over a trench.
-  int trenchDamage();
   ///The amount of damage walking over water.
   int waterDamage();
   ///The current turn number.
