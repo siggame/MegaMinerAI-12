@@ -28,19 +28,15 @@ public interface Client extends Library {
     //accessors
   int getMapWidth(Pointer connection);
   int getMapHeight(Pointer connection);
-  int getMaxHealth(Pointer connection);
   int getTrenchDamage(Pointer connection);
   int getWaterDamage(Pointer connection);
   int getTurnNumber(Pointer connection);
-  int getAttackDamage(Pointer connection);
-  int getOffensePower(Pointer connection);
-  int getDefensePower(Pointer connection);
   int getMaxUnits(Pointer connection);
-  int getUnitCost(Pointer connection);
   int getPlayerID(Pointer connection);
   int getGameNumber(Pointer connection);
   int getMaxSiege(Pointer connection);
   float getOxygenRate(Pointer connection);
+  int getDepositionRate(Pointer connection);
 
   Pointer getPlayer(Pointer connection, int num);
   int getPlayerCount(Pointer connection);
@@ -52,6 +48,8 @@ public interface Client extends Library {
   int getUnitCount(Pointer connection);
   Pointer getTile(Pointer connection, int num);
   int getTileCount(Pointer connection);
+  Pointer getUnitType(Pointer connection, int num);
+  int getUnitTypeCount(Pointer connection);
 
 
     //getters
@@ -83,6 +81,12 @@ public interface Client extends Library {
   int unitGetMaxHealth(Pointer ptr);
   int unitGetMovementLeft(Pointer ptr);
   int unitGetMaxMovement(Pointer ptr);
+  int unitGetRange(Pointer ptr);
+  int unitGetOffensePower(Pointer ptr);
+  int unitGetDefensePower(Pointer ptr);
+  int unitGetDigPower(Pointer ptr);
+  int unitGetFillPower(Pointer ptr);
+  int unitGetAttackPower(Pointer ptr);
 
   int tileGetId(Pointer ptr);
   int tileGetX(Pointer ptr);
@@ -90,7 +94,21 @@ public interface Client extends Library {
   int tileGetOwner(Pointer ptr);
   int tileGetPumpID(Pointer ptr);
   int tileGetWaterAmount(Pointer ptr);
-  int tileGetIsTrench(Pointer ptr);
+  int tileGetDepth(Pointer ptr);
+  int tileGetTurnsUntilDeposit(Pointer ptr);
+
+  int unitTypeGetId(Pointer ptr);
+  String unitTypeGetName(Pointer ptr);
+  int unitTypeGetType(Pointer ptr);
+  int unitTypeGetCost(Pointer ptr);
+  int unitTypeGetAttackPower(Pointer ptr);
+  int unitTypeGetDigPower(Pointer ptr);
+  int unitTypeGetFillPower(Pointer ptr);
+  int unitTypeGetMaxHealth(Pointer ptr);
+  int unitTypeGetMaxMovement(Pointer ptr);
+  int unitTypeGetOffensePower(Pointer ptr);
+  int unitTypeGetDefensePower(Pointer ptr);
+  int unitTypeGetRange(Pointer ptr);
 
 
     //properties

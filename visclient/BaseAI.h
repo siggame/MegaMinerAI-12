@@ -13,6 +13,7 @@
 #include "PumpStation.h"
 #include "Unit.h"
 #include "Tile.h"
+#include "UnitType.h"
 
 namespace client
 {
@@ -31,29 +32,20 @@ protected:
   std::vector<PumpStation> pumpStations;
   std::vector<Unit> units;
   std::vector<Tile> tiles;
+  std::vector<UnitType> unitTypes;
 public:
   ///The width of the total map.
   int mapWidth();
   ///The height of the total map.
   int mapHeight();
-  ///The maximum amount of health a unit will have.
-  int maxHealth();
   ///The amount of damage walking over a trench.
   int trenchDamage();
   ///The amount of damage walking over water.
   int waterDamage();
   ///The current turn number.
   int turnNumber();
-  ///The amount of damage a unit will deal.
-  int attackDamage();
-  ///How quickly a unit will siege a PumpStation.
-  int offensePower();
-  ///How much a unit will slow a siege.
-  int defensePower();
   ///The maximum number of units allowed per player.
   int maxUnits();
-  ///The cost of spawning in a new unit
-  int unitCost();
   ///The id of the current player.
   int playerID();
   ///What number game this is for the server
@@ -62,6 +54,8 @@ public:
   int maxSiege();
   ///The rate at which missing oxygen is regained.
   float oxygenRate();
+  ///The number of turns until sediment is deposited on the trenches.
+  int depositionRate();
   
   BaseAI(Connection* c);
   virtual ~BaseAI();

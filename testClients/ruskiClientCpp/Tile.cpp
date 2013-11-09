@@ -39,9 +39,9 @@ int Tile::waterAmount()
   return ((_Tile*)ptr)->waterAmount;
 }
 
-int Tile::isTrench()
+int Tile::depth()
 {
-  return ((_Tile*)ptr)->isTrench;
+  return ((_Tile*)ptr)->depth;
 }
 
 
@@ -60,6 +60,6 @@ std::ostream& operator<<(std::ostream& stream,Tile ob)
   stream << "owner: " << ((_Tile*)ob.ptr)->owner  <<'\n';
   stream << "pumpID: " << ((_Tile*)ob.ptr)->pumpID  <<'\n';
   stream << "waterAmount: " << ((_Tile*)ob.ptr)->waterAmount  <<'\n';
-  stream << "isTrench: " << ((_Tile*)ob.ptr)->isTrench  <<'\n';
+  stream << "depth: " << ((_Tile*)ob.ptr)->depth  <<'\n';
   return stream;
 }

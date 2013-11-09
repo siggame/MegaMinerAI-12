@@ -5,6 +5,14 @@
 
 namespace visualizer
 {
+	void RenderProgressBar(const IRenderer& renderer,
+						   float xPos, float yPos,
+						   float width, float height,
+						   float percent,
+						   const Color& col, const Color& backgroundColor = Color(0,0,0,0.8f),
+						   bool bDrawText = false,
+						   bool bDrawDivider = false);
+
     // NOTE: consider combining color sprite and DrawSprite since they are
     //    essentially the same, except that DrawSprite is drawn with white.
     class ColorSprite : public Anim
@@ -82,16 +90,74 @@ namespace visualizer
         public ColorSprite
 	{
 	public:
-		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, bool flipped = false, Fade f = None) : ColorSprite(c,f),
-			m_Sprite(sprite),
-			m_Flipped(flipped)
-			{}
+		DrawSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, Fade f = None) : ColorSprite(c,f), m_Sprite(sprite) {}
+
+		void animate( const float& t, AnimData* d, IGame* game );
+
+	protected:
+
+		MoveableSprite * m_Sprite;
+		glm::vec2 m_pos;
+
+	};
+
+	class DrawFlippedSmoothMoveSprite : public DrawSmoothMoveSprite
+	{
+	public:
+		DrawFlippedSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, bool flipped, Fade f = None) : DrawSmoothMoveSprite(sprite,c,f), m_Flipped(flipped) {}
 
 		void animate( const float& t, AnimData* d, IGame* game );
 
 	private:
-		MoveableSprite * m_Sprite;
+
 		bool m_Flipped;
+	};
+
+	class DrawRotatedSmoothMoveSprite : public DrawSmoothMoveSprite
+	{
+	public:
+		DrawRotatedSmoothMoveSprite(MoveableSprite * sprite, const glm::vec4& c, float angle, Fade f = None) :
+			DrawSmoothMoveSprite(sprite,c,f), m_angle(angle)  {}
+
+		void animate( const float& t, AnimData* d, IGame* game );
+
+	private:
+
+		float m_angle;
+	};
+
+	class DrawProgressBar : public Anim
+	{
+	public:
+
+		DrawProgressBar(float width, float height, float percent);
+		DrawProgressBar(const glm::vec2& pos, float width, float height, float percent);
+
+		void animate( const float& t, AnimData* d, IGame* game );
+
+		void SetPos(const glm::vec2& pos) { m_pos = pos; }
+
+	private:
+
+		glm::vec2 m_pos;
+		float m_width;
+		float m_height;
+		float m_percent;
+
+	};
+
+	class DrawSmoothSpriteProgressBar : public DrawFlippedSmoothMoveSprite
+	{
+	public:
+
+		DrawSmoothSpriteProgressBar(MoveableSprite * sprite, DrawProgressBar* pBar, const glm::vec4& c, bool flipped = false, Fade f = None) :
+			DrawFlippedSmoothMoveSprite(sprite,c,flipped,f), m_pProgressBar(pBar)  {}
+
+
+		void animate( const float& t, AnimData* d, IGame* game );
+
+	private:
+		SmartPointer<DrawProgressBar> m_pProgressBar;
 	};
 
 	/** @name DrawAnimatedSprite

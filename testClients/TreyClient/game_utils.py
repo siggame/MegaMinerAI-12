@@ -112,11 +112,16 @@ def taxiDis(x1, y1, x2, y2):
 def isOnMap(ai, x, y):
   return x >= 0 and x < ai.mapWidth and y >= 0 and y < ai.mapHeight
 
+def getDir(x1, y1, x2, y2):
+  if abs(x2 - x1) > abs(y2 - y1):
+    return (cmp(x2 - x1, 0), 0)
+  else:
+    return (0, cmp(y2 - y1, 0))
 
 
 def validMove(ai, tile, healthLeft):
   if tile.pumpID == -1 and tile.owner != (ai.getPlayerID()^1) and (tile.x, tile.y) not in ai.unitAt:
-    if tile.isTrench:
+    if tile.depth > 0:
       if (tile.waterAmount > 0):
         return healthLeft > ai.getWaterDamage()
       else:
@@ -127,7 +132,7 @@ def validMove(ai, tile, healthLeft):
     return 0
 
 def costOfMove(ai, tile, healthLeft):
-  if (tile.isTrench):
+  if (tile.depth > 0):
     if (tile.waterAmount > 0):
       return float(ai.getWaterDamage()) / healthLeft
     else:
@@ -141,7 +146,7 @@ def validTrench(ai, tile):
   return 0
     
 def costOfTrenchPath(ai, tile):
-  if tile.isTrench:
+  if tile.depth > 0:
     return 0.5 / (ai.dfes[tile]**2)
   return 1.0 / (ai.dfes[tile]**2)
   
@@ -275,37 +280,37 @@ class game_history:
 
       #PUMPS
       if tile.pumpID != -1:
-        tempGrid[tile.x][tile.y].append(self.colorText(str(tile.owner), self.WHITE, self.GREEN))
+        tempGrid[tile.x][tile.y].append([str(tile.owner), self.WHITE, self.GREEN])
+        #tempGrid[tile.x][tile.y].append(self.colorText(str(tile.owner), self.WHITE, self.GREEN))
 
       #SPAWNS
       if tile.owner == 0:
-        tempGrid[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.RED))
+        tempGrid[tile.x][tile.y].append(['S', self.WHITE, self.RED])
       elif tile.owner == 1:
-        tempGrid[tile.x][tile.y].append(self.colorText('S', self.WHITE, self.BLUE))
+        tempGrid[tile.x][tile.y].append(['S', self.WHITE, self.MAGENTA])
 
       #GLACIERS
       if tile.owner == 3 and tile.waterAmount > 0:
-        tempGrid[tile.x][tile.y].append(self.colorText('I', self.CYAN, self.WHITE))
+        tempGrid[tile.x][tile.y].append(['I', self.WHITE, self.CYAN])
 
       #WATER
       elif tile.waterAmount > 0:
-        tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.BLUE))
+        tempGrid[tile.x][tile.y].append([' ', self.WHITE, self.BLUE])
 
       #TRENCH
-      elif tile.isTrench == 1:
-        tempGrid[tile.x][tile.y].append(self.colorText(' ', self.WHITE, self.YELLOW))
+      elif tile.depth > 0:
+        tempGrid[tile.x][tile.y].append([' ', self.WHITE, self.YELLOW])
 
     for unit in self.ai.units:
-      if unit.owner == 0:
-        if unit.type == DIGGER:
-          tempGrid[unit.x][unit.y].append(self.colorText('D', self.RED, self.BLACK))
-        elif unit.type == FILLER:
-          tempGrid[unit.x][unit.y].append(self.colorText('F', self.RED, self.BLACK))
-      elif unit.owner == 1:
-        if unit.type == DIGGER:
-          tempGrid[unit.x][unit.y].append(self.colorText('D', self.BLUE, self.BLACK))
-        elif unit.type == FILLER:
-          tempGrid[unit.x][unit.y].append(self.colorText('F', self.BLUE, self.BLACK))
+      symbol = ['W','S','T'][unit.type]
+      color = [self.RED, self.MAGENTA][unit.owner]
+      cell = tempGrid[unit.x][unit.y]
+      if cell:
+        cell[0][0] = symbol
+        if cell[0][2] != color:
+          cell[0][1] = color
+      else:
+        cell.append([symbol, color, self.BLACK])
 
     #self.print_snapshot(tempGrid)
     self.history.append(tempGrid)
@@ -315,10 +320,12 @@ class game_history:
     print('--' * self.ai.mapWidth)
     for y in range(self.ai.mapHeight):
       for x in range(self.ai.mapWidth):
-        if len(snapshot[x][y]) > 0:
-          print(snapshot[x][y][0]),
+        if snapshot[x][y]:
+          str = self.colorText(snapshot[x][y][0][0], snapshot[x][y][0][1], snapshot[x][y][0][2])
+          sys.stdout.write(str)
+          sys.stdout.write(str)
         else:
-          print(' '),
+          sys.stdout.write('  ')
       print
     return
 

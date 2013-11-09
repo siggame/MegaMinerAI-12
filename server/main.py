@@ -7,7 +7,7 @@ from itertools import repeat
 import functools
 import game_app.match
 Match = game_app.match.Match
-from game_app.game_app_utils import errorBuffer, requireLogin, requireGame,                   requireTurn, requireTypes
+from game_app.game_app_utils import errorBuffer, requireLogin, requireGame, requireTurn, requireTypes
 import time
 import struct
 import bz2

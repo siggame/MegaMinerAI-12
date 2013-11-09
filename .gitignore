@@ -28,3 +28,9 @@ moc_*.cpp
 qrc_*.cpp
 #Makefile
 *-build-*
+*.Debug
+*.Release
+
+#links
+common
+interfaces

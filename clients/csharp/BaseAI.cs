@@ -13,6 +13,7 @@ public abstract class BaseAI
   public static PumpStation[] pumpStations;
   public static Unit[] units;
   public static Tile[] tiles;
+  public static UnitType[] unitTypes;
   IntPtr connection;
   public static int iteration;
   bool initialized;
@@ -76,6 +77,12 @@ public abstract class BaseAI
     {
       tiles[i] = new Tile(Client.getTile(connection, i));
     }
+    count = Client.getUnitTypeCount(connection);
+    unitTypes = new UnitType[count];
+    for(int i = 0; i < count; i++)
+    {
+      unitTypes[i] = new UnitType(Client.getUnitType(connection, i));
+    }
 
     if(!initialized)
     {
@@ -98,12 +105,6 @@ public abstract class BaseAI
     int value = Client.getMapHeight(connection);
     return value;
   }
-  ///The maximum amount of health a unit will have.
-  public int maxHealth()
-  {
-    int value = Client.getMaxHealth(connection);
-    return value;
-  }
   ///The amount of damage walking over a trench.
   public int trenchDamage()
   {
@@ -122,34 +123,10 @@ public abstract class BaseAI
     int value = Client.getTurnNumber(connection);
     return value;
   }
-  ///The amount of damage a unit will deal.
-  public int attackDamage()
-  {
-    int value = Client.getAttackDamage(connection);
-    return value;
-  }
-  ///How quickly a unit will siege a PumpStation.
-  public int offensePower()
-  {
-    int value = Client.getOffensePower(connection);
-    return value;
-  }
-  ///How much a unit will slow a siege.
-  public int defensePower()
-  {
-    int value = Client.getDefensePower(connection);
-    return value;
-  }
   ///The maximum number of units allowed per player.
   public int maxUnits()
   {
     int value = Client.getMaxUnits(connection);
-    return value;
-  }
-  ///The cost of spawning in a new unit
-  public int unitCost()
-  {
-    int value = Client.getUnitCost(connection);
     return value;
   }
   ///The id of the current player.
@@ -174,6 +151,12 @@ public abstract class BaseAI
   public float oxygenRate()
   {
     float value = Client.getOxygenRate(connection);
+    return value;
+  }
+  ///The number of turns until sediment is deposited on the trenches.
+  public int depositionRate()
+  {
+    int value = Client.getDepositionRate(connection);
     return value;
   }
 }

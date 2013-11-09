@@ -26,7 +26,7 @@ win32: {
 CONFIG += static
 } else {
 QMAKE_CFLAGS_DEBUG += -rdynamic
-QMAKE_CXXFLAGS_DEBUG += -rdynamic
+QMAKE_CXXFLAGS_DEBUG += -rdynamic -g
 QMAKE_LFLAGS_DEBUG += -rdynamic
 LIBS += -lGLU
 CONFIG += dll

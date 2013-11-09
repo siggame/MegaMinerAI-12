@@ -19,10 +19,10 @@ namespace visualizer
 	struct BaseSprite : public Animatable
 	{
 		BaseSprite(const glm::vec2& pos, const glm::vec2& scale, const string& sprite, const string& tag = "") :
-			pos(pos), scale(scale), m_sprite(sprite), Animatable(tag)  {}
+			m_pos(pos), m_scale(scale), m_sprite(sprite), Animatable(tag)  {}
 
-		glm::vec2 pos;
-		glm::vec2 scale;
+		glm::vec2 m_pos;
+		glm::vec2 m_scale;
 		string m_sprite;
 	};
 
@@ -36,11 +36,9 @@ namespace visualizer
       *      structures to render it correctly.
       */
 	struct MoveableSprite :
-		public Animatable
+		public BaseSprite
 	{
-		MoveableSprite(const string& sprite) :
-			m_SpriteName(sprite)
-			{}
+		MoveableSprite(const string& sprite, const glm::vec2& scale = glm::vec2(1.0f)) : BaseSprite(glm::vec2(0.0f),scale,sprite) {}
 
 		struct Move
 		{
@@ -54,7 +52,6 @@ namespace visualizer
 			glm::vec2 from;
 		};
 
-		std::string m_SpriteName;
 		std::vector<Move> m_Moves;
 	};
 

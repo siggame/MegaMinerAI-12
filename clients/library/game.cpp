@@ -57,19 +57,15 @@ DLLEXPORT Connection* createConnection()
 
   c->mapWidth = 0;
   c->mapHeight = 0;
-  c->maxHealth = 0;
   c->trenchDamage = 0;
   c->waterDamage = 0;
   c->turnNumber = 0;
-  c->attackDamage = 0;
-  c->offensePower = 0;
-  c->defensePower = 0;
   c->maxUnits = 0;
-  c->unitCost = 0;
   c->playerID = 0;
   c->gameNumber = 0;
   c->maxSiege = 0;
   c->oxygenRate = 0;
+  c->depositionRate = 0;
   c->Players = NULL;
   c->PlayerCount = 0;
   c->Mappables = NULL;
@@ -80,6 +76,8 @@ DLLEXPORT Connection* createConnection()
   c->UnitCount = 0;
   c->Tiles = NULL;
   c->TileCount = 0;
+  c->UnitTypes = NULL;
+  c->UnitTypeCount = 0;
   return c;
 }
 
@@ -123,6 +121,14 @@ DLLEXPORT void destroyConnection(Connection* c)
     {
     }
     delete[] c->Tiles;
+  }
+  if(c->UnitTypes)
+  {
+    for(int i = 0; i < c->UnitTypeCount; i++)
+    {
+      delete[] c->UnitTypes[i].name;
+    }
+    delete[] c->UnitTypes;
   }
   delete c;
 }
@@ -259,7 +265,7 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   UNLOCK( &object->_c->mutex);
  
   Connection* c = object->_c;
- 
+
   // Only owner can control unit
   if (object->owner != getPlayerID(c))
     return 0;
@@ -267,24 +273,27 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   if (object->movementLeft <= 0)
     return 0;
   // Cannot move outside map
-  if (0 < x || x >= getMapWidth(c) || 0 < y || y >= getMapHeight(c))
+  if (0 > x || x >= getMapWidth(c) || 0 > y || y >= getMapHeight(c))
     return 0;
   
   // Get the tile we're trying to get to
   _Tile* tile = getTile(c, x * getMapHeight(c) + y);
-    
+  // Cannot move onto enemy spawn tiles
+  if (tile->owner == (getPlayerID(c)^1) && tile->pumpID == -1)
+    return 0;
+  // Can only move to adjacent coords
+  if (abs(object->x - x) + abs(object->y - y) != 1)
+    return 0;
+  
   // Cannot move onto another unit
   for (int i = 0; i < getUnitCount(c); ++i)
   {
     if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
       return 0;
   }
-  // Cannot move onto enemy spawn tiles
-  if (tile->pumpID == -1 && tile->owner == getPlayerID(c)^1)
-    return 0;
-  // Can only move to adjacent coords
-  if (abs(object->x - x) + abs(object->y - y) != 1)
-    return 0;
+  
+    
+  _Tile* prevTile = getTile(c, object->x * getMapHeight(c) + object->y);
     
   // Move the unit
   object->x = x;
@@ -292,17 +301,16 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   
   // Decrement movement
   object->movementLeft -= 1;
-  
-  // Apply damage for moving into trenches
-  if (tile->isTrench)
-  {
-    if (tile->waterAmount > 0)
-      object->healthLeft -= getWaterDamage(c);
-    else
-      object->healthLeft -= getTrenchDamage(c);
-  }
-  
-  // Don't do any client-side object deletion?
+
+
+  if( (tile->depth > 0) ^ (prevTile->depth > 0))
+    object->healthLeft -= getTrenchDamage(c);
+  if( tile->waterAmount > 0 )
+    object->healthLeft -= getWaterDamage(c);
+
+  //Make sure not less than 0
+  if(object->healthLeft < 0)
+    object->healthLeft = 0;
   
   return 1;
 }
@@ -324,35 +332,42 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   // Only owner can control unit
   if (object->owner != getPlayerID(c))
     return 0;
-  // Only fillers can fill
-  if (object->type != 1)
+  // Only workers can fill
+  if (object->fillPower <= 0)
+    return 0;
+  if (object->healthLeft <= 0)
     return 0;
   // Can only fill once per turn
   if (object->hasFilled == 1)
     return 0;
   // Can only fill adjacent tiles
-  if ((object->x - x != 1 && object->x - x != -1) || (object->y - y != 1 && object->y - y != -1))
+  if (abs(object->x - x) + abs(object->y - y) > 1)
     return 0;
-  
   // Must fill in trenches
-  if (tile->isTrench == 0)
+  if (tile->depth <= 0)
     return 0;
-  // Can't fill in trenches with water
-  if (tile->waterAmount > 0)
+  // Only dig on normal tiles
+  if (tile->owner != 2)
     return 0;
   // Can't fill in a trench with a unit on it
   for (int i = 0; i < getUnitCount(c); ++i)
   {
-    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+    //Look for units that are not itself, and have same x, and y
+    if (getUnit(c, i)->id != object->id && getUnit(c, i)->x == x && getUnit(c, i)->y == y)
       return 0;
   }
   
-  // Set the tile to not be a trench
-  tile->isTrench = 0;
+  // Decrease the trench's depth
+  tile->depth -= object->fillPower;
+  if (tile->depth < 0)
+    tile->depth = 0;
   // Unit can no longer move
   object->movementLeft = 0;
   
   object->hasFilled = 1;
+
+  //Reset deposition
+  tile->turnsUntilDeposit = getDepositionRate(c);
   
   return 1;
 }
@@ -375,7 +390,9 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   if (object->owner != getPlayerID(c))
     return 0;
   // Only diggers can dig
-  if (object->type != 0)
+  if (object->digPower <= 0)
+    return 0;
+  if (object->healthLeft <= 0)
     return 0;
   // Can only dig once per turn
   if (object->hasDug == 1)
@@ -383,28 +400,20 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   // Can only dig adjacent tiles and the tile underneath the digger
   if (abs(object->x - x) + abs(object->y - y) > 1)
     return 0;
-  
-  // Can't dig a trench on a trench
-  if (tile->isTrench == 1)
-    return 0;
-  // Can't dig a trenches on pumps
-  if (tile->pumpID != -1)
-    return 0;
-  // Can't dig on ice tiles
-  if (tile->owner == 3)
-    return 0;
-  // Can't dig on spawn tiles
-  if (tile->owner == 0 || tile->owner == 1)
+  // Can only dig on normal tiles
+  if (tile->owner != 2)
     return 0;
   // Can't dig a trench under another unit
   for (int i = 0; i < getUnitCount(c); ++i)
   {
-    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+    //Check for units that are not itself, and have same x and y
+    if (getUnit(c, i)->id != object->id && getUnit(c, i)->x == x && getUnit(c, i)->y == y)
       return 0;
   }
   
-  // Set the tile to be a trench
-  tile->isTrench = 1;
+  // Increase the tiles depth
+  tile->depth += object->digPower;
+  tile->turnsUntilDeposit = getDepositionRate(c);
   // Unit can no longer move
   object->movementLeft = 0;
   
@@ -430,8 +439,10 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   // Only owner can control unit
   if (object->owner != getPlayerID(c))
     return 0;
+  if (object->healthLeft <= 0)
+    return 0;
   // Target must be adjacent
-  if (abs(object->x - x) + abs(object->y - y) != 1)
+  if (abs(object->x - x) + abs(object->y - y) > object->range)
     return 0;
   // Can only attack once per turn
   if (object->hasAttacked == 1)
@@ -445,7 +456,9 @@ DLLEXPORT int unitAttack(_Unit* object, _Unit* target)
   // Unit can no longer move
   object->movementLeft = 0;
   
-  target->healthLeft -= getAttackDamage(c);
+  target->healthLeft -= object->attackPower;
+  if(target->healthLeft < 0)
+    target->healthLeft = 0;
   
   return 1;
 }
@@ -466,13 +479,23 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   // Can only spawn on current player's spawn tiles
   if (object->owner != getPlayerID(c))
     return 0;
+  // Find unit cost
+  int unitCost = -1;
+  for (int i = 0; i < getUnitTypeCount(c); ++i)
+  {
+    if (getUnitType(c, i)->type == type)
+    {
+      unitCost = getUnitType(c, i)->cost;
+      break;
+    }
+  }
+  // If a unit type with matching type was not found, then they entered an invalid unit type
+  if (unitCost == -1)
+    return 0;
   // Only spawn if player has enough resources
-  if (getPlayer(c, object->owner)->oxygen < getUnitCost(c))
+  if (getPlayer(c, object->owner)->oxygen < unitCost)
     return 0;
-  // Can only spawn Fillers and Diggers
-  if (type != 0 && type != 1)
-    return 0;
-  
+
   int count = 0;
   
   // Cannot spawn unit on top of another unit
@@ -487,11 +510,12 @@ DLLEXPORT int tileSpawn(_Tile* object, int type)
   // Cannot spawn more than MaxUnits units
   if (count >= getMaxUnits(c))
     return 0;
-  
-  getPlayer(c, getPlayerID(c))->oxygen -= getUnitCost(c);
+
+  getPlayer(c, getPlayerID(c))->oxygen -= unitCost;
   
   return 1;
 }
+
 
 
 //Utility functions for parsing data
@@ -581,6 +605,18 @@ void parseUnit(Connection* c, _Unit* object, sexp_t* expression)
   sub = sub->next;
   object->maxMovement = atoi(sub->val);
   sub = sub->next;
+  object->range = atoi(sub->val);
+  sub = sub->next;
+  object->offensePower = atoi(sub->val);
+  sub = sub->next;
+  object->defensePower = atoi(sub->val);
+  sub = sub->next;
+  object->digPower = atoi(sub->val);
+  sub = sub->next;
+  object->fillPower = atoi(sub->val);
+  sub = sub->next;
+  object->attackPower = atoi(sub->val);
+  sub = sub->next;
 
 }
 void parseTile(Connection* c, _Tile* object, sexp_t* expression)
@@ -602,7 +638,44 @@ void parseTile(Connection* c, _Tile* object, sexp_t* expression)
   sub = sub->next;
   object->waterAmount = atoi(sub->val);
   sub = sub->next;
-  object->isTrench = atoi(sub->val);
+  object->depth = atoi(sub->val);
+  sub = sub->next;
+  object->turnsUntilDeposit = atoi(sub->val);
+  sub = sub->next;
+
+}
+void parseUnitType(Connection* c, _UnitType* object, sexp_t* expression)
+{
+  sexp_t* sub;
+  sub = expression->list;
+
+  object->_c = c;
+
+  object->id = atoi(sub->val);
+  sub = sub->next;
+  object->name = new char[strlen(sub->val)+1];
+  strncpy(object->name, sub->val, strlen(sub->val));
+  object->name[strlen(sub->val)] = 0;
+  sub = sub->next;
+  object->type = atoi(sub->val);
+  sub = sub->next;
+  object->cost = atoi(sub->val);
+  sub = sub->next;
+  object->attackPower = atoi(sub->val);
+  sub = sub->next;
+  object->digPower = atoi(sub->val);
+  sub = sub->next;
+  object->fillPower = atoi(sub->val);
+  sub = sub->next;
+  object->maxHealth = atoi(sub->val);
+  sub = sub->next;
+  object->maxMovement = atoi(sub->val);
+  sub = sub->next;
+  object->offensePower = atoi(sub->val);
+  sub = sub->next;
+  object->defensePower = atoi(sub->val);
+  sub = sub->next;
+  object->range = atoi(sub->val);
   sub = sub->next;
 
 }
@@ -681,9 +754,6 @@ DLLEXPORT int networkLoop(Connection* c)
           c->mapHeight = atoi(sub->val);
           sub = sub->next;
 
-          c->maxHealth = atoi(sub->val);
-          sub = sub->next;
-
           c->trenchDamage = atoi(sub->val);
           sub = sub->next;
 
@@ -693,19 +763,7 @@ DLLEXPORT int networkLoop(Connection* c)
           c->turnNumber = atoi(sub->val);
           sub = sub->next;
 
-          c->attackDamage = atoi(sub->val);
-          sub = sub->next;
-
-          c->offensePower = atoi(sub->val);
-          sub = sub->next;
-
-          c->defensePower = atoi(sub->val);
-          sub = sub->next;
-
           c->maxUnits = atoi(sub->val);
-          sub = sub->next;
-
-          c->unitCost = atoi(sub->val);
           sub = sub->next;
 
           c->playerID = atoi(sub->val);
@@ -718,6 +776,9 @@ DLLEXPORT int networkLoop(Connection* c)
           sub = sub->next;
 
           c->oxygenRate = atof(sub->val);
+          sub = sub->next;
+
+          c->depositionRate = atoi(sub->val);
           sub = sub->next;
 
         }
@@ -833,6 +894,37 @@ DLLEXPORT int networkLoop(Connection* c)
             }
           }
         }
+        else if(string(sub->val) == "UnitType")
+        {
+          if(c->UnitTypes)
+          {
+            sub = sub->next;
+            for(int i = 0; i < c->UnitTypeCount; i++)
+            {
+              if(!sub)
+              {
+                break;
+              }
+              int id = atoi(sub->list->val);
+              if(id == c->UnitTypes[i].id)
+              {
+                delete[] c->UnitTypes[i].name;
+                parseUnitType(c, c->UnitTypes+i, sub);
+                sub = sub->next;
+              }
+            }
+          }
+          else
+          {
+            c->UnitTypeCount =  sexp_list_length(expression)-1; //-1 for the header
+            c->UnitTypes = new _UnitType[c->UnitTypeCount];
+            for(int i = 0; i < c->UnitTypeCount; i++)
+            {
+              sub = sub->next;
+              parseUnitType(c, c->UnitTypes+i, sub);
+            }
+          }
+        }
       }
       destroy_sexp(base);
       return 1;
@@ -892,6 +984,15 @@ DLLEXPORT int getTileCount(Connection* c)
   return c->TileCount;
 }
 
+DLLEXPORT _UnitType* getUnitType(Connection* c, int num)
+{
+  return c->UnitTypes + num;
+}
+DLLEXPORT int getUnitTypeCount(Connection* c)
+{
+  return c->UnitTypeCount;
+}
+
 
 DLLEXPORT int getMapWidth(Connection* c)
 {
@@ -900,10 +1001,6 @@ DLLEXPORT int getMapWidth(Connection* c)
 DLLEXPORT int getMapHeight(Connection* c)
 {
   return c->mapHeight;
-}
-DLLEXPORT int getMaxHealth(Connection* c)
-{
-  return c->maxHealth;
 }
 DLLEXPORT int getTrenchDamage(Connection* c)
 {
@@ -917,25 +1014,9 @@ DLLEXPORT int getTurnNumber(Connection* c)
 {
   return c->turnNumber;
 }
-DLLEXPORT int getAttackDamage(Connection* c)
-{
-  return c->attackDamage;
-}
-DLLEXPORT int getOffensePower(Connection* c)
-{
-  return c->offensePower;
-}
-DLLEXPORT int getDefensePower(Connection* c)
-{
-  return c->defensePower;
-}
 DLLEXPORT int getMaxUnits(Connection* c)
 {
   return c->maxUnits;
-}
-DLLEXPORT int getUnitCost(Connection* c)
-{
-  return c->unitCost;
 }
 DLLEXPORT int getPlayerID(Connection* c)
 {
@@ -952,4 +1033,8 @@ DLLEXPORT int getMaxSiege(Connection* c)
 DLLEXPORT float getOxygenRate(Connection* c)
 {
   return c->oxygenRate;
+}
+DLLEXPORT int getDepositionRate(Connection* c)
+{
+  return c->depositionRate;
 }
