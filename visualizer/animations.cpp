@@ -75,7 +75,7 @@ namespace visualizer
 	{
 		DrawFlippedSmoothMoveSprite::animate(t,d,game);
 
-		m_pProgressBar->SetPos(m_pos);
+		m_pProgressBar->SetPos(m_pos + glm::vec2(0.0f,-0.1f));
 		m_pProgressBar->animate(t,d,game);
 	}
 

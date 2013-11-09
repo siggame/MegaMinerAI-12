@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-
-///A mappable object!
+/// <summary>
+/// A mappable object!
+/// </summary>
 public class Mappable
 {
   public IntPtr ptr;
@@ -35,13 +36,13 @@ public class Mappable
     throw new ExistentialError();
   }
 
-    //commands
+  #region Commands
+  #endregion
 
-
-    //getters
-
-
-  ///Unique Identifier
+  #region Getters
+  /// <summary>
+  /// Unique Identifier
+  /// </summary>
   public int Id
   {
     get
@@ -52,7 +53,9 @@ public class Mappable
     }
   }
 
-  ///X position of the object
+  /// <summary>
+  /// X position of the object
+  /// </summary>
   public int X
   {
     get
@@ -63,7 +66,9 @@ public class Mappable
     }
   }
 
-  ///Y position of the object
+  /// <summary>
+  /// Y position of the object
+  /// </summary>
   public int Y
   {
     get
@@ -74,5 +79,8 @@ public class Mappable
     }
   }
 
-}
+  #endregion
 
+  #region Properties
+  #endregion
+}
