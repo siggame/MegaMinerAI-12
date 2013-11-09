@@ -99,7 +99,7 @@ void Mars::ProccessInput()
 				const auto& tile = iter.second;
 
 				if(R.left <= tile->x && R.right >= tile->x && R.top <= tile->y && R.bottom >= tile->y &&
-				  (tile->depth > 0 || tile->owner == GLACIER))
+				  (tile->depth > 0 || tile->owner == GLACIER || tile->owner == 0 || tile->owner == 1))
 				{
 					m_selectedUnitIDs.push_back(tile->id);
 				}
