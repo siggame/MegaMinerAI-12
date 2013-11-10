@@ -293,7 +293,7 @@ DLLEXPORT int unitMove(_Unit* object, int x, int y)
   // Cannot move onto another unit
   for (int i = 0; i < getUnitCount(c); ++i)
   {
-    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+    if (getUnit(c, i)->x == x && getUnit(c, i)->y == y && getUnit(c, i)->healthLeft > 0)
       return 0;
   }
   
@@ -356,7 +356,7 @@ DLLEXPORT int unitFill(_Unit* object, _Tile* tile)
   for (int i = 0; i < getUnitCount(c); ++i)
   {
     //Look for units that are not itself, and have same x, and y
-    if (getUnit(c, i)->id != object->id && getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+    if (getUnit(c, i)->id != object->id && getUnit(c, i)->x == x && getUnit(c, i)->y == y && getUnit(c, i)->healthLeft > 0)
       return 0;
   }
   
@@ -410,7 +410,7 @@ DLLEXPORT int unitDig(_Unit* object, _Tile* tile)
   for (int i = 0; i < getUnitCount(c); ++i)
   {
     //Check for units that are not itself, and have same x and y
-    if (getUnit(c, i)->id != object->id && getUnit(c, i)->x == x && getUnit(c, i)->y == y)
+    if (getUnit(c, i)->id != object->id && getUnit(c, i)->x == x && getUnit(c, i)->y == y && getUnit(c, i)->healthLeft > 0)
       return 0;
   }
   
