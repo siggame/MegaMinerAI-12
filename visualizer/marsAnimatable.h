@@ -74,11 +74,11 @@ namespace visualizer
 
 	struct SplashScreen : public Animatable
 	{
-		SplashScreen(const string& reason, const string& nam, int w, int h) :
-			winReason(reason), name(nam), width(w), height(h) {}
+		SplashScreen(const string& reason, const glm::vec3& col, int w, int h) :
+			winReason(reason), color(col), width(w), height(h) {}
 
 		string winReason;
-		string name;
+		glm::vec3 color;
 		int width;
 		int height;
 	};
