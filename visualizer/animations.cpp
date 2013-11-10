@@ -150,7 +150,7 @@ namespace visualizer
 
 			game->renderer->drawQuad(0.0f,0.0f,m_SplashScreen->width,m_SplashScreen->height);
 
-			game->renderer->setColor(Color(0.2f,1.0f,1.0f,1.0f));
+			game->renderer->setColor(Color(m_SplashScreen->color.r,m_SplashScreen->color.g,m_SplashScreen->color.b,1.0f));
 			game->renderer->drawText(m_SplashScreen->width / 2.0f,
 									 m_SplashScreen->height / 2.0f,
 									 "Roboto",

@@ -298,9 +298,15 @@ void Mars::preDraw()
 
 void Mars::postDraw()
 {
+	bool bTourneyMode = options->getNumber("Enable Tournament Mode");
+	int state = timeManager->getTurn();
+
 	drawObjectSelection();
 
 	renderer->pop();
+
+	if(state == m_game->states.size() - 2 && bTourneyMode)
+		timeManager->pause();
 }
 
 void Mars::drawGrid()
@@ -1151,8 +1157,7 @@ void Mars::run()
 
 	animationEngine->registerGame(0, 0);
 
-	const char* playerName = m_game->states[0].players[m_game->winner]->playerName;
-	SmartPointer<SplashScreen> splashScreen = new SplashScreen(m_game->winReason,playerName,
+	SmartPointer<SplashScreen> splashScreen = new SplashScreen(m_game->winReason,GetTeamColor(m_game->winner),
 															   m_game->mapWidth,
 															   m_game->mapHeight
 															   );
@@ -1172,7 +1177,7 @@ void Mars::run()
 
 		RenderWorld(state, pumpStationCounter, depthCounter, deathList, turn);
 
-		if(state >= (int)(m_game->states.size() - 1))
+		if(state >= (int)(m_game->states.size() - 2))
 		{
 			turn.addAnimatable(splashScreen);
 		}
