@@ -281,8 +281,8 @@ class Match(DefaultGameWorld):
           elif neighbor.pumpID != -1 and self.objects[neighbor.pumpID].owner in [0, 1]:
             closed.add(neighbor.pumpID)
             flowTiles.add(self.objects[neighbor.pumpID])
-          #if it has water or is dug
-          elif (neighbor.waterAmount == 1 or neighbor.depth > 0) and neighbor not in open:   
+          #if it is dug with water
+          elif (neighbor.waterAmount > 0 and neighbor.depth > 0) and neighbor not in open:
             open.append(neighbor)          
             
       #if enough water is in ice to flow to all tiles
