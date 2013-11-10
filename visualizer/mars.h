@@ -145,6 +145,8 @@ namespace visualizer
 
             glm::vec3 GetTeamColor(int) const;
 
+			bool IsTourneyMode() const;
+
 			bool IsWaterNearTilePos(int state, int xPos, int yPos) const;
 
             void BuildWorld();

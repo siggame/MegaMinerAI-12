@@ -296,16 +296,20 @@ void Mars::preDraw()
 // Handle player input here
 }
 
+bool Mars::IsTourneyMode() const
+{
+	return (options->getNumber("Enable Tournament Mode") > 0) && (options->getString( "Game Mode" ).compare( "arena" ) > 0);
+}
+
 void Mars::postDraw()
 {
-	bool bTourneyMode = options->getNumber("Enable Tournament Mode");
 	int state = timeManager->getTurn();
 
 	drawObjectSelection();
 
 	renderer->pop();
 
-	if(state == m_game->states.size() - 2 && bTourneyMode)
+	if(state == m_game->states.size() - 2 && IsTourneyMode())
 		timeManager->pause();
 }
 
@@ -1170,6 +1174,8 @@ void Mars::run()
 
 	m_renderTagState["glacier"] = true;
 
+	int turnOffset = IsTourneyMode() ? 2 : 1;
+
 	// Look through each turn in the gamelog
 	for(int state = 0; state < (int)m_game->states.size() && !m_suicide; state++)
 	{
@@ -1177,7 +1183,7 @@ void Mars::run()
 
 		RenderWorld(state, pumpStationCounter, depthCounter, deathList, turn);
 
-		if(state >= (int)(m_game->states.size() - 2))
+		if(state >= (int)(m_game->states.size() - turnOffset))
 		{
 			turn.addAnimatable(splashScreen);
 		}
